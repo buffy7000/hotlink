@@ -2099,16 +2099,16 @@ if (document.readyState === 'loading') {
   var closeBtn = document.getElementById('invenToastClose');
   var timer = null;
 
-  function hideToast() {
+  function hideToast(persist) {
     clearTimeout(timer);
     toast.classList.remove('show');
     toast.classList.add('hide');
-    localStorage.setItem(TOAST_KEY, '1');
+    if (persist) localStorage.setItem(TOAST_KEY, '1');
   }
 
   toast.addEventListener('click', function(e) {
     if (e.target === closeBtn) return;
-    hideToast();
+    hideToast(true);
     var invenNav = document.querySelector('.nav-item[data-community="inven"]');
     if (invenNav) {
       invenNav.click();
@@ -2118,12 +2118,12 @@ if (document.readyState === 'loading') {
 
   closeBtn.addEventListener('click', function(e) {
     e.stopPropagation();
-    hideToast();
+    hideToast(true);
   });
 
   setTimeout(function() {
     toast.classList.add('show');
-    timer = setTimeout(hideToast, 3000);
+    timer = setTimeout(function() { hideToast(false); }, 5000);
   }, 500);
 })();
 
