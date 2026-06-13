@@ -65,13 +65,8 @@ class InvenCrawler extends BaseCrawler {
 
         $xpath = new DOMXPath($dom);
 
-        // 실제 게시글 li만 선택: 이미지 포함 + 댓글링크 있음 + 앵커(#) 제외
-        $items = $xpath->query(
-            "//li[" .
-            ".//a[contains(@href, '/board/webzine/2097/') and not(contains(@href, '#')) and not(contains(@href, '?c=')) and .//img]" .
-            " and .//a[contains(@href, '?c=')]" .
-            "]"
-        );
+        // li.list.thumb 선택
+        $items = $xpath->query("//li[contains(@class,'list') and contains(@class,'thumb')]");
 
         if (!$items || $items->length == 0) {
             echo "게시글 리스트를 찾을 수 없습니다.\n";
@@ -111,72 +106,68 @@ class InvenCrawler extends BaseCrawler {
     }
 
     private function extractPost($item, $xpath, $rank) {
-        // 1. URL (이미지 포함 + 앵커 아님 + 댓글링크 아님)
-        $linkNode = $xpath->query(
-            ".//a[contains(@href, '/board/webzine/2097/') and not(contains(@href, '#')) and not(contains(@href, '?c=')) and .//img]",
-            $item
-        )->item(0);
+        // 1. URL (a.contentLink)
+        $linkNode = $xpath->query(".//a[contains(@class,'contentLink')]", $item)->item(0);
         if (!$linkNode) return null;
 
         $url = $linkNode->getAttribute('href');
         if (strpos($url, 'http') !== 0) {
             $url = $this->baseUrl . $url;
         }
-        // 페이지 파라미터 제거 (?p=2 등)
         $url = preg_replace('/\?.*$/', '', $url);
 
-        // 2. 썸네일
+        // 2. 썸네일 (a.img > img)
         $thumbnailUrl = null;
-        $imgNode = $xpath->query(".//img", $linkNode)->item(0);
+        $imgNode = $xpath->query(".//a[contains(@class,'img')]//img", $item)->item(0);
         if ($imgNode) {
-            $src = $imgNode->getAttribute('src');
-            if (!empty($src)) {
-                $thumbnailUrl = $src;
-            }
+            $thumbnailUrl = $imgNode->getAttribute('src');
         }
 
-        // 3. 제목 (span 텍스트, 앞의 카테고리 태그 제거)
-        $titleNode = $xpath->query(".//span", $linkNode)->item(0);
+        // 3. 제목 (span.subject)
+        $titleNode = $xpath->query(".//span[@class='subject']", $item)->item(0);
         $title = $titleNode ? trim($titleNode->textContent) : '';
-        // "계층 제목..." → 한글 1~5자 카테고리 접두어 제거
-        $title = preg_replace('/^[가-힣]{1,5}\s+/', '', $title);
 
-        // 4. 메타 div 파싱: "닉네임 Lv.숫자 조회 숫자 추천 숫자 시간"
-        $metaNode = $xpath->query(".//div", $item)->item(0);
-        $metaText = $metaNode ? trim($metaNode->textContent) : '';
-        $metaText = preg_replace('/\s+/', ' ', $metaText);
-
+        // 4. 작성자 (span.nick의 onclick에서 닉네임 추출)
         $author = '인벤';
-        $viewsCount = 0;
-        $likesCount = 0;
-        $createdAt = date('Y-m-d H:i:s');
-
-        if ($metaText) {
-            if (preg_match('/^(.+?)\s+Lv\.\d+/', $metaText, $m)) {
-                $author = trim($m[1]);
-            }
-            if (preg_match('/조회\s+(\d+)/', $metaText, $m)) {
-                $viewsCount = intval($m[1]);
-            }
-            if (preg_match('/추천\s+(\d+)/', $metaText, $m)) {
-                $likesCount = intval($m[1]);
-            }
-            // 시간: HH:MM 또는 YY.MM.DD
-            if (preg_match('/(\d{2}\.\d{2}\.\d{2})\s*$/', $metaText, $m)) {
-                $createdAt = '20' . str_replace('.', '-', $m[1]) . ' 00:00:00';
-            } elseif (preg_match('/(\d{1,2}:\d{2})\s*$/', $metaText, $m)) {
-                $createdAt = date('Y-m-d') . ' ' . str_pad($m[1], 5, '0', STR_PAD_LEFT) . ':00';
+        $nickNode = $xpath->query(".//span[@class='nick']", $item)->item(0);
+        if ($nickNode) {
+            $onclick = $nickNode->getAttribute('onclick');
+            if (preg_match("/layerNickName\('([^']+)'/", $onclick, $m)) {
+                $author = $m[1];
             }
         }
 
-        // 5. 댓글수 (?c= 포함 a 태그)
-        $commentsCount = 0;
-        $commentNode = $xpath->query(".//a[contains(@href, '?c=')]", $item)->item(0);
-        if ($commentNode) {
-            $commentText = trim($commentNode->textContent);
-            if (preg_match('/(\d+)/', $commentText, $m)) {
-                $commentsCount = intval($m[1]);
+        // 5. 조회수 (span.view → "조회 506")
+        $viewsCount = 0;
+        $viewNode = $xpath->query(".//span[@class='view']", $item)->item(0);
+        if ($viewNode && preg_match('/(\d+)/', $viewNode->textContent, $m)) {
+            $viewsCount = intval($m[1]);
+        }
+
+        // 6. 추천수 (span.reco → "추천 1")
+        $likesCount = 0;
+        $recoNode = $xpath->query(".//span[@class='reco']", $item)->item(0);
+        if ($recoNode && preg_match('/(\d+)/', $recoNode->textContent, $m)) {
+            $likesCount = intval($m[1]);
+        }
+
+        // 7. 시간 (span.time → "07:06" 또는 "25.06.14")
+        $createdAt = date('Y-m-d H:i:s');
+        $timeNode = $xpath->query(".//span[@class='time']", $item)->item(0);
+        if ($timeNode) {
+            $timeText = trim($timeNode->textContent);
+            if (preg_match('/^(\d{2})\.(\d{2})\.(\d{2})$/', $timeText, $m)) {
+                $createdAt = '20' . $m[1] . '-' . $m[2] . '-' . $m[3] . ' 00:00:00';
+            } elseif (preg_match('/^(\d{1,2}):(\d{2})$/', $timeText, $m)) {
+                $createdAt = date('Y-m-d') . ' ' . str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':' . $m[2] . ':00';
             }
+        }
+
+        // 8. 댓글수 (a.com-btn > span.num)
+        $commentsCount = 0;
+        $commentNode = $xpath->query(".//a[contains(@class,'com-btn')]//span[@class='num']", $item)->item(0);
+        if ($commentNode) {
+            $commentsCount = intval(trim($commentNode->textContent));
         }
 
         return [
