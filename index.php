@@ -1034,8 +1034,95 @@ function escapeOgContent($content) {
     width: 14px;
     height: 14px;
   }
-}    
-    
+}
+
+/* 인벤 토스트 알림 */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 9999;
+  max-width: 320px;
+  cursor: pointer;
+  border-left: 4px solid var(--inven-color);
+  transform: translateX(calc(100% + 32px));
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-notification.hide {
+  transform: translateX(calc(100% + 32px));
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.toast-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.toast-desc {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  color: #475569;
+}
+
+@media (max-width: 480px) {
+  .toast-notification {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+    transform: translateY(calc(100% + 32px));
+  }
+  .toast-notification.show {
+    transform: translateY(0);
+  }
+  .toast-notification.hide {
+    transform: translateY(calc(100% + 32px));
+  }
+}
+
   </style>
 
 </head>
@@ -1271,6 +1358,16 @@ function escapeOgContent($content) {
       <div>📌 [08/20] 더쿠 추가</div>
       <div>📌 [08/15] ① 목록개수 200개로 확대 ② 루리웹 추가</div>
     </div>
+  </div>
+
+  <!-- 인벤 추가 토스트 알림 -->
+  <div class="toast-notification" id="invenToast">
+    <div class="toast-icon">🎮</div>
+    <div class="toast-content">
+      <div class="toast-title">인벤이 추가됐어요!</div>
+      <div class="toast-desc">게임 인기글도 이제 핫링크에서 확인하세요</div>
+    </div>
+    <button class="toast-close" id="invenToastClose" aria-label="닫기">✕</button>
   </div>
 
   <!-- 리스트 컨테이너 -->
@@ -1992,6 +2089,43 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(init, 0);
 }
+
+// 인벤 추가 토스트
+(function() {
+  var TOAST_KEY = 'invenToastSeen';
+  if (localStorage.getItem(TOAST_KEY)) return;
+
+  var toast = document.getElementById('invenToast');
+  var closeBtn = document.getElementById('invenToastClose');
+  var timer = null;
+
+  function hideToast() {
+    clearTimeout(timer);
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    localStorage.setItem(TOAST_KEY, '1');
+  }
+
+  toast.addEventListener('click', function(e) {
+    if (e.target === closeBtn) return;
+    hideToast();
+    var invenNav = document.querySelector('.nav-item[data-community="inven"]');
+    if (invenNav) {
+      invenNav.click();
+      invenNav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  });
+
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    hideToast();
+  });
+
+  setTimeout(function() {
+    toast.classList.add('show');
+    timer = setTimeout(hideToast, 3000);
+  }, 500);
+})();
 
 
 })();
