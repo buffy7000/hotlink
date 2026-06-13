@@ -65,8 +65,13 @@ class InvenCrawler extends BaseCrawler {
 
         $xpath = new DOMXPath($dom);
 
-        // 게시글 본문 링크를 포함한 li 항목 선택
-        $items = $xpath->query("//li[.//a[contains(@href, '/board/webzine/2097/') and not(contains(@href, '?c='))]]");
+        // 실제 게시글 li만 선택: 이미지 포함 + 댓글링크 있음 + 앵커(#) 제외
+        $items = $xpath->query(
+            "//li[" .
+            ".//a[contains(@href, '/board/webzine/2097/') and not(contains(@href, '#')) and not(contains(@href, '?c=')) and .//img]" .
+            " and .//a[contains(@href, '?c=')]" .
+            "]"
+        );
 
         if (!$items || $items->length == 0) {
             echo "게시글 리스트를 찾을 수 없습니다.\n";
@@ -106,9 +111,9 @@ class InvenCrawler extends BaseCrawler {
     }
 
     private function extractPost($item, $xpath, $rank) {
-        // 1. URL (첫 번째 a - ?c= 없는 것)
+        // 1. URL (이미지 포함 + 앵커 아님 + 댓글링크 아님)
         $linkNode = $xpath->query(
-            ".//a[contains(@href, '/board/webzine/2097/') and not(contains(@href, '?c='))]",
+            ".//a[contains(@href, '/board/webzine/2097/') and not(contains(@href, '#')) and not(contains(@href, '?c=')) and .//img]",
             $item
         )->item(0);
         if (!$linkNode) return null;
@@ -117,6 +122,8 @@ class InvenCrawler extends BaseCrawler {
         if (strpos($url, 'http') !== 0) {
             $url = $this->baseUrl . $url;
         }
+        // 페이지 파라미터 제거 (?p=2 등)
+        $url = preg_replace('/\?.*$/', '', $url);
 
         // 2. 썸네일
         $thumbnailUrl = null;
