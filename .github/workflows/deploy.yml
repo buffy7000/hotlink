@@ -21,8 +21,10 @@ jobs:
           password: ${{ secrets.FTP_PASS }}
           local-dir: ./
           server-dir: /hotlink.kr/
+          protocol: ftps
+          port: 21
           exclude: |
             .github/**
             README.md
             .git/**
-            stocks/** 
+            stocks/**
