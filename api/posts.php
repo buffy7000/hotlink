@@ -145,7 +145,8 @@ try {
             'mlbpark' => 6,
             'bobaedream' => 7,
             'humoruniv' => 8,
-            'todayhumor' => 9
+            'todayhumor' => 9,
+            'inven' => 10
         ];
         
         $communityIds = [];
@@ -213,7 +214,8 @@ try {
             6 => 'mlbpark',
             7 => 'bobaedream',
             8 => 'humoruniv',
-            9 => 'todayhumor'
+            9 => 'todayhumor',
+            10 => 'inven'
         ];
         
         $formattedData[] = [
