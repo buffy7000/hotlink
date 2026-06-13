@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7QB3K9SQQH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7QB3K9SQQH');
+</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>핫링크-커뮤니티 인기글</title>
+  <meta name="description" content="클리앙, 루리웹, 뽐뿌 등 주요 커뮤니티 인기글을 한 곳에서 확인하세요">
+  <meta name="keywords" content="커뮤니티 인기글, 클리앙, 루리웹, 뽐뿌, 네이트판, 오유, 보배드림">
+  
+  <!-- Open Graph 태그 -->
+    <meta property="og:title" content="핫링크-커뮤니티 인기글">
+    <meta property="og:description" content="클리앙, 루리웹, 뽐뿌 등 주요 커뮤니티 인기글을 한 곳에서 확인하세요">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hotlink.kr">
+    <meta property="og:site_name" content="핫링크">
+    <meta property="og:locale" content="ko_KR">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg-color: #ffffff;
+      --text-color: #1e293b;
+      --muted-text-color: #64748b;
+      --border-color: #e2e8f0;
+      --primary-color: #3b82f6;
+      --secondary-color: #6b7280;
+      
+      /* 커뮤니티별 브랜드 색상 */
+      --ppomppu-color: #D7D7D7;
+      --clien-color: #374373;
+      --natepann-color: #be185d;
+      --ruliweb-color: #1A70DC;
+      --theqoo-color: #344A65;
+      --mlbpark-color: #7c3aed;
+      --bobaedream-color: #0ea5e9;  /* 스카이블루 */
+      --humoruniv-color: #f59e0b;   /* 주황색 */
+      --todayhumor-color: #d97706;
+      
+      
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f172a;
+        --card-bg-color: #1e293b;
+        --text-color: #f1f5f9;
+        --muted-text-color: #94a3b8;
+        --border-color: #334155;
+      }
+        /* 드롭다운 메뉴 다크모드 배경 */
+        .time-dropdown-menu {
+        background: #1e293b;    /* 어두운 배경으로 변경 */
+        }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* 커뮤니티 선택 영역 (최상단) */
+    .community-section {
+      margin-bottom: 12px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      opacity: 0.8;
+    }
+
+    .community-controls {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 2px;
+    }
+
+    .community-btn {
+      flex-shrink: 0;
+      background: #EBEBEB; 
+      color: #979696; 
+      border: 1px solid var(--border-color); 
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .community-btn:hover {
+      background: #f8fafc; 
+      transform: translateY(-1px);
+    }
+
+    .community-btn.active {
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      background: var(--primary-color);
+    }
+
+    /* 정렬/시간 선택 영역 (구분된 영역) */
+    .filter-section {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .filter-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* 정렬 옵션 (왼쪽) */
+    .sort-controls {
+      display: flex;
+      gap: 0px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      border-radius: 6px;        /* 이 줄 추가 */
+      overflow: hidden;          /* 이 줄 추가 */
+    }
+    .sort-controls::-webkit-scrollbar { display: none; }
+
+    /* 시간 드롭다운 (오른쪽) */
+    .time-dropdown {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .time-selector {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      padding-right: 28px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      position: relative;
+      min-width: 80px;
+      -webkit-tap-highlight-color: transparent;  /* 추가 */
+      touch-action: manipulation;                /* 추가 */
+    }
+
+    .time-selector-native {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      padding-right: 28px;                    /* 화살표 공간 확보 */
+      font-size: 13px;
+      cursor: pointer;
+      min-width: 80px;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      outline: none;                          /* 테두리 제거 */
+      -webkit-tap-highlight-color: transparent; /* 터치 하이라이트 제거 */
+      
+      /* 화살표 추가 */
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+    }
+    
+    /* 포커스 상태에서도 테두리 제거 */
+    .time-selector-native:focus {
+      outline: none;
+      border: 1px solid rgba(255,255,255,0.5); /* 살짝 밝게만 */
+      box-shadow: none;
+    }
+    
+    
+    /* 다크모드에서 select 스타일 */
+    @media (prefers-color-scheme: dark) {
+      .time-selector-native {
+        background: rgba(255,255,255,0.2) !important;
+        color: rgba(255,255,255,0.8) !important;
+        outline: none !important;
+      }
+      
+      .time-selector-native:focus {
+        outline: none !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+      }
+      
+      .time-selector-native option {
+        background: #1e293b;
+        color: #f1f5f9;
+      }
+    }
+
+
+    .time-selector:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .time-selector::after {
+      content: '▼';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      transition: transform 0.2s;
+    }
+
+    .time-selector.open::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .time-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 4px;
+      min-width: 120px;
+      display: none;
+      z-index: 200;
+    }
+
+    .time-dropdown-menu.show {
+      display: block;
+      animation: fadeInDown 0.2s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .time-option {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-color);
+      text-align: left;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .time-option:hover {
+      background: var(--bg-color);
+    }
+
+    .time-option.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* 컨트롤 버튼 */
+    .control-btn {
+  flex-shrink: 0;
+  background: white; 
+  color: 1e293b; 
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 0;          /* 이 줄 추가 */
+  border-left: none;         /* 이 줄 추가 */
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+}
+
+/* 첫 번째 버튼 */
+.control-btn:first-child {
+  border-radius: 10px 0 0 10px;  /* 이 줄 추가 - 왼쪽만 둥글게 */
+  border-left: 1px solid rgba(255,255,255,0.3);
+}
+
+/* 마지막 버튼 */
+.control-btn:last-child {
+  border-radius: 0 10px 10px 0;  /* 오른쪽만 둥글게 */
+  border-right: 1px solid rgba(255,255,255,0.3);  /* 오른쪽 테두리 복원 */
+}
+
+.control-btn:hover {
+  background: var(--primary-color); 
+  color: white;   
+  z-index: 1;                 /* 호버 시 위로 */
+  position: relative;
+}
+
+.control-btn.active {
+  background: var(--primary-color);
+  color: white;
+  z-index: 1;
+  position: relative;
+}
+
+
+    .control-btn:hover {
+      background: var(--primary-color); 
+      color: white;   
+      transform: translateY(-1px);
+    }
+
+    .control-btn.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* 리스트 컨테이너 */
+    .list-container {
+      background: var(--card-bg-color);
+      min-height: calc(100vh - 160px);
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.15s ease;
+      cursor: pointer;
+      text-decoration: none;  /* 추가 */
+      color: inherit;         /* 추가 */
+    }
+
+    .list-item:hover {
+      background-color: var(--bg-color);
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .rank-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      font-weight: 700;
+      font-size: 16px;
+      color: white;
+      border-radius: 8px;
+      margin-right: 12px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .rank-number[data-community="ppomppu"] {
+      background: linear-gradient(135deg, var(--ppomppu-color), #BFBFBF);
+      box-shadow: 0 2px 8px rgba(215, 215, 215, 0.3);
+    }
+    .rank-number[data-community="clien"] {
+    background: linear-gradient(135deg, var(--clien-color), #374373);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    }
+    .rank-number[data-community="natepann"] {
+      background: linear-gradient(135deg, var(--natepann-color), #9f1239);
+      box-shadow: 0 2px 8px rgba(190, 24, 93, 0.2);
+    }
+    .rank-number[data-community="ruliweb"] {
+      background: linear-gradient(135deg, var(--ruliweb-color), #1560BD);
+      box-shadow: 0 2px 8px rgba(26, 112, 220, 0.2);
+    }
+    .rank-number[data-community="theqoo"] {
+      background: linear-gradient(135deg, var(--theqoo-color), #2c3e50);
+      box-shadow: 0 2px 8px rgba(52, 74, 101, 0.2);
+    }
+    .rank-number[data-community="mlbpark"] {
+      background: linear-gradient(135deg, var(--mlbpark-color), #6d28d9);
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+    }
+    .rank-number[data-community="bobaedream"] {
+      background: linear-gradient(135deg, var(--bobaedream-color), #0284c7);
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+    }
+    
+    .rank-number[data-community="humoruniv"] {
+      background: linear-gradient(135deg, var(--humoruniv-color), #d97706);
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+    .rank-number[data-community="todayhumor"] {
+      background: linear-gradient(135deg, var(--todayhumor-color), #b45309);
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+    }
+
+    .rank-number.rank-1::after {
+      content: '👑';
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      font-size: 12px;
+    }
+    .rank-number.rank-2::after {
+      content: '🥈';
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      font-size: 10px;
+    }
+    .rank-number.rank-3::after {
+      content: '🥉';
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      font-size: 10px;
+    }
+
+    .item-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .source-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .source-label[data-community="ppomppu"] { background: var(--ppomppu-color); }
+    .source-label[data-community="clien"] { background: var(--clien-color); }
+    .source-label[data-community="natepann"] { background: var(--natepann-color); }
+    .source-label[data-community="ruliweb"] { background: var(--ruliweb-color); }
+    .source-label[data-community="theqoo"] { background: var(--theqoo-color); }
+    .source-label[data-community="mlbpark"] { background: var(--mlbpark-color); }
+    .source-label[data-community="bobaedream"] { background: var(--bobaedream-color); }
+    .source-label[data-community="humoruniv"] { background: var(--humoruniv-color); }
+    .source-label[data-community="todayhumor"] { background: var(--todayhumor-color); }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.3;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+        display: flex;              /* 추가 */
+  align-items: baseline;      /* 추가 */
+  gap: 4px;                   /* 추가 */
+    }
+
+/* 방문한 링크만 회색으로 표시 */
+a.list-item:visited .item-title {
+  color: #BBBBBB !important;
+  opacity: 0.8 !important;
+}
+
+/* 다크모드에서 방문한 링크 */
+@media (prefers-color-scheme: dark) {
+  a.list-item:visited .item-title {
+    color: #a0aec0 !important;
+  }
+}
+
+
+    .comments-count {
+      flex-shrink: 0;
+      font-size: 13px;
+      color: var(--muted-text-color);
+      font-weight: 600;
+      white-space: nowrap;      
+    }
+
+    .item-meta {
+      font-size: 12px;
+      color: var(--muted-text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* 시간 이모티콘 색상을 조회수와 동일하게 */
+    .meta-item .time-icon {
+      color: var(--muted-text-color);
+    }
+    
+    /* 더 구체적인 시간 아이콘 색상 지정 */
+.item-meta .meta-item .time-icon {
+  color: var(--muted-text-color) !important;
+}
+
+    .item-extra {
+      flex-shrink: 0;
+      width: 80px;
+      margin-left: 12px;
+      text-align: right;
+      font-size: 11px;
+      color: var(--muted-text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    @media (max-width: 480px) {
+      .filter-controls {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .sort-controls {
+           flex: 1;
+        justify-content: center;
+      }
+
+      .time-dropdown {
+        flex-shrink: 0;            /* 추가: 크기 고정 */
+      }
+
+      .community-controls {
+        gap: 4px;
+      }
+
+      .community-btn {
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+
+      .list-item {
+        padding: 10px 12px;
+      }
+      
+      .rank-number {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        margin-right: 10px;
+      }
+      
+      .source-label {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+      
+      .item-title {
+        font-size: 14px;
+        
+      .control-btn {              /* 이 부분을 추가 */
+    font-size: 11px;
+    padding: 5px 8px;
+    
+      }
+    }
+    
+    
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--muted-text-color);
+    }
+
+    .hidden { display: none !important; }
+
+    /* 드롭다운 외부 클릭 감지를 위한 오버레이 */
+    .dropdown-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 150;
+      display: none;
+    }
+
+    .dropdown-overlay.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🏆핫링크 - 커뮤니티 인기글</h1>
+    
+    <!-- 1. 커뮤니티 선택 (최상단) -->
+    <div class="community-section">
+      <div class="section-label">커뮤니티 선택</div>
+      <div class="community-controls">
+        <button class="community-btn active" data-community="all">전체</button>
+        <button class="community-btn active" data-community="ppomppu">뽐뿌</button>
+        <button class="community-btn active" data-community="clien">클리앙</button>
+        <button class="community-btn active" data-community="natepann">네이트판</button>
+        <button class="community-btn active" data-community="ruliweb">루리웹</button>
+        <button class="community-btn active" data-community="theqoo">더쿠</button>
+        <button class="community-btn active" data-community="mlbpark">엠팍</button>
+        <button class="community-btn active" data-community="bobaedream">보배드림</button>
+        <button class="community-btn active" data-community="humoruniv">웃대</button>
+        <button class="community-btn active" data-community="todayhumor">오유</button>
+      </div>
+    </div>
+
+    <!-- 2. 정렬/시간 선택 (구분된 영역) -->
+    <div class="filter-section">
+      <div class="filter-controls">
+        <!-- 정렬 옵션 (왼쪽) -->
+        <div class="sort-controls">
+          <button class="control-btn active" data-sort="hot">🔥 인기</button>
+          <button class="control-btn" data-sort="latest">📅 최신</button>
+          <button class="control-btn" data-sort="comments">💬 댓글</button>
+          <button class="control-btn" data-sort="views">👁 조회</button>
+        </div>
+        
+        <!-- 시간 드롭다운 (오른쪽) -->
+        <div class="time-dropdown">
+          <select class="time-selector-native" id="timeSelect">
+            <option value="3h">3시간</option>
+            <option value="6h">6시간</option>
+            <option value="12h">12시간</option>
+            <option value="24h" selected>24시간</option>
+            <option value="3d">3일</option>
+          </select>
+        </div>
+        </div>
+      </div>
+          </div>
+      
+
+
+  </div>
+
+  <!-- 드롭다운 오버레이 -->
+  <div class="dropdown-overlay" id="dropdownOverlay" onclick="closeTimeDropdown()"></div>
+
+    <!--️ 여기로 배너 이동 (목록 바로 위) -->
+    <div id="topBanner" style="
+      background: linear-gradient(90deg, rgba(139,92,246,0.9) 0%, rgba(124,58,237,0.9) 50%, rgba(109,40,217,0.9) 100%);
+      color: white;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      max-width: 800px;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    " onclick="toggleBanner()">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="firstLine">📢 [08/24] 크롤링 시간 수정(루리웹, 더쿠, 엠팍, 보배드림, 웃대, 오유)</span>
+        <span id="toggleIcon" style="font-size: 10px;">▼</span>
+      </div>
+      <div id="bannerContent" style="
+        display: none;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+      ">
+        <div>📌 [08/21] 엠팍/보배드림/웃대/오유 추가</div>          
+        <div>📌 [08/20] 더쿠 추가</div>
+        <div>📌 [08/15] ① 목록개수 200개로 확대 ② 루리웹 추가</div>
+      </div>
+    </div>
+
+
+
+
+
+  <div class="list-container">
+    <div id="list">
+      <div class="loading">데이터를 불러오는 중...</div>
+    </div>
+  </div>
+
+
+  <script>
+    (function() {
+      'use strict';
+      
+      var listEl = document.getElementById('list');
+      var currentSettings = {
+        time: '24h',
+        sort: 'hot',
+        communities: ['all', 'ppomppu', 'clien', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor']
+      };
+
+      var timeLabels = {
+        '3h': '3시간',
+        '6h': '6시간',
+        '12h': '12시간',
+        '24h': '24시간',
+        '3d': '3일',
+        '1w': '1주일'
+      };
+
+    // 배너 토글 함수 추가
+    window.toggleBanner = function() {
+      var content = document.getElementById('bannerContent');
+      var icon = document.getElementById('toggleIcon');
+      var firstLine = document.getElementById('firstLine');
+      
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.textContent = '▲';
+        // 펼쳤을 때는 첫 줄 텍스트 유지 또는 변경 가능
+        localStorage.setItem('bannerExpanded', 'true');
+      } else {
+        content.style.display = 'none';
+        icon.textContent = '▼';
+        // 접었을 때도 첫 줄 텍스트 유지
+        localStorage.setItem('bannerExpanded', 'false');
+      }
+    };
+
+
+
+// 네이티브 select 이벤트 리스너
+document.addEventListener('DOMContentLoaded', function() {
+  var timeSelect = document.getElementById('timeSelect');
+  if (timeSelect) {
+    timeSelect.addEventListener('change', function(e) {
+      var timeValue = e.target.value;
+      currentSettings.time = timeValue;
+      saveSettings(); // 여기에 추가
+      renderList();
+      console.log('시간 변경:', timeValue);
+    });
+  }
+});
+
+
+    
+
+      // 정렬 버튼 클릭
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('control-btn') && e.target.dataset.sort) {
+          var sortValue = e.target.dataset.sort;
+          
+          // 활성 상태 업데이트
+          document.querySelectorAll('.control-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+          });
+          e.target.classList.add('active');
+          
+          // 설정 업데이트
+          currentSettings.sort = sortValue;
+          saveSettings(); // 여기에 추가
+          
+          // 리스트 업데이트
+          renderList();
+          
+          console.log('정렬 변경:', sortValue);
+        }
+      });
+
+      // 커뮤니티 버튼 클릭 (멀티 선택)
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('community-btn')) {
+          var communityValue = e.target.dataset.community;
+          
+         if (communityValue === 'all') {
+  // "전체" 버튼 클릭 시
+  var allActive = e.target.classList.contains('active');
+  var buttons = document.querySelectorAll('.community-btn');
+  
+  if (allActive) {
+    // 전체가 활성화되어 있으면 모두 비활성화
+    buttons.forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    currentSettings.communities = [];
+    listEl.innerHTML = '<div class="loading">보고 싶은 커뮤니티를 선택해주세요.</div>';
+  } else {
+    // 전체가 비활성화되어 있으면 모두 활성화
+    buttons.forEach(function(btn) {
+      btn.classList.add('active');
+    });
+    currentSettings.communities = ['all', 'clien', 'ppomppu', 'theqoo', 'ruliweb', 'natepann', 'todayhumor', 'mlbpark', 'slrclub'];
+    renderList(); // 데이터 다시 로드
+  }
+  return;
+}
+
+
+          
+            else {
+            // 개별 커뮤니티 버튼 클릭 시
+            var isActive = e.target.classList.contains('active');
+            
+            if (isActive) {
+              // 활성화되어 있으면 비활성화
+              e.target.classList.remove('active');
+              var index = currentSettings.communities.indexOf(communityValue);
+              if (index > -1) {
+                currentSettings.communities.splice(index, 1);
+              }
+              // "전체"도 비활성화
+              document.querySelector('.community-btn[data-community="all"]').classList.remove('active');
+              var allIndex = currentSettings.communities.indexOf('all');
+              if (allIndex > -1) {
+                currentSettings.communities.splice(allIndex, 1);
+              }
+            } else {
+              // 비활성화되어 있으면 활성화
+              e.target.classList.add('active');
+              if (currentSettings.communities.indexOf(communityValue) === -1) {
+                currentSettings.communities.push(communityValue);
+              }
+            }
+            
+            // 모든 개별 커뮤니티가 선택되어 있으면 "전체"도 활성화
+           // 배열을 여러 줄로 나누면 오류 찾기 쉬움
+            var individualCommunities = [
+                'ppomppu',
+                'clien',
+                'natepann',
+                'ruliweb',
+                'theqoo',
+                'mlbpark',
+                'bobaedream',
+                'humoruniv',
+                'todayhumor'
+            ];
+            
+            var allIndividualSelected = individualCommunities.every(function(comm) {
+                return currentSettings.communities.indexOf(comm) > -1;
+            });
+            
+            if (allIndividualSelected && currentSettings.communities.indexOf('all') === -1) {
+              document.querySelector('.community-btn[data-community="all"]').classList.add('active');
+              currentSettings.communities.push('all');
+            }
+          }
+          
+          // 아무것도 선택되지 않았으면 전체 활성화
+          if (currentSettings.communities.length === 0) {
+            document.querySelectorAll('.community-btn').forEach(function(btn) {
+              btn.classList.add('active');
+            });
+            currentSettings.communities = ['all', 'clien', 'ppomppu', 'theqoo', 'ruliweb', 'natepann', 'todayhumor', 'mlbpark', 'slrclub'];
+          }
+          
+          // 리스트 업데이트
+          renderList();
+          saveSettings(); // 여기에 추가
+
+          
+          console.log('커뮤니티 선택 변경:', currentSettings.communities);
+        }
+      });
+
+      
+
+        // 간단한 설정 저장
+        function saveSettings() {
+          localStorage.setItem('userSettings', JSON.stringify(currentSettings));
+        }
+
+      var mirrorData = []; // 빈 배열로 초기화
+
+      function formatNumber(num) {
+          if (num >= 10000) return Math.floor(num / 1000) + 'k';
+          if (num >= 1000) return (num / 1000).toFixed(1).replace('.0', '') + 'k';
+          return String(num); // 쉼표 제거, 숫자 그대로 표시
+        }
+
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, function(s) {
+          return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s]);
+        });
+      }
+
+      function getRankClass(rank) {
+        if (rank === 1) return 'rank-1';
+        if (rank === 2) return 'rank-2';
+        if (rank === 3) return 'rank-3';
+        return '';
+      }
+
+// API 데이터 로드 함수 추가
+function loadDataFromAPI() {
+  var communities = currentSettings.communities.indexOf('all') !== -1 ? 'all' : currentSettings.communities.join(',');
+  var url = '/api/posts.php?communities=' + communities + '&sort=' + currentSettings.sort + '&time=' + currentSettings.time;
+  
+  fetch(url)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
+      if (result.success) {
+        mirrorData = result.data;
+        renderOriginalList();
+      } else {
+        throw new Error(result.error || '데이터 로드 실패');
+      }
+    })
+    .catch(function(error) {
+      console.error('API 호출 실패:', error);
+      listEl.innerHTML = '<div class="loading">데이터 로딩에 실패했습니다.</div>';
+    });
+}
+
+
+
+
+    function renderOriginalList() {
+        if (!mirrorData || mirrorData.length === 0) {
+          listEl.innerHTML = '<div class="loading">데이터가 없습니다.</div>';
+          return;
+        }
+        
+        var filteredData = mirrorData;
+        
+        // 커뮤니티 필터링 (멀티 선택)
+    if (currentSettings.communities.indexOf('all') === -1) {
+        filteredData = mirrorData.filter(function(item) {
+        return currentSettings.communities.indexOf(item.site) > -1;  // item.site 사용
+        });
+    }
+        
+
+        
+
+        
+        var html = '';
+        
+       for (var i = 0; i < filteredData.length; i++) {
+  var item = filteredData[i];
+// API 데이터의 site 필드를 사용
+var siteMapping = {
+  'ppomppu': { key: 'ppomppu', name: '뽐뿌', shortName: '뽐뿌' },
+  'clien': { key: 'clien', name: '클리앙', shortName: '클리앙' },
+  'natepann': { key: 'natepann', name: '네이트판', shortName: '네이트판' }, 
+  'ruliweb': { key: 'ruliweb', name: '루리웹', shortName: '루리웹' }, 
+  'theqoo': { key: 'theqoo', name: '더쿠', shortName: '더쿠' },
+  'mlbpark': { key: 'mlbpark', name: '엠팍', shortName: '엠팍' },
+  'bobaedream': { key: 'bobaedream', name: '보배드림', shortName: '보배드림' },
+  'humoruniv': { key: 'humoruniv', name: '웃긴대학', shortName: '웃대' },
+  'todayhumor': { key: 'todayhumor', name: '오늘의유머', shortName: '오유' }
+};
+
+var communityInfo = siteMapping[item.site] || { 
+  key: 'clien', name: '클리앙', shortName: '클리앙'
+};
+
+  var displayRank = i + 1;  // 정렬된 순서대로 1, 2, 3...
+  var rankClass = getRankClass(displayRank);  // displayRank 사용
+  var commentsHtml = (item.comments !== null && item.comments !== undefined) ? 
+    '(' + formatNumber(item.comments) + ')' : '';
+
+html += '<a href="' + item.originalUrl + '" class="list-item" data-id="' + item.id + '">' +
+    '<div class="rank-number ' + rankClass + '" data-community="' + communityInfo.key + '">' + displayRank + '</div>' +
+
+       
+
+    '<div class="item-content">' + 
+    '<div class="title-row">' +
+  '<div class="item-title">' + escapeHtml(item.title) + 
+    (commentsHtml ? ' <span class="comments-count">' + commentsHtml + '</span>' : '') +
+  '</div>' +
+'</div>' +
+'<div class="item-meta">' +
+  '<div class="source-label" data-community="' + communityInfo.key + '">' +  // ← 여기로 이동됨
+    '<span>' + communityInfo.shortName + '</span>' +
+  '</div>' +
+  '<span class="meta-item"><span class="time-icon">⏰</span>' + item.timeAgo + '</span>' +
+  '<span class="meta-item">👁&nbsp;<span class="view-number">' + formatNumber(item.views) + '</span></span>' +
+  '<span class="meta-item">👤 ' + escapeHtml(item.author) + '</span>' +
+'</div>'
+
+    
+    +
+  '</div>' +
+'</a>';
+
+        }
+        
+        listEl.innerHTML = html;
+      }
+    
+          // 여기에 새로운 renderList 함수 추가
+      function renderList() {
+        loadDataFromAPI();
+      }
+
+      function init() {
+  // 저장된 설정 로드
+  var saved = localStorage.getItem('userSettings');
+  if (saved) {
+    currentSettings = JSON.parse(saved);
+    
+    // UI에 반영
+    document.getElementById('timeSelect').value = currentSettings.time;
+    
+    // 모든 정렬 버튼 비활성화 후 선택된 것만 활성화
+    document.querySelectorAll('.control-btn').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    document.querySelector('.control-btn[data-sort="' + currentSettings.sort + '"]').classList.add('active');
+
+
+
+    // 커뮤니티 버튼들도 저장된 상태로 복원
+    document.querySelectorAll('.community-btn').forEach(function(btn) {
+      if (currentSettings.communities.includes(btn.dataset.community)) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+  
+  renderList();
+}
+
+      
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        setTimeout(init, 0);
+      }
+      
+    })();
+    
+    
+    
+  </script>
+</body>
+</html>

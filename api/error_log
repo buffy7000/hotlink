@@ -1,0 +1,60 @@
+[15-Sep-2025 12:10:08 Asia/Tokyo] PHP Notice:  Undefined variable: pdo in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:10:08 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/pricetag/hotlink.kr/api/hotdeals.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:10:52 Asia/Tokyo] PHP Notice:  Undefined variable: pdo in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:10:52 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/pricetag/hotlink.kr/api/hotdeals.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:13:07 Asia/Tokyo] PHP Notice:  Undefined variable: pdo in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:13:07 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/pricetag/hotlink.kr/api/hotdeals.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:14:25 Asia/Tokyo] PHP Notice:  Undefined variable: pdo in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[15-Sep-2025 12:14:25 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/pricetag/hotlink.kr/api/hotdeals.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/hotdeals.php on line 38
+[02-Dec-2025 17:03:04 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/../SimpleEventDB.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:03:04 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/../SimpleEventDB.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:09:17 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:09:17 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:09:20 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:09:20 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:10:25 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:10:25 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:10:36 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:10:36 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:12:16 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/../config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:12:16 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/../config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:12:18 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/../config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:12:18 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/../config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:14:21 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/api/../config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4
+[02-Dec-2025 17:14:21 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/api/../config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/api/mvno_events.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/api/mvno_events.php on line 4

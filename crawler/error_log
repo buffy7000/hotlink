@@ -1,0 +1,138 @@
+[11-Aug-2025 17:16:25 Asia/Tokyo] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function BaseCrawler::__construct(), 0 passed in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 9 and exactly 2 expected in /home/pricetag/highincome.kr/hotpost/crawler/BaseCrawler.php:16
+Stack trace:
+#0 /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php(9): BaseCrawler->__construct()
+#1 {main}
+  thrown in /home/pricetag/highincome.kr/hotpost/crawler/BaseCrawler.php on line 16
+[11-Aug-2025 17:16:34 Asia/Tokyo] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function BaseCrawler::__construct(), 0 passed in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 9 and exactly 2 expected in /home/pricetag/highincome.kr/hotpost/crawler/BaseCrawler.php:16
+Stack trace:
+#0 /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php(9): BaseCrawler->__construct()
+#1 {main}
+  thrown in /home/pricetag/highincome.kr/hotpost/crawler/BaseCrawler.php on line 16
+[11-Aug-2025 17:19:03 Asia/Tokyo] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function BaseCrawler::__construct(), 0 passed in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 9 and exactly 2 expected in /home/pricetag/highincome.kr/hotpost/crawler/BaseCrawler.php:16
+Stack trace:
+#0 /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php(9): BaseCrawler->__construct()
+#1 {main}
+  thrown in /home/pricetag/highincome.kr/hotpost/crawler/BaseCrawler.php on line 16
+[11-Aug-2025 17:57:36 Asia/Tokyo] PHP Warning:  require_once(config.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 85
+[11-Aug-2025 17:57:36 Asia/Tokyo] PHP Fatal error:  require_once(): Failed opening required 'config.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 85
+[11-Aug-2025 18:00:17 Asia/Tokyo] PHP Warning:  require_once(config.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 69
+[11-Aug-2025 18:00:17 Asia/Tokyo] PHP Fatal error:  require_once(): Failed opening required 'config.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 69
+[11-Aug-2025 18:02:22 Asia/Tokyo] PHP Warning:  require_once(config.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 65
+[11-Aug-2025 18:02:22 Asia/Tokyo] PHP Fatal error:  require_once(): Failed opening required 'config.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 65
+[11-Aug-2025 18:03:38 Asia/Tokyo] PHP Notice:  Trying to access array offset on value of type bool in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 96
+[11-Aug-2025 18:03:38 Asia/Tokyo] PHP Notice:  Trying to access array offset on value of type bool in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 96
+[11-Aug-2025 18:03:38 Asia/Tokyo] PHP Notice:  Trying to access array offset on value of type bool in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 96
+[11-Aug-2025 18:03:38 Asia/Tokyo] PHP Notice:  Trying to access array offset on value of type bool in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 97
+[11-Aug-2025 18:03:38 Asia/Tokyo] PHP Notice:  Trying to access array offset on value of type bool in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 98
+[11-Aug-2025 18:25:05 Asia/Tokyo] PHP Warning:  require_once(config.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 69
+[11-Aug-2025 18:25:05 Asia/Tokyo] PHP Fatal error:  require_once(): Failed opening required 'config.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php on line 69
+[12-Aug-2025 12:03:11 Asia/Tokyo] PHP Fatal error:  Class ClienCrawler contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (BaseCrawler::crawlHotPosts) in /home/pricetag/highincome.kr/hotpost/crawler/ClienCrawler.php on line 4
+[12-Aug-2025 18:00:05 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[12-Aug-2025 18:00:05 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[12-Aug-2025 18:00:05 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[12-Aug-2025 18:00:05 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[12-Aug-2025 20:00:05 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[12-Aug-2025 20:00:05 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[12-Aug-2025 20:00:05 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[12-Aug-2025 20:00:05 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[12-Aug-2025 22:00:02 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[12-Aug-2025 22:00:02 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[12-Aug-2025 22:00:02 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[12-Aug-2025 22:00:02 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 00:00:02 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 00:00:02 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 00:00:02 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 00:00:02 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 02:00:03 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 02:00:03 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 02:00:03 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 02:00:03 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 04:00:04 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 04:00:04 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 04:00:04 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 04:00:04 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 06:00:03 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 06:00:03 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 06:00:03 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 06:00:03 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 08:00:02 Asia/Tokyo] PHP Warning:  include(ppomppu_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 08:00:02 Asia/Tokyo] PHP Warning:  include(): Failed opening 'ppomppu_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 22
+[13-Aug-2025 08:00:02 Asia/Tokyo] PHP Warning:  include(clien_crawler.php): failed to open stream: No such file or directory in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 08:00:02 Asia/Tokyo] PHP Warning:  include(): Failed opening 'clien_crawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/highincome.kr/hotpost/crawler/run_crawler.php on line 26
+[13-Aug-2025 10:11:29 Asia/Tokyo] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php:168) in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler_clien.php on line 3
+[14-Aug-2025 20:21:50 Asia/Tokyo] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/pricetag/highincome.kr/hotpost/crawler/test_crawler.php:174) in /home/pricetag/highincome.kr/hotpost/crawler/test_crawler_clien.php on line 3
+[15-Aug-2025 08:56:28 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'catch' (T_CATCH), expecting function (T_FUNCTION) or const (T_CONST) in /home/pricetag/hotlink.kr/crawler/test_crawler_ruriweb.php on line 66
+[15-Aug-2025 08:56:33 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'catch' (T_CATCH), expecting function (T_FUNCTION) or const (T_CONST) in /home/pricetag/hotlink.kr/crawler/test_crawler_ruriweb.php on line 66
+[15-Aug-2025 08:56:45 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'catch' (T_CATCH), expecting function (T_FUNCTION) or const (T_CONST) in /home/pricetag/hotlink.kr/crawler/test_crawler_ruriweb.php on line 66
+[15-Aug-2025 08:58:02 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'public' (T_PUBLIC) in /home/pricetag/hotlink.kr/crawler/test_crawler_ruriweb.php on line 46
+[15-Aug-2025 08:58:05 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'public' (T_PUBLIC) in /home/pricetag/hotlink.kr/crawler/test_crawler_ruriweb.php on line 46
+[21-Aug-2025 16:23:34 Asia/Tokyo] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/pricetag/hotlink.kr/crawler/test_crawler.php:169) in /home/pricetag/hotlink.kr/crawler/test_crawler_clien.php on line 3
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:42 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[21-Aug-2025 16:24:45 Asia/Tokyo] PHP Notice:  Undefined index: ranking in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 109
+[21-Aug-2025 16:24:45 Asia/Tokyo] PHP Notice:  Undefined index: board_type in /home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php on line 112
+[24-Aug-2025 07:41:27 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'private' (T_PRIVATE) in /home/pricetag/hotlink.kr/crawler/test_crawler_bobaedream.php on line 240
+[24-Aug-2025 07:41:32 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'private' (T_PRIVATE) in /home/pricetag/hotlink.kr/crawler/test_crawler_bobaedream.php on line 240
+[24-Aug-2025 07:41:34 Asia/Tokyo] PHP Parse error:  syntax error, unexpected 'private' (T_PRIVATE) in /home/pricetag/hotlink.kr/crawler/test_crawler_bobaedream.php on line 240
+[12-Sep-2025 16:03:54 Asia/Tokyo] PHP Warning:  include(/home/pricetag/hotlink.kr/crawler/QuasarzoneHotdealCrawler.php): failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/crawler/run_crawler_deal.php on line 23
+[12-Sep-2025 16:03:54 Asia/Tokyo] PHP Warning:  include(): Failed opening '/home/pricetag/hotlink.kr/crawler/QuasarzoneHotdealCrawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/hotlink.kr/crawler/run_crawler_deal.php on line 23
+[12-Sep-2025 16:03:54 Asia/Tokyo] PHP Warning:  include(/home/pricetag/hotlink.kr/crawler/ClienHotdealCrawler.php): failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/crawler/run_crawler_deal.php on line 27
+[12-Sep-2025 16:03:54 Asia/Tokyo] PHP Warning:  include(): Failed opening '/home/pricetag/hotlink.kr/crawler/ClienHotdealCrawler.php' for inclusion (include_path='.:/opt/alt/php74/usr/share/pear') in /home/pricetag/hotlink.kr/crawler/run_crawler_deal.php on line 27

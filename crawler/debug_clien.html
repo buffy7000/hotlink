@@ -1,0 +1,43 @@
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>클리앙</title>
+</head>
+<body>
+<div style="font-size: 12px;line-height: 21px;letter-spacing: -0.3px;margin-top: 80px;">
+<div style="color:#232F3E; margin: 20px auto 0 ;width: 127px; border-bottom: 1px solid #232F3E; padding: 10px 0; font-size: 24px; text-align: center; font-family:'Apple SD Gotihc Neo','Helvetica Neue','Helvetica','Malgun Gothic','Nanum Gothic',Gulim,Verdana,sans-serif;">
+    CLIEN.NET
+    </div>
+    <div style="text-align: center;font-size: 15px;letter-spacing: -0.5px;color: #5EAEC4;font-weight: bold;margin: 0 auto;padding: 20px 0 5px;">
+    클리앙에 접속하실 수 없습니다.
+    </div>
+    <div style="background-color: #F5F5F5; padding: 20px; margin: 20px auto;">
+    <div style="background-color: #FFFFFF; padding: 20px 0; margin: 5px auto;max-width: 600px;">
+    <p style="margin: 0 20px; color: #666666;font-size: 12px; text-align:center;">
+    접속하신 <strong style="color: red;">IP (<span id="clientIp"></span>)</strong>에서<br>
+    비정상적인 접속이력이 확인되어 접속을 제한합니다.<br>
+    정상적인 접속인 경우 <strong><a href="mailto:admin@clien.net">admin@clien.net</a></strong> 으로 접속주소와 아이디를 적어 보내주세요.<br/>
+    VPN, 가상사설망 등 비정상 접속이력이 있는 IP 대역은 접속이 제한될 수 있습니다.
+    <br><br>
+    일부의 경우 화면 상단에 보이는 접속 IP와 실제 IP가 다를 수 있습니다.
+    <br>
+    <strong><a href="https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=%EB%82%B4%EC%95%84%EC%9D%B4%ED%94%BC%EC%A3%BC%EC%86%8C%ED%99%95%EC%9D%B8&oquery=IP%EC%A3%BC%EC%86%8C+%EC%A1%B0%ED%9A%8C&tqi=UQyLjwp0YidssjZfv8VssssssNh-190840" target="_blank">내 아이피 주소 확인</a></strong>를 클릭하여 IP를 다시 확인해 주세요.
+    </p>
+    </div>
+    </div>
+    <div style="text-align: center;font-size: 11px;margin: 0 0 20px;">© 2001 - <span id="nowYear"></span> •  CLIEN.NET</div>
+    </div>
+    </body>
+    <script type="application/javascript">
+    var today = new Date();
+    document.getElementById("nowYear").innerHTML = today.getFullYear();
+
+    function getIP(json) {
+    document.getElementById("clientIp").innerHTML = json.ip;
+    }
+    </script>
+
+    <script type="application/javascript" src="https://api.ipify.org?format=jsonp&callback=getIP"></script>

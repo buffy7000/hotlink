@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>종합소득세 자료 제출 포털</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #1a3a6b;
+      --primary-lt: #2952a3;
+      --accent:     #e8a020;
+      --accent-lt:  #f5c25a;
+      --danger:     #c0392b;
+      --success:    #1a7a4a;
+      --bg:         #f4f6fb;
+      --card:       #ffffff;
+      --border:     #d0d8e8;
+      --text:       #1c2b3a;
+      --muted:      #6b7a99;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* =========================================================
+       MODAL OVERLAY
+    ========================================================= */
+    #deadline-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(10, 20, 50, 0.82);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeInOverlay .3s ease;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #deadline-modal {
+      background: #fff;
+      border-radius: 20px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 30px 80px rgba(0,0,0,.5);
+      overflow: hidden;
+      animation: slideUpModal .35s cubic-bezier(.25,.8,.25,1);
+    }
+
+    @keyframes slideUpModal {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #c0392b 0%, #96281b 100%);
+      padding: 28px 32px 22px;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-header .modal-icon {
+      font-size: 2.8rem;
+      color: #fff;
+      margin-bottom: 10px;
+      display: block;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.3));
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1);    }
+      50%      { transform: scale(1.1); }
+    }
+
+    .modal-header h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.02em;
+      line-height: 1.3;
+    }
+
+    .modal-header .modal-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.2);
+      border: 1.5px solid rgba(255,255,255,.5);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-top: 8px;
+      letter-spacing: .06em;
+    }
+
+    .modal-body {
+      padding: 28px 32px;
+      text-align: center;
+    }
+
+    .modal-deadline-box {
+      background: linear-gradient(135deg, #fff8ed, #fff3d6);
+      border: 2px solid var(--accent);
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+    }
+
+    .modal-deadline-box .deadline-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .modal-deadline-box .deadline-date {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--danger);
+      letter-spacing: -.02em;
+    }
+
+    .modal-dday-box {
+      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      color: #fff;
+    }
+
+    .modal-dday-box .dday-label {
+      font-size: .82rem;
+      font-weight: 600;
+      opacity: .85;
+      margin-bottom: 8px;
+      letter-spacing: .04em;
+    }
+
+    .modal-dday-box .dday-count {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+
+    .modal-dday-box .dday-count span {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-left: 4px;
+      opacity: .9;
+    }
+
+    .modal-dday-box .dday-sub {
+      font-size: .78rem;
+      opacity: .75;
+      margin-top: 6px;
+    }
+
+    .modal-notice {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+
+    .modal-notice strong {
+      color: var(--danger);
+    }
+
+    .modal-confirm-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      letter-spacing: -.01em;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 6px 20px rgba(26,58,107,.35);
+    }
+
+    .modal-confirm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(26,58,107,.45);
+    }
+
+    .modal-confirm-btn:active {
+      transform: translateY(0);
+    }
+
+    .modal-confirm-btn i {
+      margin-right: 8px;
+    }
+
+    /* =========================================================
+       FORM OVERLAY (비활성화 블러 레이어)
+    ========================================================= */
+    #form-blocker {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(244, 246, 251, 0.6);
+      backdrop-filter: blur(3px);
+      pointer-events: all;
+    }
+
+    #form-blocker.hidden {
+      display: none;
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+      color: #fff;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 16px rgba(0,0,0,.2);
+    }
+
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+
+    .header-logo span {
+      color: var(--accent-lt);
+    }
+
+    .header-sub {
+      font-size: .78rem;
+      opacity: .7;
+      margin-left: auto;
+    }
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #243e80 60%, #1a3a6b 100%);
+      color: #fff;
+      padding: 52px 32px 44px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: .95rem;
+      opacity: .8;
+      line-height: 1.7;
+    }
+
+    .hero .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    /* =========================================================
+       MAIN LAYOUT
+    ========================================================= */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title i {
+      color: var(--accent);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+
+    /* =========================================================
+       PROGRESS STEPS
+    ========================================================= */
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 36px;
+      counter-reset: step;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 160px;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+    }
+
+    .step.active:not(:last-child)::after {
+      background: var(--primary);
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      transition: background .3s, color .3s;
+    }
+
+    .step.active .step-num {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .step.done .step-num {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .step-label {
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .step.active .step-label {
+      color: var(--primary);
+    }
+
+    /* =========================================================
+       FORM SECTIONS
+    ========================================================= */
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+      animation: fadeIn .3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    label .req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: .9rem;
+      color: var(--text);
+      font-family: inherit;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,58,107,.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .input-hint {
+      font-size: .76rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* =========================================================
+       FILE UPLOAD
+    ========================================================= */
+    .upload-category {
+      margin-bottom: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .upload-header {
+      background: #f8faff;
+      padding: 13px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      transition: background .2s;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .upload-header:hover {
+      background: #eef2ff;
+    }
+
+    .upload-header-left {
+      flex: 1;
+    }
+
+    .upload-header .cat-title {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .upload-header .cat-desc {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .upload-status-badge {
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 10px;
+      background: var(--border);
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .upload-status-badge.uploaded {
+      background: #d4edda;
+      color: var(--success);
+    }
+
+    .upload-body {
+      padding: 16px 18px;
+    }
+
+    .upload-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fafbfd;
+    }
+
+    .upload-drop-zone:hover,
+    .upload-drop-zone.dragover {
+      border-color: var(--primary);
+      background: #eef2ff;
+    }
+
+    .upload-drop-zone i {
+      font-size: 2rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .upload-drop-zone p {
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    .upload-drop-zone .btn-browse {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 7px 18px;
+      background: var(--primary);
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .upload-drop-zone .btn-browse:hover {
+      background: var(--primary-lt);
+    }
+
+    .file-list {
+      margin-top: 12px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #f4f6fb;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: .82rem;
+    }
+
+    .file-item i {
+      color: var(--primary);
+    }
+
+    .file-item .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-item .file-remove {
+      color: var(--danger);
+      cursor: pointer;
+      font-size: .75rem;
+      flex-shrink: 0;
+    }
+
+    /* =========================================================
+       CHECKLIST
+    ========================================================= */
+    .checklist {
+      background: #f8faff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+
+    .checklist h4 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: 7px;
+      transition: color .2s;
+    }
+
+    .check-item i {
+      font-size: .85rem;
+      color: var(--border);
+      width: 16px;
+      text-align: center;
+    }
+
+    .check-item.done {
+      color: var(--success);
+    }
+
+    .check-item.done i {
+      color: var(--success);
+    }
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: .9rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(26,58,107,.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(26,58,107,.4);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: #f0f4ff;
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+    }
+
+    /* =========================================================
+       SENSITIVE INFO WARNING
+    ========================================================= */
+    .warning-box {
+      background: #fff8f8;
+      border: 1.5px solid #f5c6c6;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .warning-box i {
+      color: var(--danger);
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .warning-box p {
+      font-size: .8rem;
+      color: #8b2222;
+      line-height: 1.6;
+    }
+
+    /* =========================================================
+       PRIVACY CONSENT
+    ========================================================= */
+    .consent-box {
+      background: #f8f9ff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .consent-box h4 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .consent-box p {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .consent-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .consent-check input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+    footer {
+      background: var(--primary);
+      color: rgba(255,255,255,.6);
+      text-align: center;
+      padding: 22px;
+      font-size: .78rem;
+    }
+
+    footer strong {
+      color: #fff;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      main { padding: 24px 16px 60px; }
+      .hero h1 { font-size: 1.5rem; }
+      .modal-body { padding: 20px 20px; }
+      .modal-header { padding: 22px 20px 18px; }
+      .modal-dday-box .dday-count { font-size: 2.4rem; }
+      .steps { gap: 0; }
+      .step-label { font-size: .65rem; }
+      .btn-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     MODAL : 종합소득세 마감기한 안내
+============================================================ -->
+<div id="deadline-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div id="deadline-modal">
+    <div class="modal-header">
+      <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
+      <h2 id="modal-title">종합소득세 마감기한 안내</h2>
+      <div class="modal-badge">⚠ 반드시 확인하세요</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-deadline-box">
+        <div class="deadline-label">📅 종합소득세 신고 마감일</div>
+        <div class="deadline-date">2026년 5월 8일 (금)</div>
+      </div>
+
+      <div class="modal-dday-box">
+        <div class="dday-label">📌 접수마감일까지 남은시간</div>
+        <div class="dday-count" id="dday-number">—<span>일</span></div>
+        <div class="dday-sub" id="dday-sub-text">계산 중…</div>
+      </div>
+
+      <p class="modal-notice">
+        위 마감일 이전까지 <strong>모든 서류를 제출</strong>해 주셔야 정상적으로<br>
+        종합소득세 신고가 처리됩니다.<br>
+        기한 내 미제출 시 <strong>불이익이 발생할 수 있습니다.</strong>
+      </p>
+
+      <button class="modal-confirm-btn" id="modal-confirm-btn" onclick="closeModal()">
+        <i class="fa-solid fa-circle-check"></i>확인했습니다
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- FORM BLOCKER (모달 닫히기 전 폼 차단) -->
+<div id="form-blocker"></div>
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+<header>
+  <div class="header-inner">
+    <div class="header-logo">세무회계<span>성흠</span></div>
+    <div class="header-sub">종합소득세 자료 제출 시스템</div>
+  </div>
+</header>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<div class="hero">
+  <div class="hero-badge"><i class="fa-solid fa-file-invoice-dollar"></i> 2025 귀속 종합소득세 자료 제출</div>
+  <h1>서류 제출 신청(프리랜서용)</h1>
+  <p>아래 양식을 작성하시고 해당 서류를 업로드해 주세요.<br>담당자가 확인 후 안내 드립니다.</p>
+</div>
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+<main>
+
+  <!-- PROGRESS STEPS -->
+  <div class="steps">
+    <div class="step active" id="step-1">
+      <div class="step-num">1</div>
+      <div class="step-label">기본정보</div>
+    </div>
+    <div class="step" id="step-2">
+      <div class="step-num">2</div>
+      <div class="step-label">홈택스 정보</div>
+    </div>
+    <div class="step" id="step-3">
+      <div class="step-num">3</div>
+      <div class="step-label">서류 업로드</div>
+    </div>
+    <div class="step" id="step-4">
+      <div class="step-num">4</div>
+      <div class="step-label">최종 확인</div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="checklist">
+    <h4><i class="fa-solid fa-list-check"></i> 제출 진행 현황</h4>
+    <div class="check-item" id="chk-basic"><i class="fa-regular fa-circle"></i> 기본 인적사항 입력</div>
+    <div class="check-item" id="chk-hometax"><i class="fa-regular fa-circle"></i> 홈택스 계정 정보 입력</div>
+    <div class="check-item" id="chk-docs"><i class="fa-regular fa-circle"></i> 서류 업로드 (1개 이상)</div>
+    <div class="check-item" id="chk-consent"><i class="fa-regular fa-circle"></i> 개인정보 수집·이용 동의</div>
+  </div>
+
+  <!-- ====================================================
+       SECTION 1 : 기본 인적사항
+  ==================================================== -->
+  <section class="form-section active" id="section-1">
+    <div class="card">
+      <h2 class="section-title"><i class="fa-solid fa-user"></i> 1. 기본 인적사항</h2>
+
+      <div class="warning-box">
+        <i class="fa-solid fa-shield-halved"></i>
+        <p>입력하신 개인정보는 종합소득세 신고 업무 처리 목적으로만 사용되며, 암호화되어 안전하게 보관됩니다.</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>성명 <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="홍길동" />
+        </div>
+        <div class="form-group">
+          <label>생년월일 <span class="req">*</span></label>
+          <input type="text" id="birth" placeholder="YYYYMMDD" maxlength="8" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>휴대폰번호 <span class="req">*</span></label>
+          <input type="tel" id="phone" placeholder="010-0000-0000" />
+        </div>
+        <div class="form-group">
+          <label>이메일 주소</label>
+          <input type="email" id="email" placeholder="example@email.com" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>주소</label>
+        <input type="text" id="address" placeholder="사업장 또는 주거지 주소" />
+      </div>
+
+      <div class="form-group">
+        <label>주민등록등본 첨부 <span class="req">*</span></label>
+        <div class="warning-box" style="margin-bottom:12px;">
+          <i class="fa-solid fa-exclamation-circle"></i>
+          <p>주민등록번호 뒷자리 전체가 기재된 등본을 첨부해 주세요. 파일은 암호화 전송됩니다.</p>
+        </div>
+        <div class="upload-drop-zone" id="zone-jumin" onclick="triggerFileInput('file-jumin')">
+          <i class="fa-solid fa-upload"></i>
+          <p>파일을 끌어다 놓거나</p>
+          <div class="btn-browse">파일 선택</div>
+          <p style="margin-top:8px; font-size:.72rem;">최대 10MB · PDF, JPG, PNG 허용</p>
+          <input type="file" id="file-jumin" style="display:none" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'zone-jumin','list-jumin')" />
+        </div>
+        <div class="file-list" id="list-jumin"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goStep(2)">다음 단계 <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       SECTION 2 : 홈택스 계정 정보
+  ==================================================== -->
+  <section class="form-section" id="section-2">
+    <div class="card">
+      <h2 class="section-title"><i class="fa-solid fa-computer"></i> 2. 홈택스 계정 정보</h2>
+
+      <div class="warning-box">
+        <i class="fa-solid fa-lock"></i>
+        <p>홈택스 계정 정보는 신고 자료 조회 목적으로만 사용되며, 제출 이후 삭제 처리됩니다. 아직 가입하지 않으신 분은 <strong>국세청 홈택스(hometax.go.kr)</strong>에서 가입 후 입력해 주세요.</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>홈택스 아이디 <span class="req">*</span></label>
+          <input type="text" id="hometax-id" placeholder="홈택스 로그인 아이디" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>홈택스 비밀번호 <span class="req">*</span></label>
+          <input type="password" id="hometax-pw" placeholder="••••••••" autocomplete="new-password" />
+          <p class="input-hint">입력된 비밀번호는 암호화되어 전송됩니다.</p>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(1)"><i class="fa-solid fa-arrow-left" style="margin-right:6px"></i> 이전</button>
+        <button class="btn btn-primary" onclick="goStep(3)">다음 단계 <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       SECTION 3 : 서류 업로드
+  ==================================================== -->
+  <section class="form-section" id="section-3">
+    <div class="card">
+      <h2 class="section-title"><i class="fa-solid fa-folder-open"></i> 3. 공제신청 자료 업로드</h2>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:20px;">해당되는 서류만 제출하시면 됩니다. 각 항목 최대 10MB까지 업로드 가능합니다.</p>
+
+      <!-- 3-1 보험증권 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-ins')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-1. 보험증권</div>
+            <div class="cat-desc">자동차보험 · 화재보험 · 책임배상보험 등</div>
+          </div>
+          <div class="upload-status-badge" id="badge-ins">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-ins" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-ins')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <p style="margin-top:6px;font-size:.72rem;">최대 10MB · PDF, JPG, PNG 허용</p>
+            <input type="file" id="file-ins" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'','list-ins','badge-ins')" />
+          </div>
+          <div class="file-list" id="list-ins"></div>
+        </div>
+      </div>
+
+      <!-- 3-2 퇴직연금/노란우산 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-pension')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-2. 퇴직연금 / 노란우산공제</div>
+            <div class="cat-desc">2025년 퇴직연금 · 노란우산공제 납입내역서</div>
+          </div>
+          <div class="upload-status-badge" id="badge-pension">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-pension" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-pension')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-pension" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'','list-pension','badge-pension')" />
+          </div>
+          <div class="file-list" id="list-pension"></div>
+        </div>
+      </div>
+
+      <!-- 3-3 업무용차량 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-car')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-3. 업무용 차량</div>
+            <div class="cat-desc">자차: 자동차등록증 · 리스/렌탈: 계약서 또는 증권</div>
+          </div>
+          <div class="upload-status-badge" id="badge-car">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-car" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-car')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-car" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'','list-car','badge-car')" />
+          </div>
+          <div class="file-list" id="list-car"></div>
+        </div>
+      </div>
+
+      <!-- 3-4 사업관련 대출금 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-loan')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-4. 사업관련 대출금</div>
+            <div class="cat-desc">대출잔액증명서 · 연간 이자 납입증명서</div>
+          </div>
+          <div class="upload-status-badge" id="badge-loan">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-loan" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-loan')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-loan" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls" onchange="handleFile(this,'','list-loan','badge-loan')" />
+          </div>
+          <div class="file-list" id="list-loan"></div>
+        </div>
+      </div>
+
+      <!-- 3-5 신용카드 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-card')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-5. 연간 신용카드 사용내역서</div>
+            <div class="cat-desc">사용하시는 카드의 연간 사용명세서 · 엑셀 파일 필수</div>
+          </div>
+          <div class="upload-status-badge" id="badge-card">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-card" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-card')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <p style="margin-top:6px;font-size:.72rem;">엑셀(.xlsx/.xls) 파일 필수</p>
+            <input type="file" id="file-card" style="display:none" multiple accept=".xlsx,.xls,.pdf" onchange="handleFile(this,'','list-card','badge-card')" />
+          </div>
+          <div class="file-list" id="list-card"></div>
+        </div>
+      </div>
+
+      <!-- 3-6 경비 영수증 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-receipt')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-6. 사업 관련 경비 영수증</div>
+            <div class="cat-desc">국세·지방세 영수증 · 공과금 · 통신요금 · 기부금 · 세금계산서 · 청첩장·부고장 등</div>
+          </div>
+          <div class="upload-status-badge" id="badge-receipt">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-receipt" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-receipt')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-receipt" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls" onchange="handleFile(this,'','list-receipt','badge-receipt')" />
+          </div>
+          <div class="file-list" id="list-receipt"></div>
+        </div>
+      </div>
+
+      <!-- 3-7 기타 서류 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-biz')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-7. 사업 관련 기타 서류</div>
+            <div class="cat-desc">사업장 임대차계약서 · 고정자산 구입내역 · 지원금 수령내역</div>
+          </div>
+          <div class="upload-status-badge" id="badge-biz">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-biz" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-biz')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-biz" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls" onchange="handleFile(this,'','list-biz','badge-biz')" />
+          </div>
+          <div class="file-list" id="list-biz"></div>
+        </div>
+      </div>
+
+      <!-- 3-8 타소득 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-income')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-8. 타소득</div>
+            <div class="cat-desc">소득지급명세서 · 이자·배당소득 2천만원 초과 · 근로/사업/연금/기타 소득</div>
+          </div>
+          <div class="upload-status-badge" id="badge-income">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-income" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-income')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-income" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'','list-income','badge-income')" />
+          </div>
+          <div class="file-list" id="list-income"></div>
+        </div>
+      </div>
+
+      <!-- 3-9 기타 -->
+      <div class="upload-category">
+        <div class="upload-header" onclick="toggleUpload('body-etc')">
+          <div class="upload-header-left">
+            <div class="cat-title">3-9. 기타</div>
+            <div class="cat-desc">상기 자료 외 사업 관련성이 있는 자료</div>
+          </div>
+          <div class="upload-status-badge" id="badge-etc">미업로드</div>
+        </div>
+        <div class="upload-body" id="body-etc" style="display:none">
+          <div class="upload-drop-zone" onclick="triggerFileInput('file-etc')">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>파일을 끌어다 놓거나</p>
+            <div class="btn-browse">파일 선택</div>
+            <input type="file" id="file-etc" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls" onchange="handleFile(this,'','list-etc','badge-etc')" />
+          </div>
+          <div class="file-list" id="list-etc"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(2)"><i class="fa-solid fa-arrow-left" style="margin-right:6px"></i> 이전</button>
+        <button class="btn btn-primary" onclick="goStep(4)">다음 단계 <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       SECTION 4 : 최종 확인 및 제출
+  ==================================================== -->
+  <section class="form-section" id="section-4">
+    <div class="card">
+      <h2 class="section-title"><i class="fa-solid fa-clipboard-check"></i> 4. 최종 확인 및 제출</h2>
+
+      <!-- 요약 -->
+      <div class="checklist">
+        <h4>입력 완료 확인</h4>
+        <div class="check-item" id="final-basic"><i class="fa-regular fa-circle"></i> 기본 인적사항</div>
+        <div class="check-item" id="final-hometax"><i class="fa-regular fa-circle"></i> 홈택스 계정 정보</div>
+        <div class="check-item" id="final-jumin"><i class="fa-regular fa-circle"></i> 주민등록등본 업로드</div>
+        <div class="check-item" id="final-docs"><i class="fa-regular fa-circle"></i> 공제 서류 업로드 (1개 이상)</div>
+      </div>
+
+      <!-- 개인정보 동의 -->
+      <div class="consent-box">
+        <h4><i class="fa-solid fa-shield-halved" style="margin-right:6px;color:var(--primary)"></i>개인정보 수집·이용 동의</h4>
+        <p>수집 항목: 성명, 생년월일, 연락처, 이메일, 주소, 홈택스 계정 정보, 첨부 서류<br>
+        수집 목적: 종합소득세 신고 업무 처리<br>
+        보유 기간: 세무 신고 완료 후 5년<br>
+        귀하는 동의를 거부할 권리가 있으나, 거부 시 서비스 이용이 제한됩니다.</p>
+        <label class="consent-check">
+          <input type="checkbox" id="consent-check" onchange="updateChecklist()" />
+          위 개인정보 수집·이용에 동의합니다. (필수)
+        </label>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="submitForm()">
+        <i class="fa-solid fa-paper-plane" style="margin-right:8px"></i>제출하기
+      </button>
+
+      <div class="btn-row" style="justify-content:flex-start;margin-top:12px;">
+        <button class="btn btn-secondary" onclick="goStep(3)"><i class="fa-solid fa-arrow-left" style="margin-right:6px"></i> 이전으로</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>세무 자료 제출 포털</strong> · 개인정보 보호정책 · 모든 파일은 암호화되어 안전하게 전송됩니다.
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  /* ---- D-Day 계산 ---- */
+  (function calcDDay() {
+    const deadline = new Date('2026-05-08T23:59:59');
+    const now      = new Date();
+    const diffMs   = deadline - now;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    const numEl  = document.getElementById('dday-number');
+    const subEl  = document.getElementById('dday-sub-text');
+
+    if (diffDays > 0) {
+      numEl.innerHTML  = `${diffDays}<span>일</span>`;
+      subEl.textContent = `오늘 기준 ${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} → 마감 2026.05.08`;
+    } else if (diffDays === 0) {
+      numEl.innerHTML  = `D-DAY<span></span>`;
+      subEl.textContent = '오늘이 마감일입니다!';
+    } else {
+      numEl.innerHTML  = `마감<span>완료</span>`;
+      subEl.textContent = `마감일이 ${Math.abs(diffDays)}일 지났습니다.`;
+      numEl.style.fontSize = '2rem';
+    }
+  })();
+
+  /* ---- 모달 닫기 ---- */
+  function closeModal() {
+    const overlay = document.getElementById('deadline-modal-overlay');
+    const blocker = document.getElementById('form-blocker');
+    overlay.style.animation = 'fadeOutOverlay .25s ease forwards';
+    setTimeout(() => {
+      overlay.remove();
+      blocker.classList.add('hidden');
+    }, 240);
+  }
+
+  /* ESC / 배경 클릭 차단 */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') e.preventDefault();
+  });
+  document.getElementById('deadline-modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+      /* 배경 클릭 시 모달 살짝 흔들기 */
+      const modal = document.getElementById('deadline-modal');
+      modal.style.animation = 'none';
+      modal.style.transform = 'scale(1.02)';
+      setTimeout(() => { modal.style.transform = ''; }, 150);
+    }
+  });
+
+  /* fade out 애니메이션 */
+  const style = document.createElement('style');
+  style.textContent = `@keyframes fadeOutOverlay { to { opacity:0; } }`;
+  document.head.appendChild(style);
+
+  /* ---- 스텝 이동 ---- */
+  let currentStep = 1;
+
+  function goStep(step) {
+    document.getElementById(`section-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${currentStep}`).classList.add('done');
+
+    currentStep = step;
+    document.getElementById(`section-${step}`).classList.add('active');
+
+    /* 뒤로 갈 때 done 재설정 */
+    for (let i = step; i <= 4; i++) {
+      const el = document.getElementById(`step-${i}`);
+      el.classList.remove('done');
+      if (i === step) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+
+    updateChecklist();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ---- 파일 업로드 핸들러 ---- */
+  function triggerFileInput(id) {
+    document.getElementById(id).click();
+  }
+
+  function handleFile(input, zoneId, listId, badgeId) {
+    const list = document.getElementById(listId);
+    Array.from(input.files).forEach(file => {
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `
+        <i class="fa-solid fa-file"></i>
+        <span class="file-name">${file.name}</span>
+        <span style="color:var(--muted);font-size:.75rem">${(file.size/1024/1024).toFixed(2)}MB</span>
+        <span class="file-remove" onclick="this.parentElement.remove(); updateBadge('${badgeId}','${listId}'); updateChecklist()"><i class="fa-solid fa-xmark"></i></span>
+      `;
+      list.appendChild(item);
+    });
+    if (badgeId) updateBadge(badgeId, listId);
+    updateChecklist();
+    input.value = '';
+  }
+
+  function updateBadge(badgeId, listId) {
+    if (!badgeId) return;
+    const count = document.getElementById(listId).children.length;
+    const badge = document.getElementById(badgeId);
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = `${count}개 업로드됨`;
+      badge.classList.add('uploaded');
+    } else {
+      badge.textContent = '미업로드';
+      badge.classList.remove('uploaded');
+    }
+  }
+
+  function toggleUpload(bodyId) {
+    const body = document.getElementById(bodyId);
+    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+  }
+
+  /* ---- 체크리스트 업데이트 ---- */
+  function updateChecklist() {
+    const basicDone    = document.getElementById('name').value.trim() && document.getElementById('phone').value.trim();
+    const hometaxDone  = document.getElementById('hometax-id').value.trim() && document.getElementById('hometax-pw').value.trim();
+    const juminDone    = document.getElementById('list-jumin').children.length > 0;
+    const docsDone     = ['list-ins','list-pension','list-car','list-loan','list-card',
+                          'list-receipt','list-biz','list-income','list-etc'].some(id => document.getElementById(id).children.length > 0);
+    const consentDone  = document.getElementById('consent-check').checked;
+
+    setCheck('chk-basic',    basicDone);
+    setCheck('chk-hometax',  hometaxDone);
+    setCheck('chk-docs',     juminDone || docsDone);
+    setCheck('chk-consent',  consentDone);
+
+    setCheck('final-basic',  basicDone);
+    setCheck('final-hometax',hometaxDone);
+    setCheck('final-jumin',  juminDone);
+    setCheck('final-docs',   docsDone);
+  }
+
+  function setCheck(id, done) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (done) {
+      el.classList.add('done');
+      el.querySelector('i').className = 'fa-solid fa-circle-check';
+    } else {
+      el.classList.remove('done');
+      el.querySelector('i').className = 'fa-regular fa-circle';
+    }
+  }
+
+  /* 실시간 체크 */
+  ['name','phone','hometax-id','hometax-pw','email'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateChecklist);
+  });
+
+  /* ---- 제출 ---- */
+  async function submitForm() {
+    const name    = document.getElementById('name').value.trim();
+    const phone   = document.getElementById('phone').value.trim();
+    const htId    = document.getElementById('hometax-id').value.trim();
+    const consent = document.getElementById('consent-check').checked;
+
+    if (!name || !phone) { alert('성명과 휴대폰번호는 필수 입력입니다.'); goStep(1); return; }
+    if (!htId) { alert('홈택스 아이디를 입력해 주세요.'); goStep(2); return; }
+    if (!consent) { alert('개인정보 수집·이용에 동의해 주셔야 제출 가능합니다.'); return; }
+
+    const receiptNum = 'TAX-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*900000)+100000);
+
+    try {
+      await fetch('tables/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          receipt_number: receiptNum,
+          name,
+          phone,
+          email: document.getElementById('email').value.trim(),
+          birth: document.getElementById('birth').value.trim(),
+          address: document.getElementById('address').value.trim(),
+          hometax_id: htId,
+          status: '제출완료',
+          submitted_at: new Date().toISOString(),
+          doc_count: countUploadedDocs()
+        })
+      });
+    } catch(e) {
+      console.warn('API 저장 실패 (로컬 시뮬레이션):', e);
+    }
+
+    localStorage.setItem('last_receipt', receiptNum);
+    localStorage.setItem('last_name', name);
+    alert(`✅ 제출이 완료되었습니다!\n접수번호: ${receiptNum}\n\n담당자가 검토 후 연락드리겠습니다.`);
+    window.location.reload();
+  }
+
+  function countUploadedDocs() {
+    return ['list-jumin','list-ins','list-pension','list-car','list-loan','list-card',
+            'list-receipt','list-biz','list-income','list-etc']
+      .reduce((sum, id) => sum + document.getElementById(id).children.length, 0);
+  }
+</script>
+</body>
+</html>

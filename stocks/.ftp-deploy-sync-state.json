@@ -1,0 +1,49 @@
+{
+    "description": "DO NOT DELETE THIS FILE. This file is used to keep track of which files have been synced in the most recent deployment. If you delete this file a resync will need to be done (which can take a while) - read more: https://github.com/SamKirkland/FTP-Deploy-Action",
+    "version": "1.0.0",
+    "generatedTime": 1781261825843,
+    "data": [
+        {
+            "type": "folder",
+            "name": "data"
+        },
+        {
+            "type": "folder",
+            "name": "etf"
+        },
+        {
+            "type": "file",
+            "name": "index.html",
+            "size": 23245,
+            "hash": "36a425953ca52c9237b382f3cea0b6d6072dfb5edf639a399cf6bd0384686489"
+        },
+        {
+            "type": "folder",
+            "name": "scripts"
+        },
+        {
+            "type": "file",
+            "name": "data/stocks.json",
+            "size": 89635,
+            "hash": "33383faa1db58f68579410e10f2c53a8856b023d036ca075304518dcfdca09a7"
+        },
+        {
+            "type": "file",
+            "name": "etf/index.html",
+            "size": 29722,
+            "hash": "ff916759cfb94f3f9d36142197c45251d124a902db9355741a01ae79599d89a3"
+        },
+        {
+            "type": "file",
+            "name": "scripts/analytics.js",
+            "size": 362,
+            "hash": "5a8d9168cc3e0729817c8d6c82ecfd6e3c99b032fd2e3fe924ac217999ffb9c8"
+        },
+        {
+            "type": "file",
+            "name": "scripts/nav.js",
+            "size": 3229,
+            "hash": "9f4179e89c9db62be3743a2fe666c1d084978e0984eed0fa6e7a46bd469faf13"
+        }
+    ]
+}

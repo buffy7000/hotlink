@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>핫링크 - 클리앙 핫딜</title>
+  <meta name="description" content="클리앙 지름신 게시판의 최신 핫딜 정보">
+</head>
+<body>
+  <div id="app"></div>
+  
+  <script>
+    // 메인 페이지의 HTML을 가져와서 삽입
+    fetch('/deal/index.html')
+      .then(response => response.text())
+      .then(html => {
+        // body 내용만 추출
+        const bodyContent = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)[1];
+        document.getElementById('app').innerHTML = bodyContent;
+        
+        // 스크립트도 실행
+        const scripts = html.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        if (scripts) {
+          scripts.forEach(scriptTag => {
+            const script = document.createElement('script');
+            script.innerHTML = scriptTag.replace(/<\/?script[^>]*>/gi, '');
+            document.body.appendChild(script);
+          });
+        }
+        
+        // 클리앙으로 자동 설정
+        setTimeout(() => {
+          if (window.currentSettings) {
+            window.currentSettings.source = 'clien';
+            // UI 업데이트
+            document.querySelectorAll('.nav-item').forEach(item => {
+              item.classList.remove('active');
+              if (item.dataset.source === 'clien') {
+                item.classList.add('active');
+              }
+            });
+            if (window.renderList) window.renderList();
+          }
+        }, 100);
+      });
+  </script>
+</body>
+</html>

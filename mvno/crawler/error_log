@@ -1,0 +1,36 @@
+[04-Dec-2025 17:16:21 Asia/Tokyo] PHP Deprecated:  mb_convert_encoding(): Handling HTML entities via mbstring is deprecated; use htmlspecialchars, htmlentities, or mb_encode_numericentity/mb_decode_numericentity instead in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 70
+[04-Dec-2025 17:25:25 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Undefined constant "MVNO_DB_HOST" in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 18
+[04-Dec-2025 17:26:09 Asia/Tokyo] PHP Warning:  require_once(/home/pricetag/hotlink.kr/mvno/crawler/../config/database_mvno.php): Failed to open stream: No such file or directory in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 15
+[04-Dec-2025 17:26:09 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pricetag/hotlink.kr/mvno/crawler/../config/database_mvno.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 15
+[04-Dec-2025 17:35:25 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to undefined method SimpleEventDB::execute() in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php:178
+Stack trace:
+#0 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(334): upsertEventToDB()
+#1 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(404): crawlEyagiEvents()
+#2 {main}
+  thrown in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 178
+[04-Dec-2025 17:36:49 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to undefined method SimpleEventDB::query() in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php:178
+Stack trace:
+#0 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(334): upsertEventToDB()
+#1 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(404): crawlEyagiEvents()
+#2 {main}
+  thrown in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 178
+[04-Dec-2025 17:36:51 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to undefined method SimpleEventDB::query() in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php:178
+Stack trace:
+#0 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(334): upsertEventToDB()
+#1 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(404): crawlEyagiEvents()
+#2 {main}
+  thrown in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 178
+[04-Dec-2025 17:38:40 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Call to undefined method SimpleEventDB::query() in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php:178
+Stack trace:
+#0 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(334): upsertEventToDB()
+#1 /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php(404): crawlEyagiEvents()
+#2 {main}
+  thrown in /home/pricetag/hotlink.kr/mvno/crawler/03_eyagi_crawler.php on line 178
+[27-Jan-2026 17:50:25 Asia/Tokyo] PHP Fatal error:  Cannot redeclare parseEventData() (previously declared in /home/pricetag/hotlink.kr/mvno/crawler/01_ktm_crawler.php:83) in /home/pricetag/hotlink.kr/mvno/crawler/02_hello_crawler.php on line 95
+[27-Jan-2026 17:59:16 Asia/Tokyo] PHP Fatal error:  Cannot redeclare parseEventData() (previously declared in /home/pricetag/hotlink.kr/mvno/crawler/01_ktm_crawler.php:83) in /home/pricetag/hotlink.kr/mvno/crawler/02_hello_crawler.php on line 95

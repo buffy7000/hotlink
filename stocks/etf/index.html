@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETF 적립식 계산기 📈</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px 80px;
+    }
+
+    header { text-align: center; margin-bottom: 32px; }
+    header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    header p { color: #777; font-size: 0.95rem; }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .section { margin-bottom: 24px; }
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #666;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 560px;
+      margin-bottom: 16px;
+    }
+    .tab {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { color: #aaa; }
+    .tab.active {
+      background: #e05c5c;
+      border-color: #e05c5c;
+      color: #fff;
+    }
+
+    /* ETF cards */
+    .etf-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .etf-card {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 14px;
+      color: #888;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .etf-card:hover { border-color: #555; color: #ccc; }
+    .etf-card.active { border-color: #e05c5c; color: #e8e8e8; background: #1f1515; }
+    .etf-card-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+    .etf-card-code { font-size: 0.72rem; color: #555; }
+    .etf-card.active .etf-card-code { color: #888; }
+
+    /* Chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 100px;
+      color: #aaa;
+      font-size: 0.88rem;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: #555; color: #e8e8e8; }
+    .chip.active { background: #e05c5c; border-color: #e05c5c; color: #fff; font-weight: 600; }
+
+    /* Custom input */
+    .input-custom { display: none; margin-top: 10px; }
+    .input-custom.show { display: flex; align-items: center; gap: 10px; }
+    .input-custom input {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #e8e8e8;
+      font-size: 1rem;
+      padding: 11px 16px;
+      transition: border-color 0.2s;
+    }
+    .input-custom input:focus { outline: none; border-color: #e05c5c; }
+    .input-custom span { color: #666; font-size: 0.88rem; white-space: nowrap; }
+
+    /* Scenario chips */
+    .scenario-chips { display: flex; gap: 8px; }
+    .scenario-chip {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #aaa;
+      font-size: 0.82rem;
+      padding: 10px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .scenario-chip:hover { border-color: #555; color: #ccc; }
+    .scenario-chip.active { border-color: #e05c5c; background: #1f1515; color: #e8e8e8; }
+    .scenario-rate { font-size: 1.1rem; font-weight: 800; margin-top: 4px; }
+    .scenario-chip.active .scenario-rate { color: #e05c5c; }
+
+    /* Calc button */
+    .btn-calc {
+      width: 100%;
+      background: #e05c5c;
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 15px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 20px;
+    }
+    .btn-calc:hover { background: #c94f4f; }
+    .btn-calc:active { transform: scale(0.98); }
+
+    /* Result */
+    .result-card {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+    .result-placeholder { color: #444; font-size: 0.9rem; }
+    .result-description { color: #777; font-size: 0.85rem; line-height: 1.6; }
+    .result-profit { font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
+    .result-profit.gain { color: #e05c5c; }
+    .result-profit.loss { color: #5b9bd5; }
+    .result-sub { color: #888; font-size: 0.85rem; }
+    .result-detail {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #222;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      text-align: left;
+    }
+    .detail-item label { display: block; font-size: 0.72rem; color: #555; margin-bottom: 3px; }
+    .detail-item span { font-size: 0.92rem; color: #ccc; font-weight: 500; }
+
+    .loading { color: #555; font-size: 0.9rem; }
+    .error { color: #e05c5c; font-size: 0.9rem; }
+
+    /* Chart toggle */
+    .toggle-btn {
+      width: 100%;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #888;
+      font-size: 0.88rem;
+      padding: 11px 16px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .toggle-btn:hover { border-color: #555; color: #ccc; }
+    .toggle-arrow { transition: transform 0.2s; }
+    .toggle-btn.open .toggle-arrow { transform: rotate(180deg); }
+
+    .chart-panel {
+      display: none;
+      margin-top: 12px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 20px 16px 16px;
+    }
+    .chart-panel.show { display: block; }
+
+    .chart-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .chart-tab {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #666;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chart-tab.active { background: #222; border-color: #444; color: #e8e8e8; }
+
+    .chart-scroll { overflow-x: auto; padding-bottom: 4px; }
+    .chart-bars {
+      display: flex;
+      align-items: stretch;
+      gap: 3px;
+      min-width: max-content;
+    }
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 26px;
+      cursor: default;
+      position: relative;
+    }
+    .bar-col:hover .bar-tooltip { display: block; }
+    .bar-upper {
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+    }
+    .bar-lower {
+      height: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      border-top: 1px solid #333;
+    }
+    .bar-fill-pos { width: 18px; background: #e05c5c; border-radius: 2px 2px 0 0; }
+    .bar-fill-neg { width: 18px; background: #5b9bd5; border-radius: 0 0 2px 2px; }
+    .bar-year { font-size: 0.58rem; color: #555; margin-top: 5px; }
+    .bar-tooltip {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+      color: #e8e8e8;
+      z-index: 10;
+      pointer-events: none;
+      margin-bottom: 4px;
+    }
+
+    .chart-stats {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #222;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+    .stat-item label { display: block; font-size: 0.68rem; color: #555; margin-bottom: 4px; }
+    .stat-item span { font-size: 0.92rem; font-weight: 700; color: #ccc; }
+    .chart-source { margin-top: 12px; font-size: 0.68rem; color: #444; text-align: right; }
+
+    footer {
+      margin-top: 48px;
+      color: #333;
+      font-size: 0.78rem;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+  </style>
+  <script src="../scripts/analytics.js"></script>
+  <script src="../scripts/nav.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>📈 ETF 적립식 계산기</h1>
+  <p>꾸준히 모으면 얼마가 될까</p>
+</header>
+
+<div class="tab-bar">
+  <button class="tab active" data-tab="past">⏪ 과거로 보기</button>
+  <button class="tab" data-tab="future">⏩ 미래로 보기</button>
+</div>
+
+<!-- 과거로 보기 -->
+<div class="card" id="tab-past">
+
+  <div class="section">
+    <div class="section-label">종목</div>
+    <div class="etf-cards" id="pastETFCards">
+      <button class="etf-card active" data-ticker="379810">
+        <div class="etf-card-name">KODEX 나스닥100</div>
+        <div class="etf-card-code">379810</div>
+      </button>
+      <button class="etf-card" data-ticker="379800">
+        <div class="etf-card-name">KODEX S&P500</div>
+        <div class="etf-card-code">379800</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">언제부터?</div>
+    <div class="chips" id="pastPeriodChips">
+      <button class="chip" data-months="12">1년 전</button>
+      <button class="chip active" data-months="36">3년 전</button>
+      <button class="chip" data-months="60">5년 전</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">매달 얼마씩?</div>
+    <div class="chips" id="pastMonthlyChips">
+      <button class="chip" data-amount="100000">10만원</button>
+      <button class="chip active" data-amount="300000">30만원</button>
+      <button class="chip" data-amount="500000">50만원</button>
+      <button class="chip" data-amount="custom">직접입력</button>
+    </div>
+    <div class="input-custom" id="pastMonthlyCustom">
+      <input type="text" id="pastMonthlyInput" placeholder="0" inputmode="numeric" />
+      <span>만원</span>
+    </div>
+  </div>
+
+  <button class="btn-calc" id="pastCalcBtn">계산하기</button>
+
+  <div id="pastResultSection" hidden>
+    <div class="section-label">결과</div>
+    <div class="result-card" id="pastResultCard"></div>
+  </div>
+
+</div>
+
+<!-- 미래로 보기 -->
+<div class="card" id="tab-future" hidden>
+
+  <div class="section">
+    <div class="section-label">종목</div>
+    <div class="etf-cards" id="futureETFCards">
+      <button class="etf-card active" data-ticker="379810">
+        <div class="etf-card-name">KODEX 나스닥100</div>
+        <div class="etf-card-code">379810</div>
+      </button>
+      <button class="etf-card" data-ticker="379800">
+        <div class="etf-card-name">KODEX S&P500</div>
+        <div class="etf-card-code">379800</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">수익률 시나리오</div>
+    <div class="scenario-chips" id="scenarioChips">
+      <button class="scenario-chip" data-scenario="high">
+        상위 25%<div class="scenario-rate" id="rateHigh"></div>
+      </button>
+      <button class="scenario-chip active" data-scenario="mid">
+        중간값<div class="scenario-rate" id="rateMid"></div>
+      </button>
+      <button class="scenario-chip" data-scenario="low">
+        하위 25%<div class="scenario-rate" id="rateLow"></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="toggle-btn" id="chartToggleBtn">
+      <span>📊 과거 30년 수익률 보기</span>
+      <span class="toggle-arrow">▾</span>
+    </button>
+    <div class="chart-panel" id="chartPanel">
+      <div class="chart-tabs">
+        <button class="chart-tab active" data-chart="379810">나스닥100</button>
+        <button class="chart-tab" data-chart="379800">S&P500</button>
+      </div>
+      <div class="chart-scroll">
+        <div class="chart-bars" id="chartBars"></div>
+      </div>
+      <div class="chart-stats" id="chartStats"></div>
+      <div class="chart-source">QQQ / SPY 기준 배당 포함 연간 수익률</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">목표 금액</div>
+    <div class="chips" id="targetChips">
+      <button class="chip" data-amount="100000000">1억</button>
+      <button class="chip active" data-amount="300000000">3억</button>
+      <button class="chip" data-amount="500000000">5억</button>
+      <button class="chip" data-amount="custom">직접입력</button>
+    </div>
+    <div class="input-custom" id="targetCustom">
+      <input type="text" id="targetInput" placeholder="0" inputmode="numeric" />
+      <span>만원</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">매달 얼마씩?</div>
+    <div class="chips" id="futureMonthlyChips">
+      <button class="chip" data-amount="100000">10만원</button>
+      <button class="chip active" data-amount="300000">30만원</button>
+      <button class="chip" data-amount="500000">50만원</button>
+      <button class="chip" data-amount="custom">직접입력</button>
+    </div>
+    <div class="input-custom" id="futureMonthlyCustom">
+      <input type="text" id="futureMonthlyInput" placeholder="0" inputmode="numeric" />
+      <span>만원</span>
+    </div>
+  </div>
+
+  <button class="btn-calc" id="futureCalcBtn">계산하기</button>
+
+  <div id="futureResultSection" hidden>
+    <div class="section-label">결과</div>
+    <div class="result-card" id="futureResultCard"></div>
+  </div>
+
+</div>
+
+<footer>
+  데이터 기준: 종가기준 / 매일 오후 4시 자동 업데이트<br>
+  투자권유가 아닙니다. 참고용으로만 사용해주세요.
+</footer>
+
+<script>
+  let stockData = null;
+
+  // State
+  let pastTicker = '379810', pastMonths = 36, pastMonthly = 300000, pastCustomMonthly = null;
+  let futureTicker = '379810', futureScenario = 'mid', futureTarget = 300000000, futureMonthly = 300000;
+  let futureCustomTarget = null, futureCustomMonthly = null;
+  let activeChartTicker = '379810';
+
+  const SCENARIOS = {
+    '379810': { high: 27, mid: 14, low: 3 },
+    '379800': { high: 22, mid: 10, low: 2 },
+  };
+
+  const HISTORICAL = {
+    '379810': {
+      1995:59.3,  1996:42.5,  1997:20.6,  1998:85.3,  1999:101.9,
+      2000:-36.8, 2001:-32.7, 2002:-37.6, 2003:49.8,  2004:10.5,
+      2005:1.5,   2006:6.8,   2007:18.7,  2008:-41.7, 2009:54.7,
+      2010:20,    2011:3.4,   2012:18.1,  2013:36.6,  2014:19.2,
+      2015:9.5,   2016:7.1,   2017:32.7,  2018:-0.1,  2019:39,
+      2020:48.6,  2021:27.4,  2022:-32.6, 2023:56.4,  2024:25.7,
+    },
+    '379800': {
+      1995:38.1,  1996:22.6,  1997:33.5,  1998:28.7,  1999:20.4,
+      2000:-9.7,  2001:-11.8, 2002:-21.5, 2003:28.2,  2004:10.7,
+      2005:4.8,   2006:15.9,  2007:5.1,   2008:-36.8, 2009:26.4,
+      2010:15.1,  2011:1.9,   2012:16,    2013:32.3,  2014:13.5,
+      2015:1.3,   2016:12,    2017:21.7,  2018:-4.6,  2019:31.2,
+      2020:18.4,  2021:28.8,  2022:-18.2, 2023:26.2,  2024:24.9,
+    },
+  };
+
+  function applyManwon(inputEl, setter) {
+    const raw = inputEl.value.replace(/[^0-9]/g, '');
+    if (!raw) { inputEl.value = ''; setter(null); return; }
+    const num = parseInt(raw, 10);
+    inputEl.value = num.toLocaleString('ko-KR');
+    setter(num * 10000);
+  }
+
+  function readManwon(inputEl) {
+    const raw = parseInt(inputEl.value.replace(/[^0-9]/g, ''), 10);
+    return raw ? raw * 10000 : null;
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch('../data/stocks.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      stockData = await res.json();
+    } catch (e) {
+      document.getElementById('pastCalcBtn').dataset.loadError = e.message;
+      document.getElementById('futureCalcBtn').dataset.loadError = e.message;
+    }
+  }
+
+  function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
+
+  function getFirstTradingDayOfMonth(year, month, prices) {
+    for (let d = 1; d <= 10; d++) {
+      const date = new Date(year, month - 1, d);
+      const key = date.toISOString().slice(0, 10);
+      if (prices[key] !== undefined) return { date: key, price: prices[key] };
+    }
+    return null;
+  }
+
+  function getLatestPrice(prices) {
+    const today = new Date();
+    for (let i = 0; i < 10; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      if (prices[key] !== undefined) return { date: key, price: prices[key] };
+    }
+    return null;
+  }
+
+  function calcPast() {
+    const card = document.getElementById('pastResultCard');
+    const section = document.getElementById('pastResultSection');
+
+    const loadError = document.getElementById('pastCalcBtn').dataset.loadError;
+    if (loadError) { section.hidden = false; card.innerHTML = `<span class="error">데이터 로드 실패: ${loadError}</span>`; return; }
+    if (!stockData) { section.hidden = false; card.innerHTML = '<span class="loading">데이터 불러오는 중... 잠시 후 다시 눌러주세요</span>'; return; }
+
+    const monthly = pastCustomMonthly !== null ? pastCustomMonthly : pastMonthly;
+    if (!monthly || monthly <= 0) { section.hidden = false; card.innerHTML = '<span class="result-placeholder">금액을 입력해주세요</span>'; return; }
+
+    const prices = stockData[pastTicker]?.prices;
+    if (!prices) { section.hidden = false; card.innerHTML = '<span class="error">데이터가 없습니다</span>'; return; }
+
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setMonth(startDate.getMonth() - pastMonths);
+
+    let year = startDate.getFullYear();
+    let month = startDate.getMonth() + 1;
+    const endYear = today.getFullYear();
+    const endMonth = today.getMonth() + 1;
+
+    let totalUnits = 0, totalInvested = 0, monthCount = 0;
+
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+      const entry = getFirstTradingDayOfMonth(year, month, prices);
+      if (entry) {
+        totalUnits += monthly / entry.price;
+        totalInvested += monthly;
+        monthCount++;
+      }
+      month++;
+      if (month > 12) { month = 1; year++; }
+    }
+
+    const latest = getLatestPrice(prices);
+    if (!latest || totalInvested === 0) { section.hidden = false; card.innerHTML = '<span class="error">계산할 데이터가 부족합니다</span>'; return; }
+
+    const currentValue = totalUnits * latest.price;
+    const profit = currentValue - totalInvested;
+    const returnRate = (profit / totalInvested) * 100;
+    const isGain = profit >= 0;
+    const cls = isGain ? 'gain' : 'loss';
+    const sign = isGain ? '+' : '';
+
+    section.hidden = false;
+    card.innerHTML = `
+      <div class="result-description">
+        <strong>${stockData[pastTicker].name}</strong>에 ${pastMonths / 12}년간<br>
+        매달 ${fmt(monthly)}원씩 적립했더라면
+      </div>
+      <div class="result-profit ${cls}">${sign}${fmt(profit)}원</div>
+      <div class="result-sub">${sign}${returnRate.toFixed(1)}% ${isGain ? '수익' : '손실'}</div>
+      <div class="result-detail">
+        <div class="detail-item"><label>총 투자금</label><span>${fmt(totalInvested)}원</span></div>
+        <div class="detail-item"><label>현재 평가금</label><span>${fmt(currentValue)}원</span></div>
+        <div class="detail-item"><label>투자 기간</label><span>${monthCount}개월</span></div>
+        <div class="detail-item"><label>기준일 종가 (${latest.date})</label><span>${fmt(latest.price)}원</span></div>
+      </div>
+    `;
+  }
+
+  function calcFuture() {
+    const card = document.getElementById('futureResultCard');
+    const section = document.getElementById('futureResultSection');
+
+    const loadError = document.getElementById('futureCalcBtn').dataset.loadError;
+    if (loadError) { section.hidden = false; card.innerHTML = `<span class="error">데이터 로드 실패: ${loadError}</span>`; return; }
+
+    const target = futureCustomTarget !== null ? futureCustomTarget : futureTarget;
+    const monthly = futureCustomMonthly !== null ? futureCustomMonthly : futureMonthly;
+    if (!target || target <= 0 || !monthly || monthly <= 0) {
+      section.hidden = false; card.innerHTML = '<span class="result-placeholder">금액을 입력해주세요</span>'; return;
+    }
+
+    const annualRate = SCENARIOS[futureTicker][futureScenario] / 100;
+    const monthlyRate = annualRate / 12;
+
+    let balance = 0, months = 0;
+    while (balance < target && months < 1200) {
+      balance = (balance + monthly) * (1 + monthlyRate);
+      months++;
+    }
+
+    const totalInvested = monthly * months;
+    const profit = balance - totalInvested;
+    const years = Math.floor(months / 12);
+    const remMonths = months % 12;
+    const periodStr = years > 0 ? `${years}년${remMonths > 0 ? ` ${remMonths}개월` : ''}` : `${months}개월`;
+    const rateLabel = futureScenario === 'high' ? '상위 25%' : futureScenario === 'mid' ? '중간값' : '하위 25%';
+    const appliedRate = SCENARIOS[futureTicker][futureScenario];
+
+    section.hidden = false;
+    card.innerHTML = `
+      <div class="result-description">
+        ${stockData?.[futureTicker]?.name ?? futureTicker} · ${rateLabel} (연 ${appliedRate}%) 기준<br>
+        매달 ${fmt(monthly)}원씩 ${fmt(target)}원 목표
+      </div>
+      <div class="result-profit gain">${periodStr}</div>
+      <div class="result-sub">목표 달성까지</div>
+      <div class="result-detail">
+        <div class="detail-item"><label>총 투자금</label><span>${fmt(totalInvested)}원</span></div>
+        <div class="detail-item"><label>예상 최종금액</label><span>${fmt(balance)}원</span></div>
+        <div class="detail-item"><label>예상 수익금</label><span style="color:#e05c5c">+${fmt(profit)}원</span></div>
+        <div class="detail-item"><label>수익률</label><span style="color:#e05c5c">+${((profit/totalInvested)*100).toFixed(1)}%</span></div>
+      </div>
+    `;
+  }
+
+  function updateScenarioChips() {
+    const s = SCENARIOS[futureTicker];
+    document.getElementById('rateHigh').textContent = `+${s.high}%`;
+    document.getElementById('rateMid').textContent  = `+${s.mid}%`;
+    document.getElementById('rateLow').textContent  = `+${s.low}%`;
+  }
+
+  function renderChart(ticker) {
+    const data = HISTORICAL[ticker];
+    const values = Object.values(data);
+    const maxAbs = Math.max(...values.map(Math.abs));
+    const POS_H = 90, NEG_H = 70;
+
+    const bars = Object.entries(data).map(([year, rate]) => {
+      const isPos = rate >= 0;
+      const h = Math.round(Math.abs(rate) / maxAbs * (isPos ? POS_H : NEG_H));
+      const sign = rate > 0 ? '+' : '';
+      return `
+        <div class="bar-col">
+          <div class="bar-upper">
+            ${isPos ? `<div class="bar-fill-pos" style="height:${h}px"></div>` : ''}
+          </div>
+          <div class="bar-lower">
+            ${!isPos ? `<div class="bar-fill-neg" style="height:${h}px"></div>` : ''}
+          </div>
+          <div class="bar-year">'${String(year).slice(2)}</div>
+          <div class="bar-tooltip">${year}: ${sign}${rate}%</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('chartBars').innerHTML = bars;
+
+    // Stats
+    const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
+    const sorted = [...values].sort((a, b) => a - b);
+    const p75 = sorted[Math.floor(sorted.length * 0.75)].toFixed(1);
+    const positiveYears = values.filter(v => v > 0).length;
+
+    document.getElementById('chartStats').innerHTML = `
+      <div class="stat-item"><label>30년 평균</label><span>+${avg}%</span></div>
+      <div class="stat-item"><label>상위 25% 기준</label><span>+${p75}%</span></div>
+      <div class="stat-item"><label>상승한 해</label><span>${positiveYears}/30년</span></div>
+    `;
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-past').hidden = tab.dataset.tab !== 'past';
+      document.getElementById('tab-future').hidden = tab.dataset.tab !== 'future';
+    });
+  });
+
+  // Past ETF cards
+  document.getElementById('pastETFCards').addEventListener('click', (e) => {
+    const card = e.target.closest('.etf-card');
+    if (!card) return;
+    document.querySelectorAll('#pastETFCards .etf-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    pastTicker = card.dataset.ticker;
+  });
+
+  // Past period chips
+  document.getElementById('pastPeriodChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#pastPeriodChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    pastMonths = parseInt(chip.dataset.months);
+  });
+
+  // Past monthly chips
+  document.getElementById('pastMonthlyChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#pastMonthlyChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const custom = document.getElementById('pastMonthlyCustom');
+    if (chip.dataset.amount === 'custom') {
+      custom.classList.add('show'); pastMonthly = null;
+      pastCustomMonthly = readManwon(document.getElementById('pastMonthlyInput'));
+    } else {
+      custom.classList.remove('show'); pastMonthly = parseInt(chip.dataset.amount); pastCustomMonthly = null;
+    }
+  });
+  document.getElementById('pastMonthlyInput').addEventListener('input', (e) => { applyManwon(e.target, (v) => { pastCustomMonthly = v; }); });
+
+  // Future ETF cards
+  document.getElementById('futureETFCards').addEventListener('click', (e) => {
+    const card = e.target.closest('.etf-card');
+    if (!card) return;
+    document.querySelectorAll('#futureETFCards .etf-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    futureTicker = card.dataset.ticker;
+    updateScenarioChips();
+  });
+
+  // Scenario chips
+  document.getElementById('scenarioChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.scenario-chip');
+    if (!chip) return;
+    document.querySelectorAll('.scenario-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    futureScenario = chip.dataset.scenario;
+  });
+
+  // Chart toggle
+  document.getElementById('chartToggleBtn').addEventListener('click', () => {
+    const btn = document.getElementById('chartToggleBtn');
+    const panel = document.getElementById('chartPanel');
+    const isOpen = panel.classList.toggle('show');
+    btn.classList.toggle('open', isOpen);
+    if (isOpen) renderChart(activeChartTicker);
+  });
+
+  // Chart tabs
+  document.querySelectorAll('.chart-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeChartTicker = tab.dataset.chart;
+      renderChart(activeChartTicker);
+    });
+  });
+
+  // Target chips
+  document.getElementById('targetChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#targetChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const custom = document.getElementById('targetCustom');
+    if (chip.dataset.amount === 'custom') {
+      custom.classList.add('show'); futureTarget = null;
+      futureCustomTarget = readManwon(document.getElementById('targetInput'));
+    } else {
+      custom.classList.remove('show'); futureTarget = parseInt(chip.dataset.amount); futureCustomTarget = null;
+    }
+  });
+  document.getElementById('targetInput').addEventListener('input', (e) => { applyManwon(e.target, (v) => { futureCustomTarget = v; }); });
+
+  // Future monthly chips
+  document.getElementById('futureMonthlyChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#futureMonthlyChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const custom = document.getElementById('futureMonthlyCustom');
+    if (chip.dataset.amount === 'custom') {
+      custom.classList.add('show'); futureMonthly = null;
+      futureCustomMonthly = readManwon(document.getElementById('futureMonthlyInput'));
+    } else {
+      custom.classList.remove('show'); futureMonthly = parseInt(chip.dataset.amount); futureCustomMonthly = null;
+    }
+  });
+  document.getElementById('futureMonthlyInput').addEventListener('input', (e) => { applyManwon(e.target, (v) => { futureCustomMonthly = v; }); });
+
+  // Calc buttons
+  document.getElementById('pastCalcBtn').addEventListener('click', calcPast);
+  document.getElementById('futureCalcBtn').addEventListener('click', calcFuture);
+
+  updateScenarioChips();
+  loadData();
+</script>
+</body>
+</html>

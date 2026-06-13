@@ -1,0 +1,9 @@
+[11-Sep-2025 18:27:47 Asia/Tokyo] PHP Parse error:  syntax error, unexpected end of file in /home/pricetag/hotlink.kr/hotdeal/run_hotdeal_crawler.php on line 117
+[12-Sep-2025 08:42:30 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Class 'QuasarzoneHotdealCrawler' not found in /home/pricetag/hotlink.kr/hotdeal/QuasarzoneHotdealCrawler.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/hotdeal/QuasarzoneHotdealCrawler.php on line 9
+[12-Sep-2025 08:42:38 Asia/Tokyo] PHP Fatal error:  Uncaught Error: Class 'QuasarzoneHotdealCrawler' not found in /home/pricetag/hotlink.kr/hotdeal/QuasarzoneHotdealCrawler.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pricetag/hotlink.kr/hotdeal/QuasarzoneHotdealCrawler.php on line 9

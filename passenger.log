@@ -1,0 +1,17 @@
+App 3587999 output: node:internal/modules/package_json_reader:92
+App 3587999 output:         throw error;
+App 3587999 output:         ^
+App 3587999 output: SyntaxError: Error parsing /home/pricetag/hotlink.kr/package.json: Unexpected end of JSON input
+App 3587999 output:     at parse (<anonymous>)
+App 3587999 output:     at read (node:internal/modules/package_json_reader:79:16)
+App 3587999 output:     at readPackage (node:internal/modules/package_json_reader:140:10)
+App 3587999 output:     at Object.readPackageScope (node:internal/modules/package_json_reader:157:19)
+App 3587999 output:     at Module._extensions..js (node:internal/modules/cjs/loader:1380:35)
+App 3587999 output:     at Module.load (node:internal/modules/cjs/loader:1197:32)
+App 3587999 output:     at Module._load (node:internal/modules/cjs/loader:1013:12)
+App 3587999 output:     at Module.require (node:internal/modules/cjs/loader:1225:19)
+App 3587999 output:     at Module.require (/opt/cpanel/ea-ruby27/root/usr/share/passenger/helper-scripts/node-loader.js:80:25)
+App 3587999 output:     at require (node:internal/modules/helpers:177:18) {
+App 3587999 output:   path: '/home/pricetag/hotlink.kr/package.json'
+App 3587999 output: }
+App 3587999 output: Node.js v18.19.0

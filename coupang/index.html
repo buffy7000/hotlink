@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쿠팡 골드박스 상품 목록</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .api-url-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .api-url-input:focus {
+            border-color: #667eea;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge.rocket {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .badge.free-shipping {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .badge.category {
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .product-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .product-link:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b5b95);
+            transform: translateY(-1px);
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c66;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+
+        .error pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .update-time {
+            grid-column: 1 / -1;
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .debug-info h4 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .debug-info pre {
+            background: white;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎁 쿠팡 골드박스</h1>
+            <p>매일 오전 7:30 업데이트되는 특가 상품들</p>
+        </div>
+        
+        <div class="controls">
+            <input 
+                type="text" 
+                id="apiUrl" 
+                class="api-url-input" 
+                placeholder="PHP API URL을 입력하세요 (예: https://your-domain.com/coupang_api.php)"
+                value=""
+            >
+            <button id="loadProducts" class="btn">상품 목록 불러오기</button>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>골드박스 상품을 불러오는 중...</p>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="debugInfo" class="debug-info" style="display: none;"></div>
+
+        <div id="productsContainer" class="products-grid"></div>
+
+        <div id="stats" class="stats" style="display: none;"></div>
+    </div>
+
+    <script>
+        // 가격 포맷팅 함수
+        function formatPrice(price) {
+            return new Intl.NumberFormat('ko-KR').format(price) + '원';
+        }
+
+        // 상품 카드 생성 함수
+        function createProductCard(product) {
+            const badges = [];
+            if (product.isRocket) badges.push('<span class="badge rocket">로켓배송</span>');
+            if (product.isFreeShipping) badges.push('<span class="badge free-shipping">무료배송</span>');
+            if (product.categoryName) badges.push(`<span class="badge category">${product.categoryName}</span>`);
+
+            return `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${product.productImage}" alt="${product.productName}" loading="lazy" 
+                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjhGOUZBIi8+CjxwYXRoIGQ9Ik00MCAyMEM0Ni42Mjc0IDIwIDUyIDI1LjM3MjYgNTIgMzJDNTIgMzguNjI3NCA0Ni42Mjc0IDQ0IDQwIDQ0QzMzLjM3MjYgNDQgMjggMzguNjI3NCAyOCAzMkMyOCAyNS4zNzI2IDMzLjM3MjYgMjAgNDAgMjBaIiBmaWxsPSIjREVFMkU2Ii8+CjxwYXRoIGQ9Ik0yOCA1Nkg1MkM1My4xMDQ2IDU2IDU0IDU1LjEwNDYgNTQgNTRWNTBDNTQgNDguODk1NCA1My4xMDQ2IDQ4IDUyIDQ4SDI4QzI2Ljg5NTQgNDggMjYgNDguODk1NCAyNiA1MFY1NEMyNiA1NS4xMDQ2IDI2Ljg5NTQgNTYgMjggNTZaIiBmaWxsPSIjREVFMkU2Ii8+Cjwvc3ZnPgo='">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.productName}</div>
+                        <div class="product-price">${formatPrice(product.productPrice)}</div>
+                        <div class="product-meta">
+                            ${badges.join('')}
+                        </div>
+                        <a href="${product.productUrl}" target="_blank" class="product-link" rel="noopener noreferrer">
+                            상품 보러가기
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 통계 정보 표시 함수
+        function displayStats(stats) {
+            const statsContainer = document.getElementById('stats');
+            
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${stats.totalProducts}</div>
+                    <div class="stat-label">총 상품수</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.rocketCount}</div>
+                    <div class="stat-label">로켓배송</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.freeShippingCount}</div>
+                    <div class="stat-label">무료배송</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${formatPrice(stats.avgPrice)}</div>
+                    <div class="stat-label">평균가격</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${formatPrice(stats.minPrice)}</div>
+                    <div class="stat-label">최저가격</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${formatPrice(stats.maxPrice)}</div>
+                    <div class="stat-label">최고가격</div>
+                </div>
+                <div class="update-time">* 골드박스 상품은 매일 오전 7:30에 업데이트됩니다</div>
+            `;
+            
+            statsContainer.style.display = 'grid';
+        }
+
+        // 상품 목록 표시 함수
+        function displayProducts(products) {
+            const container = document.getElementById('productsContainer');
+            
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="error">현재 골드박스 상품이 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = products.map(product => createProductCard(product)).join('');
+        }
+
+        // 디버그 정보 표시 함수
+        function showDebugInfo(debug) {
+            const debugDiv = document.getElementById('debugInfo');
+            if (debug) {
+                debugDiv.innerHTML = `
+                    <h4>디버그 정보</h4>
+                    <pre>${JSON.stringify(debug, null, 2)}</pre>
+                `;
+                debugDiv.style.display = 'block';
+            } else {
+                debugDiv.style.display = 'none';
+            }
+        }
+
+        // 오류 표시 함수
+        function showError(message, debug = null) {
+            const errorDiv = document.getElementById('error');
+            let errorHtml = `<strong>오류:</strong> ${message}`;
+            
+            if (debug) {
+                errorHtml += `<pre>${JSON.stringify(debug, null, 2)}</pre>`;
+            }
+            
+            errorDiv.innerHTML = errorHtml;
+            errorDiv.style.display = 'block';
+        }
+
+        // 로딩 상태 제어 함수
+        function setLoading(isLoading) {
+            const loadingDiv = document.getElementById('loading');
+            const loadButton = document.getElementById('loadProducts');
+            
+            if (isLoading) {
+                loadingDiv.style.display = 'block';
+                loadButton.disabled = true;
+                loadButton.textContent = '불러오는 중...';
+            } else {
+                loadingDiv.style.display = 'none';
+                loadButton.disabled = false;
+                loadButton.textContent = '상품 목록 불러오기';
+            }
+        }
+
+        // API 호출 함수
+        async function fetchProducts() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            
+            if (!apiUrl) {
+                showError('PHP API URL을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayProducts(data.data.products);
+                    displayStats(data.data.stats);
+                    showDebugInfo(data.debug);
+                    
+                    // API URL 저장
+                    localStorage.setItem('coupang_api_url', apiUrl);
+                } else {
+                    showError(data.error, data.debug);
+                }
+            } catch (error) {
+                showError(`네트워크 오류: ${error.message}`);
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // 메인 실행 함수
+        async function loadProducts() {
+            setLoading(true);
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('debugInfo').style.display = 'none';
+            document.getElementById('productsContainer').innerHTML = '';
+            document.getElementById('stats').style.display = 'none';
+
+            await fetchProducts();
+            setLoading(false);
+        }
+
+        // 이벤트 리스너 등록
+        document.getElementById('loadProducts').addEventListener('click', loadProducts);
+        
+        document.getElementById('apiUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadProducts();
+            }
+        });
+
+        // 페이지 로드시 저장된 URL 복원
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUrl = localStorage.getItem('coupang_api_url');
+            if (savedUrl) {
+                document.getElementById('apiUrl').value = savedUrl;
+            }
+        });
+    </script>
+</body>
+</html>

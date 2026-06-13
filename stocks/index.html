@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>껄무새 계산기 🦜</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px 80px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: #777;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 32px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #666;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    /* Select */
+    select {
+      width: 100%;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #e8e8e8;
+      font-size: 1rem;
+      padding: 14px 16px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #e05c5c;
+    }
+
+    /* Chip buttons */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 100px;
+      color: #aaa;
+      font-size: 0.9rem;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .chip:hover {
+      border-color: #555;
+      color: #e8e8e8;
+    }
+
+    .chip.active {
+      background: #e05c5c;
+      border-color: #e05c5c;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Custom qty input */
+    .qty-custom {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .qty-custom.show {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qty-custom input {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #e8e8e8;
+      font-size: 1rem;
+      padding: 12px 16px;
+      transition: border-color 0.2s;
+    }
+
+    .qty-custom input:focus {
+      outline: none;
+      border-color: #e05c5c;
+    }
+
+    .qty-custom span {
+      color: #666;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    /* Result */
+    .result-card {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .result-placeholder {
+      color: #444;
+      font-size: 0.95rem;
+    }
+
+    .result-description {
+      color: #777;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .result-profit {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .result-profit.gain { color: #e05c5c; }
+    .result-profit.loss { color: #5b9bd5; }
+
+    .result-sub {
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    .result-detail {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #222;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .detail-item label {
+      display: block;
+      font-size: 0.75rem;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .detail-item span {
+      font-size: 0.95rem;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    .loading {
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    .error {
+      color: #e05c5c;
+      font-size: 0.9rem;
+    }
+
+    .btn-calc {
+      width: 100%;
+      background: #e05c5c;
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 24px;
+    }
+
+    .btn-calc:hover { background: #c94f4f; }
+    .btn-calc:active { transform: scale(0.98); }
+
+    /* Chart */
+    .chart-wrap {
+      position: relative;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+    #priceChart { display: block; width: 100%; height: 150px; }
+    .chart-tooltip {
+      display: none;
+      position: absolute;
+      top: 8px;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.74rem;
+      color: #e8e8e8;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+      transform: translateX(-50%);
+    }
+    .chart-date-label {
+      font-size: 0.8rem;
+      color: #888;
+      text-align: center;
+      margin-top: 6px;
+      min-height: 1.1em;
+    }
+
+    .chart-date-label.selected {
+      color: #e05c5c;
+    }
+
+    .chart-hint {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 8px;
+    }
+
+    footer {
+      margin-top: 48px;
+      color: #333;
+      font-size: 0.78rem;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+  </style>
+  <script src="scripts/analytics.js"></script>
+  <script src="scripts/nav.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>🦜 껄무새 계산기</h1>
+  <p>그때 샀더라면 얼마를 벌었을까</p>
+</header>
+
+<div class="card">
+
+  <div class="section">
+    <div class="section-label">종목</div>
+    <select id="stockSelect">
+      <option value="005930">삼성전자 (005930)</option>
+      <option value="000660">SK하이닉스 (000660)</option>
+      <option value="373220">LG에너지솔루션 (373220)</option>
+      <option value="207940">삼성바이오로직스 (207940)</option>
+      <option value="005380">현대차 (005380)</option>
+      <option value="TSLA">테슬라 (TSLA)</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <div class="section-label">주가 차트</div>
+    <div class="chart-wrap">
+      <svg id="priceChart" viewBox="0 0 500 160" preserveAspectRatio="none"></svg>
+      <div class="chart-tooltip" id="chartTooltip"></div>
+    </div>
+    <div class="chart-date-label" id="chartDateLabel"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">매수 시점</div>
+    <div class="chips" id="periodChips">
+      <button class="chip" data-days="7">1주일 전</button>
+      <button class="chip active" data-days="30">1달 전</button>
+      <button class="chip" data-days="90">3달 전</button>
+      <button class="chip" data-days="180">6달 전</button>
+      <button class="chip" data-days="365">1년 전</button>
+    </div>
+    <div class="chart-hint">또는 위 차트에서 직접 날짜를 클릭하세요</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">수량</div>
+    <div class="chips" id="qtyChips">
+      <button class="chip active" data-qty="100">100주</button>
+      <button class="chip" data-qty="500">500주</button>
+      <button class="chip" data-qty="1000">1,000주</button>
+      <button class="chip" data-qty="custom">직접입력</button>
+    </div>
+    <div class="qty-custom" id="qtyCustom">
+      <input type="number" id="qtyInput" placeholder="수량 입력" min="1" />
+      <span>주</span>
+    </div>
+  </div>
+
+  <button class="btn-calc" id="calcBtn">계산하기</button>
+
+  <div class="section" style="margin-bottom:0" id="resultSection" hidden>
+    <div class="section-label">결과</div>
+    <div class="result-card" id="resultCard"></div>
+  </div>
+
+</div>
+
+<footer>
+  데이터 기준: 종가기준 / 매일 오후 4시 자동 업데이트<br>
+  투자권유가 아닙니다. 참고용으로만 사용해주세요.
+</footer>
+
+<script>
+  let stockData = null;
+  let selectedDays = 30;
+  let selectedQty = 100;
+  let customQty = null;
+  let selectedDate = null;
+  let currentTicker = '005930';
+  let chartDates = [];
+  let chartPrices = [];
+  let chartMinP = 0, chartMaxP = 0;
+
+  const CW = 500, CH = 160;
+  const CP = { l: 8, r: 8, t: 14, b: 8 };
+
+  const STOCK_NAMES = {
+    '005930': '삼성전자',
+    '000660': 'SK하이닉스',
+    '373220': 'LG에너지솔루션',
+    '207940': '삼성바이오로직스',
+    '005380': '현대차',
+    'TSLA': '테슬라',
+  };
+
+  const CURRENCY = {
+    '005930': { symbol: '₩', locale: 'ko-KR', unit: '원', decimal: 0 },
+    '000660': { symbol: '₩', locale: 'ko-KR', unit: '원', decimal: 0 },
+    '373220': { symbol: '₩', locale: 'ko-KR', unit: '원', decimal: 0 },
+    '207940': { symbol: '₩', locale: 'ko-KR', unit: '원', decimal: 0 },
+    '005380': { symbol: '₩', locale: 'ko-KR', unit: '원', decimal: 0 },
+    'TSLA':   { symbol: '$', locale: 'en-US', unit: '$',  decimal: 2 },
+  };
+
+  function xOfIdx(i) {
+    const n = chartDates.length;
+    if (n <= 1) return CP.l;
+    return CP.l + (i / (n - 1)) * (CW - CP.l - CP.r);
+  }
+
+  function yOfPrice(p) {
+    const range = chartMaxP - chartMinP || 1;
+    return CP.t + (CH - CP.t - CP.b) * (1 - (p - chartMinP) / range);
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch('data/stocks.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      stockData = await res.json();
+    } catch (e) {
+      stockData = null;
+      document.getElementById('calcBtn').dataset.loadError = e.message;
+      return;
+    }
+    renderChart(currentTicker);
+  }
+
+  function renderChart(ticker) {
+    const svg = document.getElementById('priceChart');
+    chartDates = [];
+    chartPrices = [];
+    chartMinP = 0;
+    chartMaxP = 0;
+
+    if (!stockData || !stockData[ticker]) {
+      svg.innerHTML = '';
+      return;
+    }
+
+    const prices = stockData[ticker].prices;
+    const allDates = Object.keys(prices).sort();
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 1);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+    chartDates = allDates.filter(d => d >= cutoffStr);
+    chartPrices = chartDates.map(d => prices[d]);
+
+    if (chartDates.length < 2) {
+      svg.innerHTML = '<text x="250" y="80" fill="#555" text-anchor="middle" font-size="12">데이터 부족</text>';
+      return;
+    }
+
+    chartMinP = Math.min(...chartPrices);
+    chartMaxP = Math.max(...chartPrices);
+
+    const n = chartDates.length;
+    const pts = chartDates.map((_, i) =>
+      `${i === 0 ? 'M' : 'L'}${xOfIdx(i).toFixed(1)},${yOfPrice(chartPrices[i]).toFixed(1)}`
+    ).join(' ');
+    const area = pts + ` L${xOfIdx(n-1).toFixed(1)},${CH - CP.b} L${CP.l},${CH - CP.b} Z`;
+
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#e05c5c" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#e05c5c" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${area}" fill="url(#areaGrad)" stroke="none"/>
+      <path d="${pts}" fill="none" stroke="#e05c5c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <line id="chartMarker" x1="-1" y1="${CP.t}" x2="-1" y2="${CH - CP.b}" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4,3" opacity="0" pointer-events="none"/>
+      <circle id="chartDot" cx="-1" cy="-1" r="4" fill="#ffffff" stroke="#e05c5c" stroke-width="2" opacity="0" pointer-events="none"/>
+    `;
+
+    updateChartMarker();
+  }
+
+  function updateChartMarker() {
+    const marker = document.getElementById('chartMarker');
+    const dot = document.getElementById('chartDot');
+    if (!marker || !dot || !chartDates.length || !stockData) return;
+
+    const prices = stockData[currentTicker].prices;
+    let markerDate;
+
+    if (selectedDate) {
+      markerDate = selectedDate;
+    } else {
+      const past = getPastPrice(prices, selectedDays);
+      markerDate = past?.date;
+    }
+
+    if (!markerDate) {
+      marker.setAttribute('opacity', '0');
+      dot.setAttribute('opacity', '0');
+      return;
+    }
+
+    let idx = chartDates.indexOf(markerDate);
+    if (idx === -1) {
+      const target = new Date(markerDate).getTime();
+      idx = chartDates.reduce((best, d, i) =>
+        Math.abs(new Date(d).getTime() - target) < Math.abs(new Date(chartDates[best]).getTime() - target) ? i : best
+      , 0);
+    }
+
+    const svgX = xOfIdx(idx);
+    const svgY = yOfPrice(chartPrices[idx]);
+
+    marker.setAttribute('x1', svgX.toFixed(1));
+    marker.setAttribute('x2', svgX.toFixed(1));
+    marker.setAttribute('opacity', '1');
+    dot.setAttribute('cx', svgX.toFixed(1));
+    dot.setAttribute('cy', svgY.toFixed(1));
+    dot.setAttribute('opacity', '1');
+  }
+
+  function setupChartEvents() {
+    const wrap = document.querySelector('.chart-wrap');
+    const tooltip = document.getElementById('chartTooltip');
+    const dateLabel = document.getElementById('chartDateLabel');
+
+    function fmtPrice(ticker, price) {
+      const cur = CURRENCY[ticker];
+      return cur.decimal > 0
+        ? cur.symbol + price.toLocaleString(cur.locale, { minimumFractionDigits: cur.decimal, maximumFractionDigits: cur.decimal })
+        : price.toLocaleString(cur.locale) + cur.unit;
+    }
+
+    function idxFromClientX(clientX) {
+      if (!chartDates.length) return -1;
+      const rect = wrap.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      return Math.round(ratio * (chartDates.length - 1));
+    }
+
+    wrap.addEventListener('mousemove', (e) => {
+      const idx = idxFromClientX(e.clientX);
+      if (idx < 0) return;
+      const x = e.clientX - wrap.getBoundingClientRect().left;
+      tooltip.style.display = 'block';
+      tooltip.style.left = `${x}px`;
+      tooltip.textContent = `${chartDates[idx]}  ${fmtPrice(currentTicker, chartPrices[idx])}`;
+      dateLabel.textContent = formatDate(chartDates[idx]);
+      dateLabel.classList.remove('selected');
+    });
+
+    wrap.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+      if (selectedDate) {
+        dateLabel.textContent = `📌 ${formatDate(selectedDate)} 선택됨`;
+        dateLabel.classList.add('selected');
+      } else {
+        dateLabel.textContent = '';
+        dateLabel.classList.remove('selected');
+      }
+    });
+
+    wrap.addEventListener('click', (e) => {
+      const idx = idxFromClientX(e.clientX);
+      if (idx < 0 || !chartDates.length) return;
+
+      selectedDate = chartDates[idx];
+      document.querySelectorAll('#periodChips .chip').forEach(c => c.classList.remove('active'));
+      updateChartMarker();
+
+      dateLabel.textContent = `📌 ${formatDate(selectedDate)} 선택됨`;
+      dateLabel.classList.add('selected');
+      tooltip.style.display = 'none';
+    });
+
+    let lastTouchIdx = -1;
+
+    function showTouchTooltip(clientX) {
+      const idx = idxFromClientX(clientX);
+      if (idx < 0 || !chartDates.length) return;
+      lastTouchIdx = idx;
+      const x = clientX - wrap.getBoundingClientRect().left;
+      tooltip.style.display = 'block';
+      tooltip.style.left = `${x}px`;
+      tooltip.textContent = `${chartDates[idx]}  ${fmtPrice(currentTicker, chartPrices[idx])}`;
+      dateLabel.textContent = formatDate(chartDates[idx]);
+      dateLabel.classList.remove('selected');
+
+      const marker = document.getElementById('chartMarker');
+      const dot = document.getElementById('chartDot');
+      if (marker && dot) {
+        const svgX = xOfIdx(idx);
+        const svgY = yOfPrice(chartPrices[idx]);
+        marker.setAttribute('x1', svgX.toFixed(1));
+        marker.setAttribute('x2', svgX.toFixed(1));
+        marker.setAttribute('opacity', '1');
+        dot.setAttribute('cx', svgX.toFixed(1));
+        dot.setAttribute('cy', svgY.toFixed(1));
+        dot.setAttribute('opacity', '1');
+      }
+    }
+
+    wrap.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      lastTouchIdx = -1;
+      showTouchTooltip(e.touches[0].clientX);
+    }, { passive: false });
+
+    wrap.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      showTouchTooltip(e.touches[0].clientX);
+    }, { passive: false });
+
+    wrap.addEventListener('touchend', () => {
+      tooltip.style.display = 'none';
+      if (lastTouchIdx < 0 || !chartDates.length) return;
+
+      selectedDate = chartDates[lastTouchIdx];
+      document.querySelectorAll('#periodChips .chip').forEach(c => c.classList.remove('active'));
+      updateChartMarker();
+      dateLabel.textContent = `📌 ${formatDate(selectedDate)} 선택됨`;
+      dateLabel.classList.add('selected');
+    });
+  }
+
+  function getLatestPrice(prices) {
+    const today = new Date();
+    for (let i = 0; i < 10; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      if (prices[key] !== undefined) return { date: key, price: prices[key] };
+    }
+    return null;
+  }
+
+  function getPastPrice(prices, daysAgo) {
+    const today = new Date();
+    const target = new Date(today);
+    target.setDate(target.getDate() - daysAgo);
+    for (let i = 0; i <= 10; i++) {
+      const d = new Date(target);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      if (prices[key] !== undefined) return { date: key, price: prices[key] };
+    }
+    return null;
+  }
+
+  function formatDate(dateStr) {
+    const [y, m, d] = dateStr.split('-');
+    return `${y}년 ${parseInt(m)}월 ${parseInt(d)}일`;
+  }
+
+  function calculate() {
+    const card = document.getElementById('resultCard');
+    const section = document.getElementById('resultSection');
+
+    const loadError = document.getElementById('calcBtn').dataset.loadError;
+    if (loadError) {
+      section.hidden = false;
+      card.innerHTML = `<span class="error">데이터 로드 실패: ${loadError}</span>`;
+      return;
+    }
+    if (!stockData) {
+      section.hidden = false;
+      card.innerHTML = '<span class="loading">데이터 불러오는 중... 잠시 후 다시 눌러주세요</span>';
+      return;
+    }
+    section.hidden = false;
+
+    const ticker = currentTicker;
+    const qty = customQty !== null ? customQty : selectedQty;
+
+    if (!qty || qty <= 0) {
+      card.innerHTML = '<span class="result-placeholder">수량을 입력해주세요</span>';
+      return;
+    }
+
+    const prices = stockData[ticker]?.prices;
+    if (!prices) {
+      card.innerHTML = '<span class="error">해당 종목 데이터가 없습니다</span>';
+      return;
+    }
+
+    const latest = getLatestPrice(prices);
+    let past;
+    if (selectedDate) {
+      const price = prices[selectedDate];
+      if (price === undefined) {
+        card.innerHTML = '<span class="error">선택된 날짜의 데이터가 없습니다</span>';
+        return;
+      }
+      past = { date: selectedDate, price };
+    } else {
+      past = getPastPrice(prices, selectedDays);
+    }
+
+    if (!latest || !past) {
+      card.innerHTML = '<span class="error">해당 기간 데이터가 부족합니다</span>';
+      return;
+    }
+
+    if (latest.date === past.date) {
+      card.innerHTML = '<span class="error">해당 기간 데이터가 충분하지 않습니다</span>';
+      return;
+    }
+
+    const buyTotal = past.price * qty;
+    const nowTotal = latest.price * qty;
+    const diff = nowTotal - buyTotal;
+    const pct = ((diff / buyTotal) * 100).toFixed(2);
+    const isGain = diff >= 0;
+
+    const cur = CURRENCY[ticker];
+    const fmt = (n) => cur.decimal > 0
+      ? cur.symbol + n.toLocaleString(cur.locale, { minimumFractionDigits: cur.decimal, maximumFractionDigits: cur.decimal })
+      : n.toLocaleString(cur.locale) + cur.unit;
+    const fmtQty = (n) => n.toLocaleString('ko-KR');
+    const sign = isGain ? '+' : '';
+    const cls = isGain ? 'gain' : 'loss';
+    const label = isGain ? '수익' : '손실';
+
+    card.innerHTML = `
+      <div class="result-description">
+        <strong>${STOCK_NAMES[ticker]}</strong>을 ${formatDate(past.date)}에<br>
+        ${fmtQty(qty)}주 샀더라면 (${fmt(buyTotal)})
+      </div>
+      <div class="result-profit ${cls}">
+        ${sign}${fmt(diff)}
+      </div>
+      <div class="result-sub">${sign}${pct}% ${label}</div>
+      <div class="result-detail">
+        <div class="detail-item">
+          <label>매수가 (${past.date})</label>
+          <span>${fmt(past.price)}</span>
+        </div>
+        <div class="detail-item">
+          <label>현재가 (${latest.date})</label>
+          <span>${fmt(latest.price)}</span>
+        </div>
+        <div class="detail-item">
+          <label>매수금액</label>
+          <span>${fmt(buyTotal)}</span>
+        </div>
+        <div class="detail-item">
+          <label>현재평가</label>
+          <span>${fmt(nowTotal)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Stock select
+  document.getElementById('stockSelect').addEventListener('change', (e) => {
+    currentTicker = e.target.value;
+    selectedDate = null;
+    const dateLabel = document.getElementById('chartDateLabel');
+    dateLabel.textContent = '';
+    dateLabel.classList.remove('selected');
+    renderChart(currentTicker);
+    document.getElementById('resultSection').hidden = true;
+  });
+
+  // Period chips
+  document.getElementById('periodChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#periodChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedDays = parseInt(chip.dataset.days);
+    selectedDate = null;
+    const dateLabel = document.getElementById('chartDateLabel');
+    dateLabel.textContent = '';
+    dateLabel.classList.remove('selected');
+    updateChartMarker();
+  });
+
+  // Qty chips
+  document.getElementById('qtyChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#qtyChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+
+    const custom = document.getElementById('qtyCustom');
+    if (chip.dataset.qty === 'custom') {
+      custom.classList.add('show');
+      selectedQty = null;
+      customQty = parseInt(document.getElementById('qtyInput').value) || null;
+    } else {
+      custom.classList.remove('show');
+      selectedQty = parseInt(chip.dataset.qty);
+      customQty = null;
+    }
+  });
+
+  document.getElementById('qtyInput').addEventListener('input', (e) => {
+    customQty = parseInt(e.target.value) || null;
+  });
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+
+  setupChartEvents();
+  loadData();
+</script>
+</body>
+</html>
