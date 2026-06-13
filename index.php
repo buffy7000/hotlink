@@ -1216,8 +1216,8 @@ function escapeOgContent($content) {
   <select class="time-selector-native" id="timeSelect">
     <option value="3h">3시간</option>
     <option value="6h">6시간</option>
-    <option value="12h">12시간</option>
-    <option value="24h" selected>24시간</option>
+    <option value="12h" selected>12시간</option>
+    <option value="24h">24시간</option>
     <option value="3d">3일</option>
   </select>
   
@@ -1329,7 +1329,7 @@ function escapeOgContent($content) {
       
       var listEl = document.getElementById('list');
       var currentSettings = {
-        time: '24h',
+        time: '12h',
         sort: 'hot',
         communities: ['all'],
         date: formatDateForInput(new Date()),
@@ -1393,9 +1393,9 @@ function escapeOgContent($content) {
         document.getElementById('todayBtn').addEventListener('click', function() {
           currentSettings.date = formatDateForInput(new Date());
           currentSettings.isToday = true;
-          currentSettings.time = '24h';
+          currentSettings.time = '12h';
           document.getElementById('dateSelect').value = currentSettings.date;
-          document.getElementById('timeSelect').value = '24h';
+          document.getElementById('timeSelect').value = '12h';
           updateDateDisplay();
           renderList();
         });
