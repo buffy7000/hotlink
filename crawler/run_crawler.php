@@ -53,7 +53,11 @@ try {
     // ⭐️ 오늘의유머 크롤링 실행
     writeLog("오늘의유머 크롤링 중...");
     include '/home/pricetag/hotlink.kr/crawler/test_crawler_todayhumor.php';
-    
+
+    // ⭐️ 인벤 크롤링 실행
+    writeLog("인벤 크롤링 중...");
+    include '/home/pricetag/hotlink.kr/crawler/test_crawler_inven.php';
+
     writeLog("크롤링 완료");
     
 } catch (Exception $e) {
