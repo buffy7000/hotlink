@@ -1809,7 +1809,7 @@ function renderByCommunityGroups(data, limitPerCommunity) {
       // 커뮤니티 제목과 더보기 버튼
       html += '<div style="background: #f8fafc; padding: 8px 16px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">' +
               '<span>' + communityNames[community] + '</span>' +
-              '<a href="' + moreLink + '" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500;">더보기 ></a>' +
+              '<a href="#" class="more-btn" data-community="' + community + '" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500;">더보기 ></a>' +
               '</div>';
 
       for (var i = 0; i < communityData.length; i++) {
