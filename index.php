@@ -2117,79 +2117,61 @@ if (document.readyState === 'loading') {
   setTimeout(init, 0);
 }
 
-// 인벤 추가 토스트
+// 토스트 알림 시스템 (인벤 → SLR 순서)
 (function() {
-  var TOAST_KEY = 'invenToastSeen';
-  if (localStorage.getItem(TOAST_KEY)) return;
+  var INVEN_KEY = 'invenToastSeen';
+  var SLR_KEY = 'slrclubToastSeen';
 
-  var toast = document.getElementById('invenToast');
-  var closeBtn = document.getElementById('invenToastClose');
-  var timer = null;
+  function setupToast(toastId, closeBtnId, navCommunity, onPersistDismiss) {
+    var toast = document.getElementById(toastId);
+    var closeBtn = document.getElementById(closeBtnId);
+    var timer = null;
 
-  function hideToast(persist) {
-    clearTimeout(timer);
-    toast.classList.remove('show');
-    toast.classList.add('hide');
-    if (persist) localStorage.setItem(TOAST_KEY, '1');
+    function hide(persist) {
+      clearTimeout(timer);
+      toast.classList.remove('show');
+      toast.classList.add('hide');
+      if (persist && onPersistDismiss) onPersistDismiss();
+    }
+
+    toast.addEventListener('click', function(e) {
+      if (e.target === closeBtn) return;
+      hide(true);
+      var nav = document.querySelector('.nav-item[data-community="' + navCommunity + '"]');
+      if (nav) {
+        nav.click();
+        nav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      hide(true);
+    });
+
+    setTimeout(function() {
+      toast.classList.add('show');
+      timer = setTimeout(function() { hide(false); }, 5000);
+    }, 500);
   }
 
-  toast.addEventListener('click', function(e) {
-    if (e.target === closeBtn) return;
-    hideToast(true);
-    var invenNav = document.querySelector('.nav-item[data-community="inven"]');
-    if (invenNav) {
-      invenNav.click();
-      invenNav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-  });
-
-  closeBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    hideToast(true);
-  });
-
-  setTimeout(function() {
-    toast.classList.add('show');
-    timer = setTimeout(function() { hideToast(false); }, 5000);
-  }, 500);
-})();
-
-// SLR클럽 추가 토스트 (인벤 토스트를 이미 본 사용자에게만 표시)
-(function() {
-  var TOAST_KEY = 'slrclubToastSeen';
-  if (localStorage.getItem(TOAST_KEY)) return;
-  if (!localStorage.getItem('invenToastSeen')) return;
-
-  var toast = document.getElementById('slrclubToast');
-  var closeBtn = document.getElementById('slrclubToastClose');
-  var timer = null;
-
-  function hideToast(persist) {
-    clearTimeout(timer);
-    toast.classList.remove('show');
-    toast.classList.add('hide');
-    if (persist) localStorage.setItem(TOAST_KEY, '1');
+  function showSlr() {
+    if (localStorage.getItem(SLR_KEY)) return;
+    setupToast('slrclubToast', 'slrclubToastClose', 'slrclub', function() {
+      localStorage.setItem(SLR_KEY, '1');
+    });
   }
 
-  toast.addEventListener('click', function(e) {
-    if (e.target === closeBtn) return;
-    hideToast(true);
-    var slrNav = document.querySelector('.nav-item[data-community="slrclub"]');
-    if (slrNav) {
-      slrNav.click();
-      slrNav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-  });
-
-  closeBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    hideToast(true);
-  });
-
-  setTimeout(function() {
-    toast.classList.add('show');
-    timer = setTimeout(function() { hideToast(false); }, 5000);
-  }, 1000);
+  if (!localStorage.getItem(INVEN_KEY)) {
+    // 인벤 토스트 표시 → 닫으면 SLR 표시
+    setupToast('invenToast', 'invenToastClose', 'inven', function() {
+      localStorage.setItem(INVEN_KEY, '1');
+      setTimeout(showSlr, 400);
+    });
+  } else {
+    // 인벤은 이미 봤으니 SLR 바로 시도
+    showSlr();
+  }
 })();
 
 
