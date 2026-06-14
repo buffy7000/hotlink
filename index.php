@@ -1058,6 +1058,10 @@ function escapeOgContent($content) {
   max-width: 320px;
   cursor: pointer;
   border-left: 4px solid var(--inven-color);
+}
+
+#slrclubToast {
+  border-left-color: var(--slrclub-color);
   transform: translateX(calc(100% + 32px));
   opacity: 0;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
@@ -1379,6 +1383,16 @@ function escapeOgContent($content) {
       <div class="toast-desc">게임 인기글도 이제 핫링크에서 확인하세요</div>
     </div>
     <button class="toast-close" id="invenToastClose" aria-label="닫기">✕</button>
+  </div>
+
+  <!-- SLR클럽 추가 토스트 알림 -->
+  <div class="toast-notification" id="slrclubToast">
+    <div class="toast-icon">📸</div>
+    <div class="toast-content">
+      <div class="toast-title">SLR클럽이 추가됐어요!</div>
+      <div class="toast-desc">카메라·IT 인기글도 이제 핫링크에서 확인하세요</div>
+    </div>
+    <button class="toast-close" id="slrclubToastClose" aria-label="닫기">✕</button>
   </div>
 
   <!-- 리스트 컨테이너 -->
@@ -2138,6 +2152,44 @@ if (document.readyState === 'loading') {
     toast.classList.add('show');
     timer = setTimeout(function() { hideToast(false); }, 5000);
   }, 500);
+})();
+
+// SLR클럽 추가 토스트 (인벤 토스트를 이미 본 사용자에게만 표시)
+(function() {
+  var TOAST_KEY = 'slrclubToastSeen';
+  if (localStorage.getItem(TOAST_KEY)) return;
+  if (!localStorage.getItem('invenToastSeen')) return;
+
+  var toast = document.getElementById('slrclubToast');
+  var closeBtn = document.getElementById('slrclubToastClose');
+  var timer = null;
+
+  function hideToast(persist) {
+    clearTimeout(timer);
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    if (persist) localStorage.setItem(TOAST_KEY, '1');
+  }
+
+  toast.addEventListener('click', function(e) {
+    if (e.target === closeBtn) return;
+    hideToast(true);
+    var slrNav = document.querySelector('.nav-item[data-community="slrclub"]');
+    if (slrNav) {
+      slrNav.click();
+      slrNav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  });
+
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    hideToast(true);
+  });
+
+  setTimeout(function() {
+    toast.classList.add('show');
+    timer = setTimeout(function() { hideToast(false); }, 5000);
+  }, 1000);
 })();
 
 

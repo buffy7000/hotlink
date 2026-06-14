@@ -15,13 +15,12 @@ class SlrclubCrawler extends BaseCrawler {
 
     public function crawlMultiplePages($pages = 3, $limitPerPage = 20) {
         $totalSaved = 0;
+        $url = $this->targetUrl;
 
         for ($page = 1; $page <= $pages; $page++) {
             try {
                 echo "\nSLR클럽 {$page}페이지 크롤링 중...\n";
                 echo str_repeat("=", 60) . "\n";
-
-                $url = $page === 1 ? $this->targetUrl : $this->targetUrl . '?p=' . $page;
                 echo "URL: {$url}\n";
 
                 $html = $this->makeRequest($url);
@@ -41,18 +40,44 @@ class SlrclubCrawler extends BaseCrawler {
                 }
 
                 if ($page < $pages) {
+                    $nextUrl = $this->getNextPageUrl($html);
+                    if (!$nextUrl) {
+                        echo "다음 페이지를 찾을 수 없습니다. 종료합니다.\n";
+                        break;
+                    }
+                    $url = $nextUrl;
                     echo "다음 페이지까지 2초 대기...\n";
                     sleep(2);
                 }
 
             } catch (Exception $e) {
                 echo "페이지 {$page} 크롤링 실패: " . $e->getMessage() . "\n";
-                continue;
+                break;
             }
         }
 
         echo "\n전체 SLR클럽 크롤링 완료: 총 {$totalSaved}개 게시글 저장\n";
         return $totalSaved;
+    }
+
+    private function getNextPageUrl($html) {
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+        libxml_clear_errors();
+
+        $xpath = new DOMXPath($dom);
+
+        // 다음페이지 이미지 링크: <a href="/l/hot_article/37493"><img alt="다음페이지" ...></a>
+        $nextLink = $xpath->query("//a[.//img[contains(@alt, '다음')]]")->item(0);
+        if ($nextLink) {
+            $href = $nextLink->getAttribute('href');
+            if (!empty($href)) {
+                return (strpos($href, 'http') === 0) ? $href : $this->baseUrl . $href;
+            }
+        }
+
+        return null;
     }
 
     private function parsePosts($html, $limit) {
