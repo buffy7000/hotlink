@@ -58,6 +58,10 @@ try {
     writeLog("인벤 크롤링 중...");
     include '/home/pricetag/hotlink.kr/crawler/test_crawler_inven.php';
 
+    // ⭐️ SLR클럽 크롤링 실행
+    writeLog("SLR클럽 크롤링 중...");
+    include '/home/pricetag/hotlink.kr/crawler/test_crawler_slrclub.php';
+
     writeLog("크롤링 완료");
     
 } catch (Exception $e) {

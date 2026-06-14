@@ -128,6 +128,7 @@ function escapeOgContent($content) {
       --humoruniv-color: #f59e0b;
       --todayhumor-color: #d97706;
       --inven-color: #1C3F6E;
+      --slrclub-color: #C0392B;
     }
 
     /* @media (prefers-color-scheme: dark) {
@@ -558,6 +559,10 @@ function escapeOgContent($content) {
       background: linear-gradient(135deg, var(--inven-color), #0f2a50);
       box-shadow: 0 2px 8px rgba(28, 63, 110, 0.3);
     }
+    .rank-number[data-community="slrclub"] {
+      background: linear-gradient(135deg, var(--slrclub-color), #922b21);
+      box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+    }
 
     .rank-number.rank-1::after {
       content: '👑';
@@ -618,6 +623,7 @@ function escapeOgContent($content) {
     .source-label[data-community="humoruniv"] { background: var(--humoruniv-color); }
     .source-label[data-community="todayhumor"] { background: var(--todayhumor-color); }
     .source-label[data-community="inven"] { background: var(--inven-color); }
+    .source-label[data-community="slrclub"] { background: var(--slrclub-color); }
 
     .item-title {
       font-weight: 600;
@@ -1205,6 +1211,11 @@ function escapeOgContent($content) {
     <span class="nav-menu">인벤</span>
   </a>
 </li>
+<li class="nav-item-wrapper">
+  <a href="#" class="nav-item" data-community="slrclub">
+    <span class="nav-menu">SLR</span>
+  </a>
+</li>
   </ul>
 </div>
 
@@ -1659,7 +1670,7 @@ function loadDataFromAPI() {
 // 새로운 함수 추가 (Promise.all 사용)
 
 function loadDataForAllCommunities() {
-  var communities = ['ppomppu', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven'];
+  var communities = ['ppomppu', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven', 'slrclub'];
   
   var hasHighlight = document.querySelector('.highlighted-item');
 if (!hasHighlight) {
@@ -1742,7 +1753,7 @@ function renderOriginalList() {
 
 // 커뮤니티별 그룹화 렌더링 함수 추가
 function renderByCommunityGroups(data, limitPerCommunity) {
-  var communities = ['ppomppu', 'clien', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven'];
+  var communities = ['ppomppu', 'clien', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven', 'slrclub'];
   var communityNames = {
     'ppomppu': '뽐뿌',
     'clien': '클리앙',
@@ -1753,7 +1764,8 @@ function renderByCommunityGroups(data, limitPerCommunity) {
     'bobaedream': '보배드림',
     'humoruniv': '웃긴대학',
     'todayhumor': '오늘의유머',
-    'inven': '인벤'
+    'inven': '인벤',
+    'slrclub': 'SLR클럽'
   };
   
   var html = '';
@@ -1858,7 +1870,8 @@ function renderSingleItem(item, rank) {
     'bobaedream': { key: 'bobaedream', name: '보배드림', shortName: '보배드림' },
     'humoruniv': { key: 'humoruniv', name: '웃긴대학', shortName: '웃대' },
     'todayhumor': { key: 'todayhumor', name: '오늘의유머', shortName: '오유' },
-    'inven': { key: 'inven', name: '인벤', shortName: '인벤' }
+    'inven': { key: 'inven', name: '인벤', shortName: '인벤' },
+    'slrclub': { key: 'slrclub', name: 'SLR클럽', shortName: 'SLR' }
   };
 
   var communityInfo = siteMapping[item.site] || { 
