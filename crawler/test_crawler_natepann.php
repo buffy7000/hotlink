@@ -133,6 +133,8 @@ class NatePannCrawler extends BaseCrawler {
             } else {
                 $url = $href;
             }
+            // ?currMenu=...&page=N 등 페이지 의존 파라미터 제거 (중복 저장 방지)
+            $url = preg_replace('/\?.*$/', '', $url);
             echo "  URL: {$url}\n";
         }
         
