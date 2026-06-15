@@ -139,6 +139,8 @@ class SlrclubCrawler extends BaseCrawler {
 
         $href = $linkNode->getAttribute('href');
         $url = (strpos($href, 'http') === 0) ? $href : $this->baseUrl . $href;
+        // ?&page=xxxxx 파라미터 제거 (페이지마다 URL이 달라 중복 저장 방지)
+        $url = preg_replace('/\?.*$/', '', $url);
 
         // 2. 작성자 (span.lop)
         $author = 'SLR클럽';
