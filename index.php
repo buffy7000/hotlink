@@ -1684,50 +1684,28 @@ function loadDataFromAPI() {
 // 새로운 함수 추가 (Promise.all 사용)
 
 function loadDataForAllCommunities() {
-  var communities = ['ppomppu', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven', 'slrclub'];
-  
   var hasHighlight = document.querySelector('.highlighted-item');
-if (!hasHighlight) {
-  listEl.innerHTML = '<div class="loading">데이터를 불러오는 중...</div>';
-}
-  
-  // 모든 커뮤니티에 대한 Promise 배열 생성 (병렬 처리)
-  var promises = communities.map(function(community) {
-    var url = '/api/posts.php?communities=' + community + '&sort=' + currentSettings.sort;
-    
-    // 오늘이 아니면 date 파라미터, 오늘이면 time 파라미터
-    if (!currentSettings.isToday) {
-      url += '&date=' + currentSettings.date;
-    } else {
-      url += '&time=' + currentSettings.time;
-    }
-    
-    return fetch(url)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(result) {
-        if (result.success && result.data) {
-          return result.data.slice(0, 5); // 각 커뮤니티에서 5개만
-        }
-        return [];
-      })
-      .catch(function(error) {
-        console.error('API 호출 실패 (' + community + '):', error);
-        return [];
-      });
-  });
-  
-  // 모든 Promise가 완료되면 데이터 합치기 (동시 처리)
-  Promise.all(promises)
-    .then(function(results) {
-      var allData = [];
-      results.forEach(function(communityData) {
-        allData = allData.concat(communityData);
-      });
-      
-      mirrorData = allData;
-      renderOriginalList();
+  if (!hasHighlight) {
+    listEl.innerHTML = '<div class="loading">데이터를 불러오는 중...</div>';
+  }
+
+  var url = '/api/posts.php?group_limit=5&sort=' + currentSettings.sort;
+
+  if (!currentSettings.isToday) {
+    url += '&date=' + currentSettings.date;
+  } else {
+    url += '&time=' + currentSettings.time;
+  }
+
+  fetch(url)
+    .then(function(response) { return response.json(); })
+    .then(function(result) {
+      if (result.success && result.data) {
+        mirrorData = result.data;
+        renderOriginalList();
+      } else {
+        throw new Error(result.error || '데이터 로드 실패');
+      }
     })
     .catch(function(error) {
       console.error('전체 데이터 로딩 실패:', error);

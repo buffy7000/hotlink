@@ -171,16 +171,59 @@ try {
         'comments' => 'comments_count DESC',
         'views' => 'views_count DESC'
     ];
-    
+    $sortCondition = $sortConditions[$sort] ?? $sortConditions['hot'];
+
+    // group_limit 모드: 커뮤니티별 상위 N개 보장 (UNION ALL)
+    if (isset($_GET['group_limit'])) {
+        $groupLimit = min(max(intval($_GET['group_limit']), 1), 20);
+        $groupCommunityIds = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // clien 제외
+
+        $siteMap = [
+            1 => 'ppomppu', 2 => 'clien', 3 => 'natepann', 4 => 'ruliweb',
+            5 => 'theqoo', 6 => 'mlbpark', 7 => 'bobaedream', 8 => 'humoruniv',
+            9 => 'todayhumor', 10 => 'inven', 11 => 'slrclub'
+        ];
+
+        $cols = "id, title, comments_count, created_at, views_count, author, community_id, url, rank_score";
+        $unionParts = [];
+        foreach ($groupCommunityIds as $cid) {
+            $unionParts[] = "(SELECT $cols FROM posts WHERE community_id = $cid AND $timeCondition ORDER BY $sortCondition LIMIT $groupLimit)";
+        }
+        $sql = implode(' UNION ALL ', $unionParts);
+
+        $stmt = $db->query($sql, []);
+        $results = $stmt->fetchAll();
+
+        $formattedData = [];
+        foreach ($results as $index => $item) {
+            $formattedData[] = [
+                'id'          => intval($item['id']),
+                'rank'        => $index + 1,
+                'title'       => $item['title'],
+                'comments'    => $item['comments_count'] ? intval($item['comments_count']) : null,
+                'timestamp'   => date('Y-m-d H:i', strtotime($item['created_at'])),
+                'timeAgo'     => getTimeAgo($item['created_at']),
+                'views'       => intval($item['views_count']),
+                'author'      => $item['author'],
+                'site'        => $siteMap[$item['community_id']] ?? 'unknown',
+                'originalUrl' => $item['url']
+            ];
+        }
+
+        $response = json_encode(['success' => true, 'data' => $formattedData], JSON_UNESCAPED_UNICODE);
+        file_put_contents($cache_file, $response);
+        echo $response;
+        exit;
+    }
+
     // 4. WHERE 절 구성
     $whereClause = "WHERE $timeCondition";
     if ($communityFilter) {
         $whereClause .= " $communityFilter";
     }
-    
+
     // 5. SQL 쿼리 구성
     $offset = ($page - 1) * $limit;
-    $sortCondition = $sortConditions[$sort] ?? $sortConditions['hot'];
     
     $sql = "
         SELECT 
