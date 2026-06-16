@@ -5,7 +5,7 @@ header('Access-Control-Allow-Origin: *');
 try {
     $pdo = new PDO(
         'mysql:host=localhost;dbname=pricetag_job;charset=utf8mb4',
-        'pricetag_pricetag',
+        'pricetag_job',
         '***REMOVED***',
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
     );

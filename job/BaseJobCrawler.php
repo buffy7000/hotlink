@@ -17,7 +17,7 @@ abstract class BaseJobCrawler {
         try {
             $this->pdo = new PDO(
                 'mysql:host=localhost;dbname=pricetag_job;charset=utf8mb4',
-                'pricetag_pricetag',
+                'pricetag_job',
                 '***REMOVED***',
                 [
                     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
