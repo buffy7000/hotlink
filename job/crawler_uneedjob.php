@@ -63,6 +63,7 @@ class UneedJobCrawler extends BaseJobCrawler {
                 : $this->cleanText($tds->item(1)->textContent);
 
             if (empty($title)) continue;
+            if (strpos($title, '기획') === false) continue;
 
             // 3번째 td: 기간
             $period = $tds->item(2)->getAttribute('title') ?: $this->cleanText($tds->item(2)->textContent);
