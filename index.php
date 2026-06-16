@@ -129,6 +129,7 @@ function escapeOgContent($content) {
       --todayhumor-color: #d97706;
       --inven-color: #1C3F6E;
       --slrclub-color: #C0392B;
+      --etoland-color: #E85D04;
     }
 
     /* @media (prefers-color-scheme: dark) {
@@ -563,6 +564,10 @@ function escapeOgContent($content) {
       background: linear-gradient(135deg, var(--slrclub-color), #922b21);
       box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
     }
+    .rank-number[data-community="etoland"] {
+      background: linear-gradient(135deg, var(--etoland-color), #9c3a00);
+      box-shadow: 0 2px 8px rgba(232, 93, 4, 0.3);
+    }
 
     .rank-number.rank-1::after {
       content: '👑';
@@ -624,6 +629,7 @@ function escapeOgContent($content) {
     .source-label[data-community="todayhumor"] { background: var(--todayhumor-color); }
     .source-label[data-community="inven"] { background: var(--inven-color); }
     .source-label[data-community="slrclub"] { background: var(--slrclub-color); }
+    .source-label[data-community="etoland"] { background: var(--etoland-color); }
 
     .item-title {
       font-weight: 600;
@@ -1062,6 +1068,10 @@ function escapeOgContent($content) {
 
 #slrclubToast {
   border-left-color: var(--slrclub-color);
+}
+
+#etolandToast {
+  border-left-color: var(--etoland-color);
   transform: translateX(calc(100% + 32px));
   opacity: 0;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
@@ -1218,6 +1228,9 @@ function escapeOgContent($content) {
 <li class="nav-item-wrapper">
   <a href="#" class="nav-item" data-community="slrclub">
     <span class="nav-menu">SLR</span>
+  </a>
+  <a href="#" class="nav-item" data-community="etoland">
+    <span class="nav-menu">이토</span>
   </a>
 </li>
   </ul>
@@ -1393,6 +1406,16 @@ function escapeOgContent($content) {
       <div class="toast-desc">카메라·IT 인기글도 이제 핫링크에서 확인하세요</div>
     </div>
     <button class="toast-close" id="slrclubToastClose" aria-label="닫기">✕</button>
+  </div>
+
+  <!-- 이토랜드 추가 토스트 알림 -->
+  <div class="toast-notification" id="etolandToast">
+    <div class="toast-icon">🔥</div>
+    <div class="toast-content">
+      <div class="toast-title">이토랜드가 추가됐어요!</div>
+      <div class="toast-desc">이토랜드 인기글도 이제 핫링크에서 확인하세요</div>
+    </div>
+    <button class="toast-close" id="etolandToastClose" aria-label="닫기">✕</button>
   </div>
 
   <!-- 리스트 컨테이너 -->
@@ -1745,7 +1768,7 @@ function renderOriginalList() {
 
 // 커뮤니티별 그룹화 렌더링 함수 추가
 function renderByCommunityGroups(data, limitPerCommunity) {
-  var communities = ['ppomppu', 'clien', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven', 'slrclub'];
+  var communities = ['ppomppu', 'clien', 'natepann', 'ruliweb', 'theqoo', 'mlbpark', 'bobaedream', 'humoruniv', 'todayhumor', 'inven', 'slrclub', 'etoland'];
   var communityNames = {
     'ppomppu': '뽐뿌',
     'clien': '클리앙',
@@ -1757,7 +1780,8 @@ function renderByCommunityGroups(data, limitPerCommunity) {
     'humoruniv': '웃긴대학',
     'todayhumor': '오늘의유머',
     'inven': '인벤',
-    'slrclub': 'SLR클럽'
+    'slrclub': 'SLR클럽',
+    'etoland': '이토랜드'
   };
   
   var html = '';
@@ -1863,7 +1887,8 @@ function renderSingleItem(item, rank) {
     'humoruniv': { key: 'humoruniv', name: '웃긴대학', shortName: '웃대' },
     'todayhumor': { key: 'todayhumor', name: '오늘의유머', shortName: '오유' },
     'inven': { key: 'inven', name: '인벤', shortName: '인벤' },
-    'slrclub': { key: 'slrclub', name: 'SLR클럽', shortName: 'SLR' }
+    'slrclub': { key: 'slrclub', name: 'SLR클럽', shortName: 'SLR' },
+    'etoland': { key: 'etoland', name: '이토랜드', shortName: '이토' }
   };
 
   var communityInfo = siteMapping[item.site] || { 
@@ -2095,10 +2120,11 @@ if (document.readyState === 'loading') {
   setTimeout(init, 0);
 }
 
-// 토스트 알림 시스템 (인벤 → SLR 순서)
+// 토스트 알림 시스템 (인벤 → SLR → 이토랜드 순서)
 (function() {
   var INVEN_KEY = 'invenToastSeen';
   var SLR_KEY = 'slrclubToastSeen';
+  var ETO_KEY = 'etolandToastSeen';
 
   function setupToast(toastId, closeBtnId, navCommunity, onPersistDismiss) {
     var toast = document.getElementById(toastId);
@@ -2133,22 +2159,30 @@ if (document.readyState === 'loading') {
     }, 500);
   }
 
+  function showEto() {
+    if (localStorage.getItem(ETO_KEY)) return;
+    setupToast('etolandToast', 'etolandToastClose', 'etoland', function() {
+      localStorage.setItem(ETO_KEY, '1');
+    });
+  }
+
   function showSlr() {
     if (localStorage.getItem(SLR_KEY)) return;
     setupToast('slrclubToast', 'slrclubToastClose', 'slrclub', function() {
       localStorage.setItem(SLR_KEY, '1');
+      setTimeout(showEto, 400);
     });
   }
 
   if (!localStorage.getItem(INVEN_KEY)) {
-    // 인벤 토스트 표시 → 닫으면 SLR 표시
     setupToast('invenToast', 'invenToastClose', 'inven', function() {
       localStorage.setItem(INVEN_KEY, '1');
       setTimeout(showSlr, 400);
     });
-  } else {
-    // 인벤은 이미 봤으니 SLR 바로 시도
+  } else if (!localStorage.getItem(SLR_KEY)) {
     showSlr();
+  } else {
+    showEto();
   }
 })();
 

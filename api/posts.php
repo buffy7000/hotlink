@@ -44,7 +44,10 @@ if (isset($_GET['highlight'])) {  // ← post_id 대신 highlight
                 6 => 'mlbpark',
                 7 => 'bobaedream',
                 8 => 'humoruniv',
-                9 => 'todayhumor'
+                9 => 'todayhumor',
+                10 => 'inven',
+                11 => 'slrclub',
+                12 => 'etoland'
             ];
             
             $data = [
@@ -147,7 +150,8 @@ try {
             'humoruniv' => 8,
             'todayhumor' => 9,
             'inven' => 10,
-            'slrclub' => 11
+            'slrclub' => 11,
+            'etoland' => 12
         ];
         
         $communityIds = [];
@@ -176,12 +180,12 @@ try {
     // group_limit 모드: 커뮤니티별 상위 N개 보장 (UNION ALL)
     if (isset($_GET['group_limit'])) {
         $groupLimit = min(max(intval($_GET['group_limit']), 1), 20);
-        $groupCommunityIds = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // clien 제외
+        $groupCommunityIds = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // clien 제외
 
         $siteMap = [
             1 => 'ppomppu', 2 => 'clien', 3 => 'natepann', 4 => 'ruliweb',
             5 => 'theqoo', 6 => 'mlbpark', 7 => 'bobaedream', 8 => 'humoruniv',
-            9 => 'todayhumor', 10 => 'inven', 11 => 'slrclub'
+            9 => 'todayhumor', 10 => 'inven', 11 => 'slrclub', 12 => 'etoland'
         ];
 
         $cols = "id, title, comments_count, created_at, views_count, author, community_id, url, rank_score";
@@ -260,9 +264,10 @@ try {
             8 => 'humoruniv',
             9 => 'todayhumor',
             10 => 'inven',
-            11 => 'slrclub'
+            11 => 'slrclub',
+            12 => 'etoland'
         ];
-        
+
         $formattedData[] = [
             'id' => intval($item['id']),
             'rank' => $offset + $index + 1,

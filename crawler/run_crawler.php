@@ -62,6 +62,10 @@ try {
     writeLog("SLR클럽 크롤링 중...");
     include '/home/pricetag/hotlink.kr/crawler/test_crawler_slrclub.php';
 
+    // ⭐️ 이토랜드 크롤링 실행
+    writeLog("이토랜드 크롤링 중...");
+    include '/home/pricetag/hotlink.kr/crawler/test_crawler_etoland.php';
+
     writeLog("크롤링 완료");
     
 } catch (Exception $e) {
