@@ -2,9 +2,8 @@
 require_once __DIR__ . '/BaseJobCrawler.php';
 
 class OkkyCrawler extends BaseJobCrawler {
-    private $baseUrl    = 'https://jobs.okky.kr';
-    // 포지션그룹[2] = 기획/디자인
-    private $listUrl    = 'https://jobs.okky.kr/contract?positionGroup%5B0%5D=2';
+    private $baseUrl = 'https://jobs.okky.kr';
+    private $listUrl = 'https://jobs.okky.kr/contract?positionGroup%5B0%5D=2';
 
     public function __construct() {
         parent::__construct(3, 'okky');
@@ -20,17 +19,10 @@ class OkkyCrawler extends BaseJobCrawler {
             return 0;
         }
 
-        // OKKY jobs는 Next.js SSR로 렌더되므로 HTML에서 바로 파싱 가능
-        // 단, 클라이언트 전용 렌더링이면 0개가 나올 수 있음 → 아래에서 JSON 폴백 시도
-        $jobs = $this->parseJobsFromHtml($html);
+        $jobs = $this->parseJobsFromRSC($html);
 
         if (empty($jobs)) {
-            echo "[OKKY] HTML 파싱 결과 없음. __NEXT_DATA__ JSON에서 시도...\n";
-            $jobs = $this->parseJobsFromNextData($html);
-        }
-
-        if (empty($jobs)) {
-            echo "[OKKY] 파싱된 공고 없음 (SPA 렌더링 가능성 있음)\n";
+            echo "[OKKY] 파싱된 공고 없음\n";
             return 0;
         }
 
@@ -39,110 +31,122 @@ class OkkyCrawler extends BaseJobCrawler {
         return $saved;
     }
 
-    private function parseJobsFromHtml($html) {
-        $xpath = $this->parseHtml($html);
-        $jobs  = [];
+    private function parseJobsFromRSC($html) {
+        // __next_f.push([1, "...RSC 청크..."]) 전체 수집
+        preg_match_all('/self\.__next_f\.push\(\[1,\s*"((?:[^"\\\\]|\\\\.)*)"\]\)/s', $html, $matches);
 
-        // /recruits/숫자 링크 카드
-        $cards = $xpath->query("//a[starts-with(@href, '/recruits/')]");
-        if (!$cards || $cards->length === 0) {
-            return $jobs;
+        if (empty($matches[1])) {
+            echo "[OKKY] RSC 청크를 찾을 수 없음\n";
+            return [];
         }
 
-        echo "[OKKY] 발견된 카드: {$cards->length}개\n";
+        // JSON 문자열 언이스케이프 후 연결
+        $rsc = '';
+        foreach ($matches[1] as $chunk) {
+            $decoded = json_decode('"' . $chunk . '"');
+            if ($decoded !== null) $rsc .= $decoded;
+        }
 
-        $seen = [];
-        foreach ($cards as $card) {
-            $href = $card->getAttribute('href');
-            if (!preg_match('#^/recruits/(\d+)$#', $href, $m)) continue;
+        // "content":[ 위치 찾기
+        $pos = strpos($rsc, '"content":[{');
+        if ($pos === false) {
+            echo "[OKKY] content 배열을 찾을 수 없음\n";
+            return [];
+        }
 
-            $url = $this->baseUrl . $href;
-            if (isset($seen[$url])) continue;
-            $seen[$url] = true;
+        // [ 위치부터 중첩 괄호 균형 맞춰 JSON 배열 추출
+        $start = strpos($rsc, '[', $pos + strlen('"content":'));
+        if ($start === false) return [];
 
-            // 제목
-            $titleNode = $xpath->query(".//h2[contains(@class,'line-clamp')]", $card)->item(0);
-            if (!$titleNode) continue;
-            $title = $this->cleanText($titleNode->textContent);
-            if (empty($title)) continue;
+        $depth = 0;
+        $end   = $start;
+        $len   = strlen($rsc);
+        for ($i = $start; $i < $len; $i++) {
+            $c = $rsc[$i];
+            if ($c === '[' || $c === '{') $depth++;
+            elseif ($c === ']' || $c === '}') {
+                $depth--;
+                if ($depth === 0) { $end = $i; break; }
+            }
+        }
 
-            // 마감일 (span.bg-gray-500/70 → "마감 7.16(목)")
-            $deadlineNode = $xpath->query(".//span[contains(@class,'bg-gray-500')]", $card)->item(0);
-            $deadline = $deadlineNode ? $this->cleanText($deadlineNode->textContent) : null;
+        $contentJson = substr($rsc, $start, $end - $start + 1);
+        $items = json_decode($contentJson, true);
+        if (!is_array($items)) {
+            echo "[OKKY] content JSON 파싱 실패\n";
+            return [];
+        }
 
-            // text-sm text-gray-500 span 들 (예산, 연차)
-            $smallSpans = $xpath->query(".//span[contains(@class,'text-sm') and contains(@class,'text-gray-500')]", $card);
-            $budget     = null;
+        echo "[OKKY] 발견된 공고: " . count($items) . "개\n";
+
+        $jobs = [];
+        foreach ($items as $item) {
+            $id    = $item['id']    ?? null;
+            $title = trim($item['title'] ?? '');
+            if (!$id || !$title) continue;
+
+            $r   = $item['recruitResponse'] ?? [];
+            $url = $this->baseUrl . '/recruits/' . $id;
+
+            // 지역
+            $location = implode(' ', array_filter([$r['city'] ?? null, $r['district'] ?? null])) ?: null;
+
+            // 단가 (만원/월)
+            $budget = null;
+            if (!empty($r['minPay'])) {
+                $budget = ($r['minPay'] === ($r['maxPay'] ?? 0))
+                    ? $r['minPay'] . '만원'
+                    : $r['minPay'] . '~' . ($r['maxPay'] ?? $r['minPay']) . '만원';
+            }
+
+            // 경력
             $experience = null;
-            foreach ($smallSpans as $span) {
-                $t = $this->cleanText($span->textContent);
-                if (strpos($t, '만원') !== false || strpos($t, '원') !== false) {
-                    $budget = $t;
-                } elseif (strpos($t, '년차') !== false || strpos($t, '신입') !== false || strpos($t, '경력') !== false) {
-                    $experience = $t;
+            if (isset($r['minCareer'])) {
+                if ($r['minCareer'] == 0) {
+                    $experience = '신입 가능';
+                } elseif (($r['maxCareer'] ?? 99) >= 99) {
+                    $experience = $r['minCareer'] . '년차 이상';
+                } else {
+                    $experience = $r['minCareer'] . '~' . $r['maxCareer'] . '년차';
                 }
             }
 
-            // 지역 (small.text-gray-600)
-            $locationNode = $xpath->query(".//small[contains(@class,'text-gray-600')]", $card)->item(0);
-            $location = $locationNode ? $this->cleanText($locationNode->textContent) : null;
+            // 마감일
+            $deadline = null;
+            if (!empty($r['deadline'])) {
+                $deadline = '마감 ' . date('n.j', strtotime($r['deadline']));
+            } elseif (!empty($r['payDateType']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $r['payDateType'])) {
+                $deadline = '마감 ' . date('n.j', strtotime($r['payDateType']));
+            }
+
+            // 투입/기간
+            $period = null;
+            if (!empty($r['startDate'])) {
+                $s = date('Y.m', strtotime($r['startDate']));
+                if (!empty($r['workingMonth'])) {
+                    $e = date('Y.m', strtotime('+' . $r['workingMonth'] . ' months', strtotime($r['startDate'])));
+                    $period = "{$s} ~ {$e} ({$r['workingMonth']}개월)";
+                } else {
+                    $period = $s . ' 시작';
+                }
+            }
+
+            // 직무
+            $category = $r['dutyName'] ?? $r['positionCategoryName'] ?? null;
 
             $jobs[] = [
                 'title'      => $title,
                 'url'        => $url,
-                'deadline'   => $deadline,
+                'category'   => $category,
+                'period'     => $period,
+                'status'     => '모집중',
                 'budget'     => $budget,
                 'experience' => $experience,
+                'deadline'   => $deadline,
                 'location'   => $location,
-                'status'     => '모집중',
             ];
 
             echo "  - {$title}" . ($deadline ? " [{$deadline}]" : '') . ($budget ? " {$budget}" : '') . "\n";
-        }
-
-        return $jobs;
-    }
-
-    private function parseJobsFromNextData($html) {
-        // Next.js __NEXT_DATA__ JSON에서 공고 목록 추출
-        if (!preg_match('/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s', $html, $m)) {
-            return [];
-        }
-
-        $json = json_decode($m[1], true);
-        if (!$json) return [];
-
-        // 페이지 데이터 경로: props.pageProps.dehydratedState.queries[*].state.data.pages[*].list
-        $queries = $json['props']['pageProps']['dehydratedState']['queries'] ?? [];
-        $jobs = [];
-        $seen = [];
-
-        foreach ($queries as $query) {
-            $pages = $query['state']['data']['pages'] ?? [];
-            foreach ($pages as $page) {
-                $items = $page['list'] ?? $page['content'] ?? $page['data'] ?? [];
-                foreach ($items as $item) {
-                    $id    = $item['id'] ?? $item['recruitId'] ?? null;
-                    $title = $item['title'] ?? $item['projectName'] ?? null;
-                    if (!$id || !$title) continue;
-
-                    $url = $this->baseUrl . '/recruits/' . $id;
-                    if (isset($seen[$url])) continue;
-                    $seen[$url] = true;
-
-                    $jobs[] = [
-                        'title'      => $title,
-                        'url'        => $url,
-                        'deadline'   => $item['deadline'] ?? $item['endDate'] ?? null,
-                        'budget'     => $item['pay'] ?? $item['budget'] ?? $item['salary'] ?? null,
-                        'experience' => $item['career'] ?? $item['experience'] ?? null,
-                        'location'   => $item['location'] ?? $item['area'] ?? null,
-                        'status'     => $item['status'] ?? '모집중',
-                    ];
-
-                    echo "  - (JSON) {$title}\n";
-                }
-            }
         }
 
         return $jobs;
