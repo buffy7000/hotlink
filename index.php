@@ -129,7 +129,7 @@ function escapeOgContent($content) {
       --todayhumor-color: #d97706;
       --inven-color: #1C3F6E;
       --slrclub-color: #C0392B;
-      --etoland-color: #ED3939;
+      --etoland-color: #3faf42;
     }
 
     /* @media (prefers-color-scheme: dark) {
@@ -565,8 +565,8 @@ function escapeOgContent($content) {
       box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
     }
     .rank-number[data-community="etoland"] {
-      background: linear-gradient(135deg, var(--etoland-color), #a01f1f);
-      box-shadow: 0 2px 8px rgba(237, 57, 57, 0.3);
+      background: linear-gradient(135deg, var(--etoland-color), #2a7a2d);
+      box-shadow: 0 2px 8px rgba(63, 175, 66, 0.3);
     }
 
     .rank-number.rank-1::after {
