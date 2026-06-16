@@ -7,10 +7,6 @@ class EtolandCrawler extends BaseCrawler {
 
     public function __construct() {
         parent::__construct(12, 'etoland');
-        // 이토랜드는 UA 기반으로 모바일 페이지 분기 → 모바일 UA 고정
-        $this->userAgents = [
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
-        ];
     }
 
     public function crawlHotPosts($limit = 50) {
@@ -69,7 +65,8 @@ class EtolandCrawler extends BaseCrawler {
 
         $xpath = new DOMXPath($dom);
 
-        $items = $xpath->query("//a[contains(@class,'mobile-list-item')]");
+        // /hit/{board}/view/{slug} 형태 href를 가진 a 태그 (time 요소 포함)
+        $items = $xpath->query("//a[contains(@href,'/hit/') and contains(@href,'/view/') and .//time]");
 
         if (!$items || $items->length == 0) {
             echo "게시글 리스트를 찾을 수 없습니다.\n";
@@ -116,19 +113,19 @@ class EtolandCrawler extends BaseCrawler {
 
         if (empty($url) || $url === $this->baseUrl) return null;
 
-        // 2. 제목 (span.body-l.truncate)
-        $titleNode = $xpath->query(".//span[contains(@class,'body-l') and contains(@class,'truncate')]", $item)->item(0);
+        // 2. 제목 (span.truncate.group-visited:...)
+        $titleNode = $xpath->query(".//span[contains(@class,'truncate') and contains(@class,'group-visited')]", $item)->item(0);
         if (!$titleNode) return null;
         $title = trim($titleNode->textContent);
 
-        // 3. 댓글수 (span.comment-xs) → "(6)"
+        // 3. 댓글수 (span.comm) → "(11)"
         $commentsCount = 0;
-        $cmtNode = $xpath->query(".//span[contains(@class,'comment-xs')]", $item)->item(0);
+        $cmtNode = $xpath->query(".//span[contains(@class,'comm')]", $item)->item(0);
         if ($cmtNode && preg_match('/(\d+)/', $cmtNode->textContent, $m)) {
             $commentsCount = intval($m[1]);
         }
 
-        // 4. 시간 (<time> 요소 텍스트 → 상대시간 변환)
+        // 4. 시간 (<time> 요소 → 상대시간 변환)
         $createdAt = date('Y-m-d H:i:s');
         $timeNode = $xpath->query(".//time", $item)->item(0);
         if ($timeNode) {
@@ -136,21 +133,21 @@ class EtolandCrawler extends BaseCrawler {
         }
 
         // 5. caption-m div에서 작성자, 조회수, 추천수 파싱
+        // 구조: <span>time</span><span>|</span><span>작성자</span><span>|</span><span>조회 1089</span>...
         $author = '이토랜드';
         $viewsCount = 0;
         $likesCount = 0;
 
         $captionNode = $xpath->query(".//div[contains(@class,'caption-m')]", $item)->item(0);
         if ($captionNode) {
-            // span 목록: [시간span, 작성자span, 조회span, 추천span, 카테고리span]
             $spans = $xpath->query("./span", $captionNode);
             foreach ($spans as $span) {
                 $text = trim($span->textContent);
-                if (empty($text)) continue;
+                if (empty($text) || $text === '|') continue;
 
-                if (preg_match('/조회\s*([\d,.]+K?)/u', $text, $m)) {
+                if (preg_match('/^조회\s*([\d,.]+K?)/u', $text, $m)) {
                     $viewsCount = $this->parseViewCount($m[1]);
-                } elseif (preg_match('/추천\s*(\d+)/u', $text, $m)) {
+                } elseif (preg_match('/^추천\s*(\d+)/u', $text, $m)) {
                     $likesCount = intval($m[1]);
                 } elseif (
                     strpos($text, '조회') === false &&
@@ -158,16 +155,22 @@ class EtolandCrawler extends BaseCrawler {
                     strpos($text, '[') === false &&
                     $span->getElementsByTagName('time')->length === 0
                 ) {
-                    // 나머지 조건에 해당하지 않는 span = 작성자
                     $author = $text;
                 }
             }
         }
 
+        // 6. 썸네일 (div.relative > img의 data-src 또는 src)
+        $thumbnailUrl = null;
+        $imgNode = $xpath->query(".//div[contains(@class,'relative')]//img", $item)->item(0);
+        if ($imgNode) {
+            $thumbnailUrl = $imgNode->getAttribute('data-src') ?: $imgNode->getAttribute('src');
+        }
+
         return [
             'title'          => $this->cleanTitle($title),
             'url'            => $url,
-            'thumbnail_url'  => null,
+            'thumbnail_url'  => $thumbnailUrl,
             'author'         => $author,
             'comments_count' => $commentsCount,
             'views_count'    => $viewsCount,
