@@ -139,7 +139,7 @@ class OkkyCrawler extends BaseJobCrawler {
                 'url'        => $url,
                 'category'   => $category,
                 'period'     => $period,
-                'status'     => '모집중',
+                'status'     => '접수중',
                 'budget'     => $budget,
                 'experience' => $experience,
                 'deadline'   => $deadline,

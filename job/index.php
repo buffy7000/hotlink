@@ -6,13 +6,13 @@
 <title>프리랜서 잡 보드 - 핫링크</title>
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: #2e2e2e;
-    --text: #e8e8e8;
-    --text2: #888;
-    --text3: #555;
+    --bg: #f4f4f5;
+    --surface: #ffffff;
+    --surface2: #f0f0f0;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --text2: #71717a;
+    --text3: #a1a1aa;
     --accent: #4f9cf9;
     --green: #3faf42;
     --red: #e84040;
