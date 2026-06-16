@@ -129,7 +129,7 @@ function escapeOgContent($content) {
       --todayhumor-color: #d97706;
       --inven-color: #1C3F6E;
       --slrclub-color: #C0392B;
-      --etoland-color: #E85D04;
+      --etoland-color: #ED3939;
     }
 
     /* @media (prefers-color-scheme: dark) {
@@ -565,8 +565,8 @@ function escapeOgContent($content) {
       box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
     }
     .rank-number[data-community="etoland"] {
-      background: linear-gradient(135deg, var(--etoland-color), #9c3a00);
-      box-shadow: 0 2px 8px rgba(232, 93, 4, 0.3);
+      background: linear-gradient(135deg, var(--etoland-color), #a01f1f);
+      box-shadow: 0 2px 8px rgba(237, 57, 57, 0.3);
     }
 
     .rank-number.rank-1::after {
@@ -1071,7 +1071,7 @@ function escapeOgContent($content) {
 }
 
 #etolandToast {
-  border-left-color: var(--etoland-color);
+  border-left-color: var(--etoland-color); /* #ED3939 공식 브랜드 컬러 */
   transform: translateX(calc(100% + 32px));
   opacity: 0;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
