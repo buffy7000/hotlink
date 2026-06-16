@@ -7,6 +7,10 @@ class EtolandCrawler extends BaseCrawler {
 
     public function __construct() {
         parent::__construct(12, 'etoland');
+        // 이토랜드는 UA 기반으로 모바일 페이지 분기 → 모바일 UA 고정
+        $this->userAgents = [
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+        ];
     }
 
     public function crawlHotPosts($limit = 50) {
