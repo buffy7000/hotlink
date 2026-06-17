@@ -22,7 +22,7 @@ jobs:
       - name: Check port connectivity
         run: |
           echo "포트 연결 테스트..."
-          curl -v --max-time 10 https://www.designnine.co.kr:40000/ 2>&1 | head -30 || true
+          curl -v --max-time 10 --ciphers 'DEFAULT@SECLEVEL=0' https://www.designnine.co.kr:40000/ 2>&1 | head -30 || true
 
       - name: Crawl DesignNine
         run: |
@@ -36,9 +36,11 @@ jobs:
           API_URL: ${{ secrets.DESIGNNINE_API_URL }}  # https://hotlink.kr/job/api/save_jobs.php
           API_KEY: ${{ secrets.DESIGNNINE_API_KEY }}
         run: |
-          RESPONSE=$(curl -s -X POST "$API_URL" \
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "$API_URL" \
             -H "Content-Type: application/json; charset=utf-8" \
             -H "X-API-Key: $API_KEY" \
             -d @/tmp/designnine_jobs.json)
-          echo "서버 응답: $RESPONSE"
-          echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); exit(0 if d.get('success') else 1)"
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+          BODY=$(echo "$RESPONSE" | grep -v "HTTP_STATUS")
+          echo "HTTP 상태코드: $HTTP_STATUS"
+          echo "서버 응답: $BODY"

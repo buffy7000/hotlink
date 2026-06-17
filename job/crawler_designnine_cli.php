@@ -13,6 +13,7 @@ curl_setopt_array($ch, [
     CURLOPT_CONNECTTIMEOUT  => 15,
     CURLOPT_SSL_VERIFYPEER  => false,
     CURLOPT_SSL_VERIFYHOST  => false,
+    CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=0',
     CURLOPT_USERAGENT       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
     CURLOPT_ENCODING        => 'gzip,deflate',
 ]);
