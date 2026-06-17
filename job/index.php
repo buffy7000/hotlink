@@ -56,7 +56,7 @@
   /* card */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s, background .15s; text-decoration: none; display: block; }
   .card:hover { border-color: var(--accent); background: var(--surface2); }
-  .card-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .card-badges { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
   .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; flex-shrink: 0; }
   .badge-active { background: rgba(63,175,66,.18); color: var(--green); border: 1px solid rgba(63,175,66,.3); }
   .badge-closed { background: rgba(136,136,136,.15); color: var(--text3); border: 1px solid var(--border); }
@@ -183,11 +183,11 @@
       jobs.forEach(function (job) {
         var isActive = job.status && job.status.indexOf('접수') !== -1;
         html += '<a class="card" href="' + esc(job.url) + '" target="_blank" rel="noopener">';
-        html += '<div class="card-top">';
+        html += '<div class="card-badges">';
         html += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(job.status || '-') + '</span>';
         if (job.category) html += '<span class="badge badge-cat">' + esc(job.category) + '</span>';
-        html += '<span class="card-title">' + esc(job.title) + '</span>';
         html += '</div>';
+        html += '<div class="card-title">' + esc(job.title) + '</div>';
 
         var metas = [];
         if (job.period)     metas.push({ icon: '📅', text: job.period });
