@@ -6,22 +6,27 @@ $targetUrl = $baseUrl . '/project/project_list1.html?mode1=search&search_gubun=1
 
 $ch = curl_init();
 curl_setopt_array($ch, [
-    CURLOPT_URL            => $targetUrl,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_TIMEOUT        => 30,
-    CURLOPT_SSL_VERIFYPEER => false,
-    CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
-    CURLOPT_ENCODING       => 'gzip,deflate',
+    CURLOPT_URL             => $targetUrl,
+    CURLOPT_RETURNTRANSFER  => true,
+    CURLOPT_FOLLOWLOCATION  => true,
+    CURLOPT_TIMEOUT         => 30,
+    CURLOPT_CONNECTTIMEOUT  => 15,
+    CURLOPT_SSL_VERIFYPEER  => false,
+    CURLOPT_SSL_VERIFYHOST  => false,
+    CURLOPT_USERAGENT       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
+    CURLOPT_ENCODING        => 'gzip,deflate',
 ]);
-$html = curl_exec($ch);
-$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$html  = curl_exec($ch);
+$code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$error = curl_error($ch);
+$errno = curl_errno($ch);
 curl_close($ch);
 
 if (!$html || $code !== 200) {
     fwrite(STDERR, "크롤링 실패: HTTP {$code}\n");
+    fwrite(STDERR, "curl 오류 [{$errno}]: {$error}\n");
     echo json_encode([]);
-    exit(1);
+    exit(0); // 실패해도 워크플로우는 계속 진행
 }
 
 $dom = new DOMDocument();

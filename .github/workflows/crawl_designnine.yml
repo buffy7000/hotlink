@@ -19,6 +19,11 @@ jobs:
           php-version: '8.1'
           extensions: curl, dom, mbstring
 
+      - name: Check port connectivity
+        run: |
+          echo "포트 연결 테스트..."
+          curl -v --max-time 10 https://www.designnine.co.kr:40000/ 2>&1 | head -30 || true
+
       - name: Crawl DesignNine
         run: |
           echo "크롤링 시작..."
