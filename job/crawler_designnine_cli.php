@@ -30,9 +30,10 @@ if (!$html || $code !== 200) {
     exit(0);
 }
 
+// charset=euc-kr 메타 태그를 DOMDocument가 읽고 내부에서 UTF-8로 변환
 $dom = new DOMDocument();
 libxml_use_internal_errors(true);
-$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+$dom->loadHTML($html);
 libxml_clear_errors();
 $xpath = new DOMXPath($dom);
 
@@ -58,12 +59,6 @@ foreach ($rows as $row) {
     $category = trim(strip_tags($tds->item(1)->textContent));
     $period   = trim(strip_tags($tds->item(3)->textContent));
     $status   = trim(strip_tags($tds->item(4)->textContent));
-
-    // EUC-KR → UTF-8 변환
-    $title    = mb_convert_encoding($title,    'UTF-8', 'EUC-KR');
-    $category = mb_convert_encoding($category, 'UTF-8', 'EUC-KR');
-    $period   = mb_convert_encoding($period,   'UTF-8', 'EUC-KR');
-    $status   = mb_convert_encoding($status,   'UTF-8', 'EUC-KR');
 
     $jobs[] = [
         'site_id'  => 1,
