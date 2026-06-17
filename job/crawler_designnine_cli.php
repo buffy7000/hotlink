@@ -30,6 +30,9 @@ if (!$html || $code !== 200) {
     exit(0); // 실패해도 워크플로우는 계속 진행
 }
 
+// EUC-KR → UTF-8 변환
+$html = mb_convert_encoding($html, 'UTF-8', 'EUC-KR');
+
 $dom = new DOMDocument();
 libxml_use_internal_errors(true);
 $dom->loadHTML('<?xml encoding="UTF-8">' . $html);
