@@ -27,11 +27,8 @@ if (!$html || $code !== 200) {
     fwrite(STDERR, "크롤링 실패: HTTP {$code}\n");
     fwrite(STDERR, "curl 오류 [{$errno}]: {$error}\n");
     echo json_encode([]);
-    exit(0); // 실패해도 워크플로우는 계속 진행
+    exit(0);
 }
-
-// EUC-KR → UTF-8 변환
-$html = mb_convert_encoding($html, 'UTF-8', 'EUC-KR');
 
 $dom = new DOMDocument();
 libxml_use_internal_errors(true);
@@ -61,6 +58,12 @@ foreach ($rows as $row) {
     $category = trim(strip_tags($tds->item(1)->textContent));
     $period   = trim(strip_tags($tds->item(3)->textContent));
     $status   = trim(strip_tags($tds->item(4)->textContent));
+
+    // EUC-KR → UTF-8 변환
+    $title    = mb_convert_encoding($title,    'UTF-8', 'EUC-KR');
+    $category = mb_convert_encoding($category, 'UTF-8', 'EUC-KR');
+    $period   = mb_convert_encoding($period,   'UTF-8', 'EUC-KR');
+    $status   = mb_convert_encoding($status,   'UTF-8', 'EUC-KR');
 
     $jobs[] = [
         'site_id'  => 1,
