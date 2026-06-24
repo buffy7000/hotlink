@@ -51,7 +51,7 @@ class DesignNineCrawler extends BaseJobCrawler {
             $linkNode = $xpath->query(".//a", $tds->item(2))->item(0);
             if (!$linkNode) continue;
 
-            $title = $this->cleanText($linkNode->textContent);
+            $title = $linkNode->getAttribute('title') ?: $this->cleanText($linkNode->textContent);
             $href  = $linkNode->getAttribute('href');
             $url   = $href ? $this->baseUrl . $href : null;
 
