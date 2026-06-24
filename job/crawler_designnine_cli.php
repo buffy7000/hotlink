@@ -47,7 +47,7 @@ foreach ($rows as $row) {
     $linkNode = $xpath->query(".//a", $tds->item(2))->item(0);
     if (!$linkNode) continue;
 
-    $title = trim(strip_tags($linkNode->textContent));
+    $title = $linkNode->getAttribute('title') ?: trim(strip_tags($linkNode->textContent));
     $href  = $linkNode->getAttribute('href');
     if (empty($title) || empty($href)) continue;
 
