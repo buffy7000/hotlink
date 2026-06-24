@@ -165,69 +165,77 @@
     return favorites.indexOf(url) !== -1;
   }
 
+  function buildCard(job, code) {
+    var displayStatus = normalizeStatus(job, code);
+    var isActive = displayStatus.indexOf('접수') !== -1;
+    var fav = isFav(job.url);
+    var h = '';
+    h += '<div class="card-wrap">';
+    h += '<a class="card" href="' + esc(job.url) + '">';
+    h += '<div class="card-badges">';
+    h += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
+    if (job.category) h += '<span class="badge badge-cat">' + esc(job.category) + '</span>';
+    h += '</div>';
+    h += '<div class="card-title">' + esc(job.title) + '</div>';
+    var metas = [];
+    if (job.period)     metas.push({ icon: '📅', text: formatPeriod(job.period) });
+    if (job.deadline)   metas.push({ icon: '⏰', text: job.deadline });
+    if (job.budget)     metas.push({ icon: '💰', text: job.budget });
+    if (job.experience) metas.push({ icon: '👤', text: job.experience });
+    if (job.location)   metas.push({ icon: '📍', text: job.location });
+    if (metas.length) {
+      h += '<div class="card-meta">';
+      metas.forEach(function (m) {
+        h += '<span class="meta-item"><span class="meta-icon">' + m.icon + '</span>' + esc(m.text) + '</span>';
+      });
+      h += '</div>';
+    }
+    h += '</a>';
+    h += '<button class="fav-btn' + (fav ? ' active' : '') + '" data-url="' + esc(job.url) + '" title="즐겨찾기">' + (fav ? '★' : '☆') + '</button>';
+    h += '</div>';
+    return h;
+  }
+
   function render() {
     var contentEl = document.getElementById('contentEl');
     var html = '';
-    var sitesToRender = currentSite === 'all'
-      ? Object.keys(allData)
-      : (allData[currentSite] ? [currentSite] : []);
 
-    sitesToRender.forEach(function (code) {
-      var group = allData[code];
-      var jobs = group.jobs.filter(function (j) {
-        if (favOnly && !isFav(j.url)) return false;
-        if (currentStatus === 'all') return true;
-        return normalizeStatus(j, code).indexOf(currentStatus) !== -1;
+    if (favOnly || currentSite === 'all') {
+      // 전체/즐겨찾기: 플랫 리스트, crawledAt 최신순 정렬
+      var flatJobs = [];
+      Object.keys(allData).forEach(function (code) {
+        allData[code].jobs.forEach(function (j) {
+          if (favOnly && !isFav(j.url)) return;
+          if (currentStatus !== 'all' && normalizeStatus(j, code).indexOf(currentStatus) === -1) return;
+          flatJobs.push({ job: j, code: code });
+        });
       });
+      flatJobs.sort(function (a, b) {
+        return (b.job.crawledAt || '').localeCompare(a.job.crawledAt || '');
+      });
+      flatJobs.forEach(function (item) { html += buildCard(item.job, item.code); });
 
-      if (jobs.length === 0) return;
-
-      html += '<div class="section">';
-      if (!favOnly) {
-        html += '<div class="section-header">';
-        html += '<span class="section-icon">📌</span>';
-        html += '<span class="section-title">' + esc(group.site_name) + '</span>';
-        html += '<span class="section-count">' + jobs.length + '개</span>';
-        if (group.site_url) {
-          html += '<a class="section-link" href="' + esc(group.site_url) + '">사이트 →</a>';
-        }
-        html += '</div>';
-      }
-
-      jobs.forEach(function (job) {
-        var displayStatus = normalizeStatus(job, code);
-        var isActive = displayStatus.indexOf('접수') !== -1;
-        var fav = isFav(job.url);
-
-        html += '<div class="card-wrap">';
-        html += '<a class="card" href="' + esc(job.url) + '">';
-        html += '<div class="card-badges">';
-        html += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
-        if (job.category) html += '<span class="badge badge-cat">' + esc(job.category) + '</span>';
-        html += '</div>';
-        html += '<div class="card-title">' + esc(job.title) + '</div>';
-
-        var metas = [];
-        if (job.period)     metas.push({ icon: '📅', text: formatPeriod(job.period) });
-        if (job.deadline)   metas.push({ icon: '⏰', text: job.deadline });
-        if (job.budget)     metas.push({ icon: '💰', text: job.budget });
-        if (job.experience) metas.push({ icon: '👤', text: job.experience });
-        if (job.location)   metas.push({ icon: '📍', text: job.location });
-
-        if (metas.length) {
-          html += '<div class="card-meta">';
-          metas.forEach(function (m) {
-            html += '<span class="meta-item"><span class="meta-icon">' + m.icon + '</span>' + esc(m.text) + '</span>';
-          });
+    } else {
+      // 특정 사이트: 섹션 헤더 + 목록
+      var group = allData[currentSite];
+      if (group) {
+        var jobs = group.jobs.filter(function (j) {
+          if (currentStatus === 'all') return true;
+          return normalizeStatus(j, currentSite).indexOf(currentStatus) !== -1;
+        });
+        if (jobs.length > 0) {
+          html += '<div class="section">';
+          html += '<div class="section-header">';
+          html += '<span class="section-icon">📌</span>';
+          html += '<span class="section-title">' + esc(group.site_name) + '</span>';
+          html += '<span class="section-count">' + jobs.length + '개</span>';
+          if (group.site_url) html += '<a class="section-link" href="' + esc(group.site_url) + '">사이트 →</a>';
+          html += '</div>';
+          jobs.forEach(function (job) { html += buildCard(job, currentSite); });
           html += '</div>';
         }
-        html += '</a>';
-        html += '<button class="fav-btn' + (fav ? ' active' : '') + '" data-url="' + esc(job.url) + '" title="즐겨찾기">' + (fav ? '★' : '☆') + '</button>';
-        html += '</div>';
-      });
-
-      html += '</div>';
-    });
+      }
+    }
 
     contentEl.innerHTML = html || '<div class="empty">표시할 공고가 없습니다.</div>';
   }
