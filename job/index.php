@@ -40,8 +40,9 @@
   .filter-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 12px; cursor: pointer; transition: all .15s; }
   .filter-btn:hover { border-color: #666; color: var(--text); }
   .filter-btn.active { background: var(--surface2); border-color: #555; color: var(--text); font-weight: 600; }
-  .filter-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
-  .fav-filter-btn.active { background: rgba(245,158,11,.15); border-color: var(--orange); color: var(--orange); font-weight: 600; }
+  .fav-header-btn { margin-left: auto; padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 13px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .fav-header-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .fav-header-btn.active { background: rgba(245,158,11,.15); border-color: var(--orange); color: var(--orange); font-weight: 600; }
 
   /* content */
   .content { padding: 8px 16px 40px; }
@@ -89,7 +90,7 @@
 <div class="header">
   <a class="header-back" href="/">← 핫링크</a>
   <h1>💼 프리랜서 잡</h1>
-  <span class="header-sub" id="updatedAt"></span>
+  <button class="fav-header-btn" id="favFilterBtn">☆ 즐겨찾기</button>
 </div>
 
 <div class="tabs" id="tabsEl">
@@ -101,8 +102,6 @@
   <button class="filter-btn active" data-status="all">전체</button>
   <button class="filter-btn" data-status="접수중">접수중</button>
   <button class="filter-btn" data-status="마감">마감</button>
-  <span class="filter-sep"></span>
-  <button class="filter-btn fav-filter-btn" id="favFilterBtn">☆ 즐겨찾기</button>
 </div>
 
 <div class="content" id="contentEl">
@@ -127,7 +126,6 @@
         allSites = res.sites;
         buildTabs();
         render();
-        document.getElementById('updatedAt').textContent = '총 ' + res.total + '개';
       })
       .catch(function (e) {
         document.getElementById('contentEl').innerHTML =
