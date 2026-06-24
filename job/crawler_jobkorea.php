@@ -153,7 +153,58 @@ class JobKoreaCrawler extends BaseJobCrawler {
 
 // 단독 실행 지원
 if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'] ?? '')) {
+    $isCli = php_sapi_name() === 'cli';
+
+    if (!$isCli) {
+        header('Content-Type: text/html; charset=utf-8');
+        ob_start();
+    }
+
     $crawler = new JobKoreaCrawler();
     $crawler->crawl();
+
+    if (!$isCli) {
+        $output = ob_get_clean();
+        ?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>잡코리아 크롤러</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #111; color: #ccc; font-family: 'Menlo', 'Consolas', monospace; font-size: 13px; padding: 24px; line-height: 1.7; }
+  h1 { font-size: 15px; color: #fff; margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+  .line { display: block; }
+  .status { color: #4f9cf9; }
+  .ok     { color: #3faf42; font-weight: 600; }
+  .skip   { color: #444; }
+  .err    { color: #e84040; }
+  .sep    { border-top: 1px solid #222; margin: 8px 0; }
+</style>
+</head>
+<body>
+<h1>잡코리아 크롤러 실행 결과</h1>
+<?php
+        foreach (explode("\n", $output) as $line) {
+            if (trim($line) === '') { echo '<div class="sep"></div>'; continue; }
+            $e = htmlspecialchars($line, ENT_QUOTES, 'UTF-8');
+            if (strpos($line, '[제외-') !== false) {
+                echo '<span class="line skip">' . $e . '</span>';
+            } elseif (strpos($line, '오류') !== false || strpos($line, '실패') !== false) {
+                echo '<span class="line err">' . $e . '</span>';
+            } elseif (strpos($line, '[잡코리아]') !== false) {
+                echo '<span class="line status">' . $e . '</span>';
+            } elseif (substr(ltrim($line), 0, 2) === '- ') {
+                echo '<span class="line ok">' . $e . '</span>';
+            } else {
+                echo '<span class="line">' . $e . '</span>';
+            }
+        }
+        ?>
+</body>
+</html>
+<?php
+    }
 }
 ?>
