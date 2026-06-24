@@ -35,11 +35,13 @@
   .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 
   /* filter */
-  .filters { display: flex; gap: 6px; padding: 10px 16px; align-items: center; }
+  .filters { display: flex; gap: 6px; padding: 10px 16px; align-items: center; flex-wrap: wrap; }
   .filter-label { font-size: 12px; color: var(--text3); margin-right: 2px; }
   .filter-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 12px; cursor: pointer; transition: all .15s; }
   .filter-btn:hover { border-color: #666; color: var(--text); }
   .filter-btn.active { background: var(--surface2); border-color: #555; color: var(--text); font-weight: 600; }
+  .filter-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+  .fav-filter-btn.active { background: rgba(245,158,11,.15); border-color: var(--orange); color: var(--orange); font-weight: 600; }
 
   /* content */
   .content { padding: 8px 16px 40px; }
@@ -54,19 +56,23 @@
   .section-link:hover { color: var(--accent); }
 
   /* card */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s, background .15s; text-decoration: none; display: block; }
+  .card-wrap { position: relative; margin-bottom: 8px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 42px 14px 14px; cursor: pointer; transition: border-color .15s, background .15s; text-decoration: none; display: block; }
   .card:hover { border-color: var(--accent); background: var(--surface2); }
   .card-badges { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
   .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; flex-shrink: 0; }
   .badge-active { background: rgba(63,175,66,.18); color: var(--green); border: 1px solid rgba(63,175,66,.3); }
   .badge-closed { background: rgba(136,136,136,.15); color: var(--text3); border: 1px solid var(--border); }
   .badge-cat { background: rgba(79,156,249,.12); color: var(--accent); border: 1px solid rgba(79,156,249,.25); }
-  .card-title { font-size: 14px; font-weight: 600; line-height: 1.45; color: var(--text); flex: 1; }
-  .card-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text2); }
+  .card-title { font-size: 14px; font-weight: 600; line-height: 1.45; color: var(--text); }
+  .card-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text2); margin-top: 8px; }
   .meta-item { display: flex; align-items: center; gap: 3px; }
   .meta-icon { font-size: 11px; }
-  .card-bottom { margin-top: 10px; display: flex; justify-content: flex-end; }
-  .btn-go { padding: 5px 14px; background: var(--accent); border-radius: 6px; color: #fff; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+
+  /* favorite button */
+  .fav-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text3); padding: 4px 6px; line-height: 1; z-index: 1; transition: color .15s, transform .1s; }
+  .fav-btn:hover { color: var(--orange); transform: scale(1.2); }
+  .fav-btn.active { color: var(--orange); }
 
   /* empty / loading */
   .empty { text-align: center; color: var(--text3); padding: 40px 0; font-size: 14px; }
@@ -95,6 +101,8 @@
   <button class="filter-btn active" data-status="all">전체</button>
   <button class="filter-btn" data-status="접수중">접수중</button>
   <button class="filter-btn" data-status="마감">마감</button>
+  <span class="filter-sep"></span>
+  <button class="filter-btn fav-filter-btn" id="favFilterBtn">☆ 즐겨찾기</button>
 </div>
 
 <div class="content" id="contentEl">
@@ -107,6 +115,8 @@
   var allSites = [];
   var currentSite = 'all';
   var currentStatus = 'all';
+  var favOnly = false;
+  var favorites = JSON.parse(localStorage.getItem('jobFavorites') || '[]');
 
   function fetchJobs() {
     fetch('/api/jobs.php')
@@ -148,10 +158,14 @@
 
   function switchStatus(status) {
     currentStatus = status;
-    document.querySelectorAll('.filter-btn').forEach(function (b) {
+    document.querySelectorAll('.filter-btn[data-status]').forEach(function (b) {
       b.classList.toggle('active', b.dataset.status === status);
     });
     render();
+  }
+
+  function isFav(url) {
+    return favorites.indexOf(url) !== -1;
   }
 
   function render() {
@@ -164,6 +178,7 @@
     sitesToRender.forEach(function (code) {
       var group = allData[code];
       var jobs = group.jobs.filter(function (j) {
+        if (favOnly && !isFav(j.url)) return false;
         if (currentStatus === 'all') return true;
         return (j.status || '').indexOf(currentStatus) !== -1;
       });
@@ -182,6 +197,9 @@
 
       jobs.forEach(function (job) {
         var isActive = job.status && job.status.indexOf('접수') !== -1;
+        var fav = isFav(job.url);
+
+        html += '<div class="card-wrap">';
         html += '<a class="card" href="' + esc(job.url) + '">';
         html += '<div class="card-badges">';
         html += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(job.status || '-') + '</span>';
@@ -190,7 +208,7 @@
         html += '<div class="card-title">' + esc(job.title) + '</div>';
 
         var metas = [];
-        if (job.period)     metas.push({ icon: '📅', text: job.period });
+        if (job.period)     metas.push({ icon: '📅', text: formatPeriod(job.period) });
         if (job.deadline)   metas.push({ icon: '⏰', text: job.deadline });
         if (job.budget)     metas.push({ icon: '💰', text: job.budget });
         if (job.experience) metas.push({ icon: '👤', text: job.experience });
@@ -204,6 +222,8 @@
           html += '</div>';
         }
         html += '</a>';
+        html += '<button class="fav-btn' + (fav ? ' active' : '') + '" data-url="' + esc(job.url) + '" title="즐겨찾기">' + (fav ? '★' : '☆') + '</button>';
+        html += '</div>';
       });
 
       html += '</div>';
@@ -211,6 +231,34 @@
 
     contentEl.innerHTML = html || '<div class="empty">표시할 공고가 없습니다.</div>';
   }
+
+  // 기간 포맷 변환
+  // "YYYY-MM-DD ~ YYYY-MM-DD" → "YYYY.MM ~ YYYY.MM (N개월)"
+  // "MM-DD~MM-DD"             → "YYYY.MM ~ YYYY.MM (N개월)"
+  function formatPeriod(period) {
+    if (!period) return '';
+    period = period.trim();
+
+    var m1 = period.match(/^(\d{4})-(\d{2})-\d{2}\s*~\s*(\d{4})-(\d{2})-\d{2}/);
+    if (m1) {
+      var sy = +m1[1], sm = +m1[2], ey = +m1[3], em = +m1[4];
+      var months = (ey - sy) * 12 + (em - sm) + 1;
+      return sy + '.' + p2(sm) + ' ~ ' + ey + '.' + p2(em) + ' (' + months + '개월)';
+    }
+
+    var m2 = period.match(/^(\d{2})-(\d{2})\s*~\s*(\d{2})-(\d{2})/);
+    if (m2) {
+      var sy = new Date().getFullYear(), sm = +m2[1], em = +m2[3];
+      if (em === 0) return sy + '.' + p2(sm) + ' ~';
+      var ey = em < sm ? sy + 1 : sy;
+      var months = (ey - sy) * 12 + (em - sm) + 1;
+      return sy + '.' + p2(sm) + ' ~ ' + ey + '.' + p2(em) + ' (' + months + '개월)';
+    }
+
+    return period;
+  }
+
+  function p2(n) { return n < 10 ? '0' + n : '' + n; }
 
   function esc(s) {
     if (!s) return '';
@@ -221,8 +269,32 @@
       .replace(/"/g, '&quot;');
   }
 
-  document.querySelectorAll('.filter-btn').forEach(function (b) {
+  // 상태 필터
+  document.querySelectorAll('.filter-btn[data-status]').forEach(function (b) {
     b.addEventListener('click', function () { switchStatus(b.dataset.status); });
+  });
+
+  // 즐겨찾기 필터 버튼
+  var favFilterBtn = document.getElementById('favFilterBtn');
+  favFilterBtn.addEventListener('click', function () {
+    favOnly = !favOnly;
+    favFilterBtn.classList.toggle('active', favOnly);
+    favFilterBtn.textContent = favOnly ? '★ 즐겨찾기' : '☆ 즐겨찾기';
+    render();
+  });
+
+  // 즐겨찾기 토글 (이벤트 위임)
+  document.getElementById('contentEl').addEventListener('click', function (e) {
+    var btn = e.target.closest('.fav-btn');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var url = btn.dataset.url;
+    var idx = favorites.indexOf(url);
+    if (idx === -1) { favorites.push(url); }
+    else { favorites.splice(idx, 1); }
+    localStorage.setItem('jobFavorites', JSON.stringify(favorites));
+    render();
   });
 
   fetchJobs();
