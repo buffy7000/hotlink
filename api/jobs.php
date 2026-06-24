@@ -65,6 +65,8 @@ try {
             'experience' => $row['experience'],
             'deadline'   => $row['deadline'],
             'location'   => $row['location'],
+            'agency'     => $row['agency'],
+            'client'     => $row['client'],
             'crawledAt'  => $row['crawled_at'],
         ];
     }

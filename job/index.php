@@ -176,13 +176,13 @@
       html += '<span class="section-title">' + esc(group.site_name) + '</span>';
       html += '<span class="section-count">' + jobs.length + '개</span>';
       if (group.site_url) {
-        html += '<a class="section-link" href="' + esc(group.site_url) + '" target="_blank">사이트 →</a>';
+        html += '<a class="section-link" href="' + esc(group.site_url) + '">사이트 →</a>';
       }
       html += '</div>';
 
       jobs.forEach(function (job) {
         var isActive = job.status && job.status.indexOf('접수') !== -1;
-        html += '<a class="card" href="' + esc(job.url) + '" target="_blank" rel="noopener">';
+        html += '<a class="card" href="' + esc(job.url) + '">';
         html += '<div class="card-badges">';
         html += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(job.status || '-') + '</span>';
         if (job.category) html += '<span class="badge badge-cat">' + esc(job.category) + '</span>';

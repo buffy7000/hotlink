@@ -59,8 +59,8 @@ abstract class BaseJobCrawler {
     }
 
     protected function saveJobs(array $jobs) {
-        $sql = "INSERT INTO jobs (site_id, title, url, period, status, budget, experience, deadline, location, category)
-                VALUES (:site_id, :title, :url, :period, :status, :budget, :experience, :deadline, :location, :category)
+        $sql = "INSERT INTO jobs (site_id, title, url, period, status, budget, experience, deadline, location, category, agency, client)
+                VALUES (:site_id, :title, :url, :period, :status, :budget, :experience, :deadline, :location, :category, :agency, :client)
                 ON DUPLICATE KEY UPDATE
                     title      = VALUES(title),
                     period     = VALUES(period),
@@ -70,6 +70,8 @@ abstract class BaseJobCrawler {
                     deadline   = VALUES(deadline),
                     location   = VALUES(location),
                     category   = VALUES(category),
+                    agency     = VALUES(agency),
+                    client     = VALUES(client),
                     crawled_at = CURRENT_TIMESTAMP";
 
         $saved = 0;
@@ -86,6 +88,8 @@ abstract class BaseJobCrawler {
                 ':deadline'   => $job['deadline']    ?? null,
                 ':location'   => $job['location']    ?? null,
                 ':category'   => $job['category']    ?? null,
+                ':agency'     => $job['agency']      ?? null,
+                ':client'     => $job['client']      ?? null,
             ]);
             $saved++;
         }
