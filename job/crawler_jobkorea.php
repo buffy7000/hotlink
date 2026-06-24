@@ -106,7 +106,7 @@ class JobKoreaCrawler extends BaseJobCrawler {
             if ($ddayNode) {
                 $ddayText = $this->cleanText($ddayNode->textContent);
                 if (preg_match('/D-(\d+)/', $ddayText, $dm)) {
-                    $deadline = '마감 ' . date('n.j', strtotime('+' . $dm[1] . ' days'));
+                    $deadline = date('m/d', strtotime('+' . $dm[1] . ' days'));
                 }
             }
 
