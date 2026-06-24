@@ -88,7 +88,6 @@
 <body>
 
 <div class="header">
-  <a class="header-back" href="/">← 핫링크</a>
   <h1>💼 프리랜서 잡</h1>
   <button class="fav-header-btn" id="favFilterBtn">☆ 즐겨찾기</button>
 </div>
@@ -314,10 +313,15 @@
 
   // 즐겨찾기 필터 버튼
   var favFilterBtn = document.getElementById('favFilterBtn');
+  var tabsEl       = document.getElementById('tabsEl');
+  var filtersEl    = document.querySelector('.filters');
+
   favFilterBtn.addEventListener('click', function () {
     favOnly = !favOnly;
     favFilterBtn.classList.toggle('active', favOnly);
     favFilterBtn.textContent = favOnly ? '★ 즐겨찾기' : '☆ 즐겨찾기';
+    tabsEl.style.display    = favOnly ? 'none' : '';
+    filtersEl.style.display = favOnly ? 'none' : '';
     render();
   });
 
