@@ -69,11 +69,12 @@ class JobKoreaCrawler extends BaseJobCrawler {
             if (!preg_match('#/Recruit/GI_Read/(\d+)#', $href, $m)) continue;
 
             $jobId = $m[1];
-            if (isset($seen[$jobId])) continue;
-            $seen[$jobId] = true;
 
             $title = $this->cleanText($link->textContent);
             if (empty($title)) continue;
+
+            if (isset($seen[$jobId])) continue;
+            $seen[$jobId] = true;
 
             if (!$this->passesFilter($title)) continue;
 
