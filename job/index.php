@@ -98,8 +98,8 @@
 
 <div class="filters">
   <span class="filter-label">상태</span>
-  <button class="filter-btn active" data-status="all">전체</button>
-  <button class="filter-btn" data-status="접수중">접수중</button>
+  <button class="filter-btn" data-status="all">전체</button>
+  <button class="filter-btn active" data-status="접수중">접수중</button>
   <button class="filter-btn" data-status="마감">마감</button>
 </div>
 
@@ -112,7 +112,7 @@
   var allData = {};
   var allSites = [];
   var currentSite = 'all';
-  var currentStatus = 'all';
+  var currentStatus = '접수중';
   var favOnly = false;
   var favorites = JSON.parse(localStorage.getItem('jobFavorites') || '[]');
 
