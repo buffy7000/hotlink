@@ -174,7 +174,8 @@
     h += '<a class="card" href="' + esc(job.url) + '">';
     h += '<div class="card-badges">';
     h += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
-    if (job.category) h += '<span class="badge badge-cat">' + esc(job.category) + '</span>';
+    var siteName = allData[code] && allData[code].site_name;
+    if (siteName) h += '<span class="badge badge-cat">' + esc(siteName) + '</span>';
     h += '</div>';
     h += '<div class="card-title">' + esc(job.title) + '</div>';
     var metas = [];
