@@ -183,14 +183,16 @@
       if (jobs.length === 0) return;
 
       html += '<div class="section">';
-      html += '<div class="section-header">';
-      html += '<span class="section-icon">📌</span>';
-      html += '<span class="section-title">' + esc(group.site_name) + '</span>';
-      html += '<span class="section-count">' + jobs.length + '개</span>';
-      if (group.site_url) {
-        html += '<a class="section-link" href="' + esc(group.site_url) + '">사이트 →</a>';
+      if (!favOnly) {
+        html += '<div class="section-header">';
+        html += '<span class="section-icon">📌</span>';
+        html += '<span class="section-title">' + esc(group.site_name) + '</span>';
+        html += '<span class="section-count">' + jobs.length + '개</span>';
+        if (group.site_url) {
+          html += '<a class="section-link" href="' + esc(group.site_url) + '">사이트 →</a>';
+        }
+        html += '</div>';
       }
-      html += '</div>';
 
       jobs.forEach(function (job) {
         var displayStatus = normalizeStatus(job, code);
