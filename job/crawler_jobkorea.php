@@ -100,8 +100,8 @@ class JobKoreaCrawler extends BaseJobCrawler {
             $expNode    = $xpath->query(".//span[contains(@class, 'item-condition_applicants')]", $container)->item(0);
             $experience = $expNode ? $this->cleanText($expNode->textContent) : null;
 
-            // 마감일 (D-N 형태) 또는 등록일 텍스트
-            $ddayNode = $xpath->query(".//span[contains(@class, 'item-dday')]", $container)->item(0);
+            // 마감일: item-condition_dday에 "D-6" 형태 → 실제 날짜로 변환
+            $ddayNode = $xpath->query(".//span[contains(@class, 'item-condition_dday')]", $container)->item(0);
             $deadline = null;
             if ($ddayNode) {
                 $ddayText = $this->cleanText($ddayNode->textContent);
