@@ -178,7 +178,7 @@
       var jobs = group.jobs.filter(function (j) {
         if (favOnly && !isFav(j.url)) return false;
         if (currentStatus === 'all') return true;
-        return (j.status || '').indexOf(currentStatus) !== -1;
+        return normalizeStatus(j, code).indexOf(currentStatus) !== -1;
       });
 
       if (jobs.length === 0) return;
@@ -194,13 +194,14 @@
       html += '</div>';
 
       jobs.forEach(function (job) {
-        var isActive = job.status && job.status.indexOf('접수') !== -1;
+        var displayStatus = normalizeStatus(job, code);
+        var isActive = displayStatus.indexOf('접수') !== -1;
         var fav = isFav(job.url);
 
         html += '<div class="card-wrap">';
         html += '<a class="card" href="' + esc(job.url) + '">';
         html += '<div class="card-badges">';
-        html += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(job.status || '-') + '</span>';
+        html += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
         if (job.category) html += '<span class="badge badge-cat">' + esc(job.category) + '</span>';
         html += '</div>';
         html += '<div class="card-title">' + esc(job.title) + '</div>';
@@ -257,6 +258,45 @@
   }
 
   function p2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  // 상태 정규화: 접수완료/마감임박 → 마감, 디자인그룹나인 기간 만료 체크
+  function normalizeStatus(job, siteCode) {
+    var status = job.status || '';
+    if (status === '접수완료' || status === '마감임박') return '마감';
+
+    if (siteCode === 'designnine' && job.period) {
+      var endYM = periodEndYearMonth(job.period);
+      if (endYM !== null) {
+        var now = new Date();
+        var curYM = now.getFullYear() * 100 + (now.getMonth() + 1);
+        if (endYM < curYM) return '마감';
+      }
+    }
+    return status;
+  }
+
+  // period 문자열에서 종료 년월을 YYYYMM 숫자로 추출
+  function periodEndYearMonth(period) {
+    period = (period || '').trim();
+
+    // "YYYY-MM-DD ~ YYYY-MM-DD"
+    var m1 = period.match(/~\s*(\d{4})-(\d{2})-\d{2}/);
+    if (m1) return +m1[1] * 100 + +m1[2];
+
+    // "MM-DD~MM-DD"
+    var m2 = period.match(/^(\d{2})-\d{2}\s*~\s*(\d{2})-\d{2}/);
+    if (m2) {
+      var sy = new Date().getFullYear(), sm = +m2[1], em = +m2[2];
+      var ey = em < sm ? sy + 1 : sy;
+      return ey * 100 + em;
+    }
+
+    // "YYYY.MM ~ YYYY.MM (...)"
+    var m3 = period.match(/~\s*(\d{4})\.(\d{2})/);
+    if (m3) return +m3[1] * 100 + +m3[2];
+
+    return null;
+  }
 
   function esc(s) {
     if (!s) return '';
