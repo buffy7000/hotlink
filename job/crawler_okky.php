@@ -114,9 +114,9 @@ class OkkyCrawler extends BaseJobCrawler {
             // 마감일
             $deadline = null;
             if (!empty($r['deadline'])) {
-                $deadline = '마감 ' . date('n.j', strtotime($r['deadline']));
+                $deadline = date('m/d', strtotime($r['deadline']));
             } elseif (!empty($r['payDateType']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $r['payDateType'])) {
-                $deadline = '마감 ' . date('n.j', strtotime($r['payDateType']));
+                $deadline = date('m/d', strtotime($r['payDateType']));
             }
 
             // 투입/기간
