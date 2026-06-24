@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>프리랜서 잡 보드 - 핫링크</title>
+<title>프리랜서 모아 - 핫링크</title>
 <style>
   :root {
     --bg: #f4f4f5;
@@ -88,7 +88,7 @@
 <body>
 
 <div class="header">
-  <h1>💼 프리랜서 잡</h1>
+  <h1><a href="/job" style="text-decoration:none;color:inherit;">💼 프리랜서 모아</a></h1>
   <button class="fav-header-btn" id="favFilterBtn">☆ 즐겨찾기</button>
 </div>
 
