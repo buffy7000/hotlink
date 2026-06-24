@@ -56,39 +56,58 @@ class JobKoreaCrawler extends BaseJobCrawler {
         $jobs  = [];
         $seen  = [];
 
-        $links = $xpath->query("//a[contains(@href, '/Recruit/GI_Read/')]");
-        if (!$links || $links->length === 0) {
-            echo "[잡코리아] 공고 링크를 찾지 못했습니다.\n";
+        // 실제 HTML 구조: div.recruit-item 안에 span.item-title, span.item-corp_name,
+        // span.item-condition_location, span.item-condition_applicants, span.item-dday
+        // 링크(a.section-item_link)는 텍스트 없는 오버레이 형태
+        $containers = $xpath->query("//div[contains(@class, 'recruit-item')]");
+        if (!$containers || $containers->length === 0) {
+            echo "[잡코리아] 공고 컨테이너를 찾지 못했습니다.\n";
             return $jobs;
         }
 
-        echo "[잡코리아] 발견된 링크: {$links->length}개\n";
+        echo "[잡코리아] 발견된 공고: {$containers->length}개\n";
 
-        foreach ($links as $link) {
-            $href = $link->getAttribute('href');
+        foreach ($containers as $container) {
+            // URL
+            $linkNode = $xpath->query(".//a[contains(@href, '/Recruit/GI_Read/')]", $container)->item(0);
+            if (!$linkNode) continue;
+            $href = $linkNode->getAttribute('href');
             if (!preg_match('#/Recruit/GI_Read/(\d+)#', $href, $m)) continue;
 
             $jobId = $m[1];
-
-            $title = $this->cleanText($link->textContent);
-            if (empty($title)) continue;
-
             if (isset($seen[$jobId])) continue;
             $seen[$jobId] = true;
 
+            $url = $this->baseUrl . '/Recruit/GI_Read/' . $jobId;
+
+            // 제목
+            $titleNode = $xpath->query(".//span[contains(@class, 'item-title')]", $container)->item(0);
+            if (!$titleNode) continue;
+            $title = $this->cleanText($titleNode->textContent);
+            if (empty($title)) continue;
+
             if (!$this->passesFilter($title)) continue;
 
-            $url       = $this->baseUrl . '/Recruit/GI_Read/' . $jobId;
-            $container = $this->findJobContainer($link);
+            // 회사명
+            $agencyNode = $xpath->query(".//span[contains(@class, 'item-corp_name')]", $container)->item(0);
+            $agency     = $agencyNode ? $this->cleanText($agencyNode->textContent) : null;
 
-            $agency     = null;
-            $location   = null;
-            $experience = null;
-            $deadline   = null;
+            // 지역
+            $locationNode = $xpath->query(".//span[contains(@class, 'item-condition_location')]", $container)->item(0);
+            $location     = $locationNode ? $this->cleanText($locationNode->textContent) : null;
 
-            if ($container) {
-                $agency                           = $this->extractAgency($xpath, $container, $title);
-                [$location, $experience, $deadline] = $this->extractMeta($xpath, $container);
+            // 경력
+            $expNode    = $xpath->query(".//span[contains(@class, 'item-condition_applicants')]", $container)->item(0);
+            $experience = $expNode ? $this->cleanText($expNode->textContent) : null;
+
+            // 마감일 (D-N 형태) 또는 등록일 텍스트
+            $ddayNode = $xpath->query(".//span[contains(@class, 'item-dday')]", $container)->item(0);
+            $deadline = null;
+            if ($ddayNode) {
+                $ddayText = $this->cleanText($ddayNode->textContent);
+                if (preg_match('/D-(\d+)/', $ddayText, $dm)) {
+                    $deadline = '마감 ' . date('n.j', strtotime('+' . $dm[1] . ' days'));
+                }
             }
 
             $jobs[] = [
@@ -101,7 +120,7 @@ class JobKoreaCrawler extends BaseJobCrawler {
                 'deadline'   => $deadline,
             ];
 
-            echo "  - {$title}" . ($agency ? " [{$agency}]" : '') . ($deadline ? " {$deadline}" : '') . "\n";
+            echo "  - {$title}" . ($agency ? " [{$agency}]" : '') . ($location ? " {$location}" : '') . "\n";
         }
 
         return $jobs;
@@ -125,67 +144,6 @@ class JobKoreaCrawler extends BaseJobCrawler {
         }
 
         return true;
-    }
-
-    // 링크에서 가장 가까운 li/article 컨테이너를 찾고, 없으면 4단계 위 반환
-    private function findJobContainer($link) {
-        $node = $link->parentNode;
-        for ($i = 0; $i < 8; $i++) {
-            if (!$node || $node->nodeName === 'body') break;
-            $tag = strtolower($node->nodeName);
-            if ($tag === 'li' || $tag === 'article') return $node;
-            $node = $node->parentNode;
-        }
-        $node = $link->parentNode;
-        for ($i = 0; $i < 4 && $node && $node->parentNode && $node->parentNode->nodeName !== 'body'; $i++) {
-            $node = $node->parentNode;
-        }
-        return $node;
-    }
-
-    // 공고 제목 링크가 아닌 회사명 추출
-    private function extractAgency($xpath, $container, $title) {
-        $candidates = $xpath->query(".//*[self::strong or self::b or self::em or self::span or self::p or self::div[not(.//*[self::ul or self::ol])]]", $container);
-        foreach ($candidates as $node) {
-            // 자식이 많은 노드는 컨테이너이므로 스킵
-            if ($node->childNodes->length > 3) continue;
-
-            $text = $this->cleanText($node->textContent);
-            if (empty($text) || $text === $title) continue;
-            if (mb_strlen($text) < 2 || mb_strlen($text) > 60) continue;
-
-            // 숫자/날짜/지역/경력/메타 패턴 제외
-            if (preg_match('/D-\d+|마감|경력|신입|년차|무관|\d{2}\/\d{2}|서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|전북|전남|경북|경남|제주/', $text)) continue;
-
-            return $text;
-        }
-        return null;
-    }
-
-    // 지역 / 경력 / 마감일 추출
-    private function extractMeta($xpath, $container) {
-        $location   = null;
-        $experience = null;
-        $deadline   = null;
-
-        $textNodes = $xpath->query(".//text()", $container);
-        foreach ($textNodes as $textNode) {
-            $text = trim($textNode->nodeValue);
-            if (empty($text)) continue;
-
-            if ($deadline === null && preg_match('/D-(\d+)/', $text, $dm)) {
-                $days     = (int)$dm[1];
-                $deadline = '마감 ' . date('n.j', strtotime("+{$days} days"));
-            }
-            if ($location === null && preg_match('/^(서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|전북|전남|경북|경남|제주)/', $text)) {
-                $location = $text;
-            }
-            if ($experience === null && preg_match('/(신입|무관|경력\s*\d+|\d+년차)/', $text)) {
-                $experience = $text;
-            }
-        }
-
-        return [$location, $experience, $deadline];
     }
 
     private function hasNextPage($html, $nextPage) {
