@@ -223,6 +223,44 @@
   var selectedCount = parseInt(localStorage.getItem(LS_COUNT)) || 20;
   var generation    = 0;
   var audioCtx      = null;
+  var running       = false;
+  var isPaused      = false;
+  var currentTimer  = null;
+  var pausedStatusText = '';
+
+  // ── 일시정지 가능한 타이머 ─────────────────────────────
+  function schedule(fn, delay) {
+    var start     = Date.now();
+    var remaining = delay;
+    var tid       = null;
+    var timer = {
+      cancelled: false,
+      pause: function () {
+        if (this.cancelled || tid === null) return;
+        clearTimeout(tid);
+        tid = null;
+        remaining -= (Date.now() - start);
+        if (remaining < 0) remaining = 0;
+      },
+      resume: function () {
+        if (this.cancelled || tid !== null) return;
+        start = Date.now();
+        tid = setTimeout(fire, remaining);
+      },
+      cancel: function () {
+        this.cancelled = true;
+        clearTimeout(tid);
+        tid = null;
+      }
+    };
+    function fire() {
+      if (timer.cancelled) return;
+      fn();
+    }
+    tid = setTimeout(fire, remaining);
+    currentTimer = timer;
+    return timer;
+  }
 
   // ── 설정 초기화 (저장값 반영) ────────────────────────
   function activateBtn(type, value) {
@@ -342,7 +380,7 @@
       osc.start(t); osc.stop(t + n.d + 0.02);
       offset += n.d + gap;
     });
-    setTimeout(function () { if (generation === gen) onDone(); }, (offset + 0.1) * 1000);
+    schedule(function () { if (generation === gen) onDone(); }, (offset + 0.1) * 1000);
   }
 
   function playFanfare(gen, onDone) {
@@ -360,7 +398,7 @@
       osc.connect(gain); gain.connect(c.destination);
       osc.start(t); osc.stop(t + 0.57);
     });
-    setTimeout(function () { if (generation === gen) onDone(); }, 1200);
+    schedule(function () { if (generation === gen) onDone(); }, 1200);
   }
 
   // ── 타이머 ───────────────────────────────────────────
@@ -374,7 +412,7 @@
 
     startBeeping(duration);
 
-    setTimeout(function () {
+    schedule(function () {
       if (generation !== gen) return;
       document.getElementById('progressFill').style.width = (num / total * 100) + '%';
       document.getElementById('statusText').textContent   = '정답! ⭐';
@@ -385,14 +423,34 @@
         playDing(gen, function () {
           if (generation !== gen) return;
           document.getElementById('statusText').textContent = '다음 문제 준비 중...';
-          setTimeout(function () { startProblem(num + 1, total, duration, gen); }, 700);
+          schedule(function () { startProblem(num + 1, total, duration, gen); }, 700);
         });
       }
     }, duration * 1000);
   }
 
+  // ── 일시정지 / 재개 ──────────────────────────────────
+  function pauseTimer() {
+    if (isPaused) return;
+    isPaused = true;
+    if (currentTimer) currentTimer.pause();
+    if (audioCtx) audioCtx.suspend();
+    pausedStatusText = document.getElementById('statusText').textContent;
+    document.getElementById('statusText').textContent = '일시정지 ⏸';
+  }
+
+  function resumeTimer() {
+    if (!isPaused) return;
+    isPaused = false;
+    document.getElementById('statusText').textContent = pausedStatusText;
+    if (currentTimer) currentTimer.resume();
+    if (audioCtx) audioCtx.resume();
+  }
+
   function showDone(total, gen) {
     if (generation !== gen) return;
+    running  = false;
+    isPaused = false;
     document.getElementById('timerBox').classList.remove('visible');
     document.getElementById('doneBox').classList.add('visible');
     document.getElementById('doneMsg').textContent = total + '문제 모두 완료! 수고했어 🥳';
@@ -409,21 +467,34 @@
 
   // ── 버튼 ─────────────────────────────────────────────
   document.getElementById('btnStart').addEventListener('click', function () {
-    generation++;
-    var gen = generation;
+    if (!running) {
+      generation++;
+      var gen = generation;
+      running  = true;
+      isPaused = false;
 
-    document.getElementById('doneBox').classList.remove('visible');
-    document.getElementById('timerBox').classList.add('visible');
-    document.getElementById('btnStop').classList.add('visible');
-    document.getElementById('btnStart').textContent = '▶ 시작';
-    document.getElementById('settings').style.display = 'none';
-    setSettingsDisabled(true);
+      document.getElementById('doneBox').classList.remove('visible');
+      document.getElementById('timerBox').classList.add('visible');
+      document.getElementById('btnStop').classList.add('visible');
+      document.getElementById('btnStart').textContent = '⏸ 일시정지';
+      document.getElementById('settings').style.display = 'none';
+      setSettingsDisabled(true);
 
-    startProblem(1, selectedCount, selectedTime, gen);
+      startProblem(1, selectedCount, selectedTime, gen);
+    } else if (isPaused) {
+      resumeTimer();
+      document.getElementById('btnStart').textContent = '⏸ 일시정지';
+    } else {
+      pauseTimer();
+      document.getElementById('btnStart').textContent = '▶ 재개';
+    }
   });
 
   document.getElementById('btnStop').addEventListener('click', function () {
     generation++;
+    running  = false;
+    isPaused = false;
+    if (currentTimer) currentTimer.cancel();
     stopAllAudio();
     document.getElementById('timerBox').classList.remove('visible');
     document.getElementById('doneBox').classList.remove('visible');
