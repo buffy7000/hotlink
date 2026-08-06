@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>띠띠띠 집중 타이머</title>
+<style>
+  :root {
+    --primary: #ff6b6b;
+    --primary2: #ff9f43;
+    --success: #6bcb77;
+    --bg: #fff9f0;
+    --surface: #ffffff;
+    --text: #333;
+    --text2: #888;
+    --border: #e8ddd0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 48px;
+  }
+
+  h1 { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+
+  /* 설정 */
+  .settings { width: 100%; max-width: 380px; }
+  .setting-group { margin-bottom: 18px; }
+  .setting-label { font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 8px; letter-spacing: .3px; }
+  .option-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .opt-btn {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .opt-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .opt-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .opt-btn:disabled { opacity: .4; cursor: default; }
+
+  .custom-wrap { display: flex; align-items: center; gap: 4px; }
+  .custom-input {
+    width: 72px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface);
+    text-align: center;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .custom-input:focus { border-color: var(--primary); }
+  .custom-input.active { border-color: var(--primary); }
+  .custom-input:disabled { opacity: .4; }
+  .custom-unit { font-size: 13px; color: var(--text2); font-weight: 600; }
+
+  /* 타이머 박스 */
+  .timer-box {
+    width: 100%; max-width: 380px;
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 32px 24px 28px;
+    margin: 20px 0 16px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(255,107,107,.12);
+    display: none;
+  }
+  .timer-box.visible { display: block; }
+
+  .problem-label { font-size: 14px; color: var(--text2); margin-bottom: 4px; }
+  .problem-num {
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .problem-total { font-size: 16px; color: var(--text2); margin-bottom: 20px; }
+
+  .progress-track {
+    background: #f0e8de;
+    border-radius: 10px;
+    height: 10px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, var(--primary), var(--primary2));
+    height: 100%;
+    border-radius: 10px;
+    transition: width .4s ease;
+  }
+
+  .countdown { font-size: 48px; font-weight: 800; color: var(--text); line-height: 1; }
+  .countdown-label { font-size: 14px; color: var(--text2); margin-top: 4px; margin-bottom: 16px; min-height: 20px; }
+  .status-text { font-size: 18px; font-weight: 700; color: var(--text2); min-height: 26px; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(255,107,107,.12); }
+    50%       { transform: scale(1.012); box-shadow: 0 6px 28px rgba(255,107,107,.22); }
+  }
+  .timer-box.beeping { animation: pulse .15s ease-in-out infinite; }
+
+  /* 완료 박스 */
+  .done-box {
+    width: 100%; max-width: 380px;
+    background: linear-gradient(135deg, #6bcb77, #4ecdc4);
+    border-radius: 24px;
+    padding: 36px 24px;
+    margin: 20px 0 16px;
+    text-align: center;
+    color: #fff;
+    display: none;
+  }
+  .done-box.visible { display: block; }
+  .done-emoji { font-size: 60px; margin-bottom: 12px; }
+  .done-title { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+  .done-sub { font-size: 16px; opacity: .85; }
+
+  /* 버튼 */
+  .btn-row { display: flex; gap: 10px; width: 100%; max-width: 380px; }
+
+  .btn-start {
+    flex: 1;
+    padding: 18px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    box-shadow: 0 4px 14px rgba(255,107,107,.35);
+  }
+  .btn-start:hover { opacity: .92; }
+  .btn-start:active { transform: scale(.97); }
+
+  .btn-stop {
+    padding: 18px 22px;
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-stop:hover { border-color: #bbb; color: var(--text); }
+  .btn-stop.visible { display: block; }
+</style>
+</head>
+<body>
+
+<h1>🎵 띠띠띠 타이머</h1>
+<p class="subtitle">수학 문제 집중력 부스터</p>
+
+<div class="settings" id="settings">
+  <div class="setting-group">
+    <div class="setting-label">⏱ 문제당 시간</div>
+    <div class="option-row">
+      <button class="opt-btn active" data-type="time" data-value="3">3초</button>
+      <button class="opt-btn"        data-type="time" data-value="5">5초</button>
+      <button class="opt-btn"        data-type="time" data-value="10">10초</button>
+      <div class="custom-wrap">
+        <input class="custom-input" id="customTime" type="number" min="1" max="300" placeholder="직접">
+        <span class="custom-unit">초</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="setting-group">
+    <div class="setting-label">📝 총 문제 수</div>
+    <div class="option-row">
+      <button class="opt-btn active" data-type="count" data-value="20">20</button>
+      <button class="opt-btn"        data-type="count" data-value="30">30</button>
+      <button class="opt-btn"        data-type="count" data-value="40">40</button>
+      <div class="custom-wrap">
+        <input class="custom-input" id="customCount" type="number" min="1" max="300" placeholder="직접">
+        <span class="custom-unit">문제</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="timer-box" id="timerBox">
+  <div class="problem-label">현재 문제</div>
+  <div class="problem-num" id="problemNum">1</div>
+  <div class="problem-total" id="problemTotal">/ 20 문제</div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="countdown" id="countdown">3.0</div>
+  <div class="countdown-label" id="countdownLabel">초 남음</div>
+  <div class="status-text" id="statusText"></div>
+</div>
+
+<div class="done-box" id="doneBox">
+  <div class="done-emoji">🎉</div>
+  <div class="done-title">다 풀었어요!</div>
+  <div class="done-sub" id="doneMsg">20문제 완료!</div>
+</div>
+
+<div class="btn-row">
+  <button class="btn-start" id="btnStart">▶ 시작</button>
+  <button class="btn-stop"  id="btnStop">■ 중지</button>
+</div>
+
+<script>
+(function () {
+  var selectedTime  = 3;
+  var selectedCount = 20;
+  var generation    = 0;
+  var tickInterval  = null;
+  var audioCtx      = null;
+
+  // ── 설정 버튼 ────────────────────────────────────────
+  document.querySelectorAll('.opt-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var type  = btn.dataset.type;
+      var value = parseInt(btn.dataset.value);
+      document.querySelectorAll('.opt-btn[data-type="' + type + '"]').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (type === 'time') {
+        selectedTime = value;
+        var ci = document.getElementById('customTime');
+        ci.value = ''; ci.classList.remove('active');
+      } else {
+        selectedCount = value;
+        var ci = document.getElementById('customCount');
+        ci.value = ''; ci.classList.remove('active');
+      }
+    });
+  });
+
+  document.getElementById('customTime').addEventListener('input', function () {
+    var v = parseInt(this.value);
+    if (v > 0) {
+      selectedTime = v;
+      document.querySelectorAll('.opt-btn[data-type="time"]').forEach(function (b) { b.classList.remove('active'); });
+      this.classList.add('active');
+    }
+  });
+
+  document.getElementById('customCount').addEventListener('input', function () {
+    var v = parseInt(this.value);
+    if (v > 0) {
+      selectedCount = v;
+      document.querySelectorAll('.opt-btn[data-type="count"]').forEach(function (b) { b.classList.remove('active'); });
+      this.classList.add('active');
+    }
+  });
+
+  // ── Audio ────────────────────────────────────────────
+  function ctx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  // 띠띠띠— 짧은 사각파 비프 반복
+  function startBeeping(duration) {
+    var c   = ctx();
+    var ON  = 0.08, OFF = 0.05;
+    var n   = Math.floor(duration / (ON + OFF));
+    var t0  = c.currentTime + 0.04;
+    for (var i = 0; i < n; i++) {
+      var t    = t0 + i * (ON + OFF);
+      var osc  = c.createOscillator();
+      var gain = c.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.setValueAtTime(0.001, t + ON);
+      osc.connect(gain); gain.connect(c.destination);
+      osc.start(t); osc.stop(t + ON + 0.01);
+    }
+  }
+
+  // 띠디딕~ — 상승 3음 (sine, 경쾌하게)
+  function playDing(gen, onDone) {
+    var c = ctx();
+    var seq = [
+      { f: 659,  d: 0.13 },
+      { f: 784,  d: 0.13 },
+      { f: 1047, d: 0.42 }
+    ];
+    var gap = 0.04, offset = 0;
+    var t0  = c.currentTime + 0.05;
+    seq.forEach(function (n) {
+      var t    = t0 + offset;
+      var osc  = c.createOscillator();
+      var gain = c.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = n.f;
+      gain.gain.setValueAtTime(0.5, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + n.d);
+      osc.connect(gain); gain.connect(c.destination);
+      osc.start(t); osc.stop(t + n.d + 0.02);
+      offset += n.d + gap;
+    });
+    setTimeout(function () { if (generation === gen) onDone(); }, (offset + 0.1) * 1000);
+  }
+
+  // 전체 완료 팡파르
+  function playFanfare(gen, onDone) {
+    var c = ctx();
+    var seq = [523, 659, 784, 1047];
+    var t0  = c.currentTime + 0.05;
+    seq.forEach(function (f, i) {
+      var t    = t0 + i * 0.16;
+      var osc  = c.createOscillator();
+      var gain = c.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      gain.gain.setValueAtTime(0.5, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+      osc.connect(gain); gain.connect(c.destination);
+      osc.start(t); osc.stop(t + 0.57);
+    });
+    setTimeout(function () { if (generation === gen) onDone(); }, 1200);
+  }
+
+  // ── 타이머 ───────────────────────────────────────────
+  function startProblem(num, total, duration, gen) {
+    if (generation !== gen) return;
+
+    document.getElementById('problemNum').textContent   = num;
+    document.getElementById('problemTotal').textContent = '/ ' + total + ' 문제';
+    document.getElementById('progressFill').style.width = ((num - 1) / total * 100) + '%';
+    document.getElementById('countdown').textContent    = duration.toFixed(1);
+    document.getElementById('countdownLabel').textContent = '초 남음';
+    document.getElementById('statusText').textContent   = '집중! 🔥';
+    document.getElementById('timerBox').classList.add('beeping');
+
+    startBeeping(duration);
+
+    var endAt = Date.now() + duration * 1000;
+    clearInterval(tickInterval);
+    tickInterval = setInterval(function () {
+      if (generation !== gen) { clearInterval(tickInterval); return; }
+      var rem = Math.max(0, (endAt - Date.now()) / 1000);
+      document.getElementById('countdown').textContent = rem.toFixed(1);
+    }, 80);
+
+    setTimeout(function () {
+      if (generation !== gen) return;
+      clearInterval(tickInterval);
+      document.getElementById('timerBox').classList.remove('beeping');
+      document.getElementById('progressFill').style.width = (num / total * 100) + '%';
+      document.getElementById('countdown').textContent    = '✓';
+      document.getElementById('countdownLabel').textContent = '';
+      document.getElementById('statusText').textContent   = '정답! ⭐';
+
+      if (num >= total) {
+        playFanfare(gen, function () { showDone(total, gen); });
+      } else {
+        playDing(gen, function () {
+          if (generation !== gen) return;
+          document.getElementById('statusText').textContent = '다음 문제 준비 중...';
+          setTimeout(function () { startProblem(num + 1, total, duration, gen); }, 700);
+        });
+      }
+    }, duration * 1000);
+  }
+
+  function showDone(total, gen) {
+    if (generation !== gen) return;
+    document.getElementById('timerBox').classList.remove('visible');
+    document.getElementById('doneBox').classList.add('visible');
+    document.getElementById('doneMsg').textContent = total + '문제 모두 완료! 수고했어 🥳';
+    document.getElementById('btnStop').classList.remove('visible');
+    document.getElementById('btnStart').textContent = '▶ 다시 시작';
+    setSettingsDisabled(false);
+  }
+
+  function setSettingsDisabled(disabled) {
+    document.querySelectorAll('.opt-btn').forEach(function (b) { b.disabled = disabled; });
+    document.querySelectorAll('.custom-input').forEach(function (i) { i.disabled = disabled; });
+  }
+
+  // ── 버튼 ─────────────────────────────────────────────
+  document.getElementById('btnStart').addEventListener('click', function () {
+    generation++;
+    var gen = generation;
+
+    document.getElementById('doneBox').classList.remove('visible');
+    document.getElementById('timerBox').classList.add('visible');
+    document.getElementById('timerBox').classList.remove('beeping');
+    document.getElementById('btnStop').classList.add('visible');
+    document.getElementById('btnStart').textContent = '▶ 시작';
+    setSettingsDisabled(true);
+
+    startProblem(1, selectedCount, selectedTime, gen);
+  });
+
+  document.getElementById('btnStop').addEventListener('click', function () {
+    generation++;
+    clearInterval(tickInterval);
+    document.getElementById('timerBox').classList.remove('visible', 'beeping');
+    document.getElementById('doneBox').classList.remove('visible');
+    document.getElementById('btnStop').classList.remove('visible');
+    document.getElementById('btnStart').textContent = '▶ 시작';
+    setSettingsDisabled(false);
+  });
+
+})();
+</script>
+</body>
+</html>
