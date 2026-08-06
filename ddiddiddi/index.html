@@ -276,22 +276,21 @@
     return audioCtx;
   }
 
-  // 띠띠띠— 짧은 사각파 비프 반복
+  // 띠...띠...띠— 1초마다 1번씩, 낮고 차분한 sine 음
   function startBeeping(duration) {
-    var c   = ctx();
-    var ON  = 0.08, OFF = 0.05;
-    var n   = Math.floor(duration / (ON + OFF));
-    var t0  = c.currentTime + 0.04;
+    var c  = ctx();
+    var n  = Math.round(duration);   // 초 수 = 비프 횟수
+    var t0 = c.currentTime + 0.05;
     for (var i = 0; i < n; i++) {
-      var t    = t0 + i * (ON + OFF);
+      var t    = t0 + i * 1.0;      // 1초 간격
       var osc  = c.createOscillator();
       var gain = c.createGain();
-      osc.type = 'square';
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.22, t);
-      gain.gain.setValueAtTime(0.001, t + ON);
+      osc.type = 'sine';
+      osc.frequency.value = 440;    // A4 — 낮고 차분한 음
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);  // 0.35초 내 페이드아웃
       osc.connect(gain); gain.connect(c.destination);
-      osc.start(t); osc.stop(t + ON + 0.01);
+      osc.start(t); osc.stop(t + 0.37);
     }
   }
 
