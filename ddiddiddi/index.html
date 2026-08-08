@@ -321,8 +321,19 @@
   });
 
   // ── Audio ────────────────────────────────────────────
+  var limiter = null;
+
   function ctx() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      limiter = audioCtx.createDynamicsCompressor();
+      limiter.threshold.value = -6;
+      limiter.knee.value      = 0;
+      limiter.ratio.value     = 20;
+      limiter.attack.value    = 0.001;
+      limiter.release.value   = 0.1;
+      limiter.connect(audioCtx.destination);
+    }
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
   }
@@ -331,6 +342,7 @@
     if (audioCtx) {
       audioCtx.close();
       audioCtx = null;
+      limiter  = null;
     }
   }
 
@@ -344,9 +356,9 @@
       var gain = c.createGain();
       osc.type = 'sine';
       osc.frequency.value = 440;
-      gain.gain.setValueAtTime(0.7, t);
+      gain.gain.setValueAtTime(0.95, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-      osc.connect(gain); gain.connect(c.destination);
+      osc.connect(gain); gain.connect(limiter);
       osc.start(t); osc.stop(t + 0.37);
     }
   }
@@ -368,7 +380,7 @@
       osc.frequency.value = n.f;
       gain.gain.setValueAtTime(0.5, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + n.d);
-      osc.connect(gain); gain.connect(c.destination);
+      osc.connect(gain); gain.connect(limiter);
       osc.start(t); osc.stop(t + n.d + 0.02);
       offset += n.d + gap;
     });
@@ -387,7 +399,7 @@
       osc.frequency.value = f;
       gain.gain.setValueAtTime(0.5, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-      osc.connect(gain); gain.connect(c.destination);
+      osc.connect(gain); gain.connect(limiter);
       osc.start(t); osc.stop(t + 0.57);
     });
     schedule(function () { if (generation === gen) onDone(); }, 1200);
