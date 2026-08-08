@@ -172,10 +172,8 @@
       <button class="opt-btn active" data-type="time" data-value="3">3초</button>
       <button class="opt-btn"        data-type="time" data-value="5">5초</button>
       <button class="opt-btn"        data-type="time" data-value="10">10초</button>
-      <div class="custom-wrap">
-        <input class="custom-input" id="customTime" type="number" min="1" max="300" placeholder="직접">
-        <span class="custom-unit">초</span>
-      </div>
+      <button class="opt-btn"        data-type="time" data-value="15">15초</button>
+      <button class="opt-btn"        data-type="time" data-value="20">20초</button>
     </div>
   </div>
 
@@ -186,7 +184,7 @@
       <button class="opt-btn"        data-type="count" data-value="30">30</button>
       <button class="opt-btn"        data-type="count" data-value="40">40</button>
       <div class="custom-wrap">
-        <input class="custom-input" id="customCount" type="number" min="1" max="300" placeholder="직접">
+        <input class="custom-input" id="customCount" type="number" min="1" max="99" maxlength="2" placeholder="직접">
         <span class="custom-unit">문제</span>
       </div>
     </div>
@@ -270,19 +268,23 @@
   }
 
   (function initSettings() {
-    var timePresets  = [3, 5, 10];
+    var timePresets  = [3, 5, 10, 15, 20];
     var countPresets = [20, 30, 40];
 
     if (timePresets.indexOf(selectedTime) !== -1) {
       activateBtn('time', selectedTime);
     } else {
-      document.getElementById('customTime').value = selectedTime;
-      document.getElementById('customTime').classList.add('active');
+      selectedTime = 3;
+      localStorage.setItem(LS_TIME, selectedTime);
+      activateBtn('time', selectedTime);
     }
 
     if (countPresets.indexOf(selectedCount) !== -1) {
       activateBtn('count', selectedCount);
     } else {
+      if (selectedCount > 99) selectedCount = 99;
+      if (selectedCount < 1)  selectedCount = 1;
+      localStorage.setItem(LS_COUNT, selectedCount);
       document.getElementById('customCount').value = selectedCount;
       document.getElementById('customCount').classList.add('active');
     }
@@ -297,8 +299,6 @@
       if (type === 'time') {
         selectedTime = value;
         localStorage.setItem(LS_TIME, value);
-        var ci = document.getElementById('customTime');
-        ci.value = ''; ci.classList.remove('active');
       } else {
         selectedCount = value;
         localStorage.setItem(LS_COUNT, value);
@@ -308,18 +308,10 @@
     });
   });
 
-  document.getElementById('customTime').addEventListener('input', function () {
-    var v = parseInt(this.value);
-    if (v > 0) {
-      selectedTime = v;
-      localStorage.setItem(LS_TIME, v);
-      document.querySelectorAll('.opt-btn[data-type="time"]').forEach(function (b) { b.classList.remove('active'); });
-      this.classList.add('active');
-    }
-  });
-
   document.getElementById('customCount').addEventListener('input', function () {
+    if (this.value.length > 2) this.value = this.value.slice(0, 2);
     var v = parseInt(this.value);
+    if (v > 99) { v = 99; this.value = 99; }
     if (v > 0) {
       selectedCount = v;
       localStorage.setItem(LS_COUNT, v);
