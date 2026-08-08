@@ -344,7 +344,7 @@
       var gain = c.createGain();
       osc.type = 'sine';
       osc.frequency.value = 440;
-      gain.gain.setValueAtTime(0.5, t);
+      gain.gain.setValueAtTime(0.7, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
       osc.connect(gain); gain.connect(c.destination);
       osc.start(t); osc.stop(t + 0.37);
