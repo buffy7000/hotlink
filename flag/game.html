@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국기 맞추기 게임 - 세계 국기 학습</title>
+<meta name="description" content="국기를 보고 나라 이름을 맞히는 4지선다 퀴즈 게임">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --text2: #64748b;
+    --border: #e2e8f0;
+    --accent: #2563eb;
+    --correct: #16a34a;
+    --wrong: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 60px;
+  }
+  .topbar { width: 100%; max-width: 480px; display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+  h1 { font-size: 22px; font-weight: 800; }
+  .back-link { font-size: 13px; color: var(--text2); text-decoration: none; margin-left: auto; }
+  .back-link:hover { color: var(--accent); }
+
+  .card { width: 100%; max-width: 480px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; text-align: center; }
+
+  /* 시작 화면 */
+  .start-emoji { font-size: 48px; margin-bottom: 12px; }
+  .start-desc { font-size: 14px; color: var(--text2); margin-bottom: 6px; line-height: 1.6; }
+  .best-score { font-size: 13px; color: var(--accent); font-weight: 700; margin-bottom: 20px; }
+  .btn-big {
+    padding: 16px 32px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff; font-size: 17px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(37,99,235,.3);
+  }
+  .btn-big:hover { opacity: .92; }
+
+  /* 게임 화면 */
+  .status-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 16px; }
+  .status-row .score { color: var(--accent); }
+  .flag-box svg { width: 100%; max-width: 280px; aspect-ratio: 3/2; border-radius: 12px; border: 2px solid var(--border); margin-bottom: 24px; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .choice-btn {
+    padding: 16px 10px; border-radius: 12px; border: 2px solid var(--border);
+    background: var(--surface); font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer;
+    transition: all .12s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .choice-btn.correct { background: var(--correct); border-color: var(--correct); color: #fff; }
+  .choice-btn.wrong { background: var(--wrong); border-color: var(--wrong); color: #fff; }
+  .choice-btn:disabled { cursor: default; }
+
+  .next-row { margin-top: 20px; min-height: 46px; }
+  .btn-next {
+    padding: 12px 28px; border-radius: 12px; border: none; background: var(--accent);
+    color: #fff; font-size: 15px; font-weight: 800; cursor: pointer;
+  }
+
+  /* 결과 화면 */
+  .result-emoji { font-size: 52px; margin-bottom: 10px; }
+  .result-score { font-size: 34px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+  .result-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🎯 국기 맞추기</h1>
+  <a class="back-link" href="index.html">← 세계 국기 학습으로</a>
+</div>
+
+<!-- 시작 화면 -->
+<div class="card" id="startScreen">
+  <div class="start-emoji">🌍</div>
+  <div class="start-desc">국기를 보고 알맞은 나라 이름을 골라보세요.<br>한 라운드는 20문제입니다.</div>
+  <div class="best-score" id="bestScoreText"></div>
+  <button class="btn-big" id="startBtn">▶ 시작하기</button>
+</div>
+
+<!-- 게임 화면 -->
+<div class="card hidden" id="gameScreen">
+  <div class="status-row">
+    <span id="progressText">1 / 20</span>
+    <span class="score" id="scoreText">점수 0</span>
+  </div>
+  <div class="flag-box"><svg id="flagSvg" viewBox="0 0 300 200"></svg></div>
+  <div class="choices" id="choices"></div>
+  <div class="next-row" id="nextRow"></div>
+</div>
+
+<!-- 결과 화면 -->
+<div class="card hidden" id="resultScreen">
+  <div class="result-emoji" id="resultEmoji">🎉</div>
+  <div class="result-score" id="resultScore">0 / 20</div>
+  <div class="result-sub" id="resultSub"></div>
+  <button class="btn-big" id="retryBtn">↺ 다시 하기</button>
+</div>
+
+<script src="flags-data.js"></script>
+<script>
+(function () {
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var LS_BEST = 'flag_game_best';
+  var ROUND_SIZE = 20;
+
+  var queue = [], qIndex = 0, score = 0, answered = false;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function renderFlagSvg(flag) {
+    var svg = document.getElementById('flagSvg');
+    svg.innerHTML = '';
+    flag.build().forEach(function (p) {
+      var el = document.createElementNS(SVG_NS, 'path');
+      el.setAttribute('d', p.d);
+      el.setAttribute('fill', p.fill);
+      if (p.fillRule) el.setAttribute('fill-rule', p.fillRule);
+      svg.appendChild(el);
+    });
+  }
+
+  function showBestScore() {
+    var best = localStorage.getItem(LS_BEST);
+    document.getElementById('bestScoreText').textContent = best ? '최고 기록: ' + best + ' / ' + ROUND_SIZE : '';
+  }
+
+  function startGame() {
+    queue = shuffle(FLAGS).slice(0, ROUND_SIZE);
+    qIndex = 0; score = 0;
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    if (qIndex >= queue.length) return endGame();
+    answered = false;
+    var flag = queue[qIndex];
+    document.getElementById('progressText').textContent = (qIndex + 1) + ' / ' + queue.length;
+    document.getElementById('scoreText').textContent = '점수 ' + score;
+    document.getElementById('nextRow').innerHTML = '';
+    renderFlagSvg(flag);
+
+    var wrongPool = shuffle(FLAGS.filter(function (f) { return f.code !== flag.code; })).slice(0, 3);
+    var options = shuffle([flag].concat(wrongPool));
+
+    var choicesEl = document.getElementById('choices');
+    choicesEl.innerHTML = '';
+    options.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = opt.name;
+      btn.addEventListener('click', function () { handleAnswer(opt, flag, btn); });
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(chosen, correctFlag, btn) {
+    if (answered) return;
+    answered = true;
+    var isCorrect = chosen.code === correctFlag.code;
+    if (isCorrect) score++;
+
+    document.querySelectorAll('.choice-btn').forEach(function (b) {
+      b.disabled = true;
+      if (b.textContent === correctFlag.name) b.classList.add('correct');
+    });
+    if (!isCorrect) btn.classList.add('wrong');
+
+    document.getElementById('scoreText').textContent = '점수 ' + score;
+
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'btn-next';
+    nextBtn.textContent = (qIndex + 1 >= queue.length) ? '결과 보기' : '다음 문제 →';
+    nextBtn.addEventListener('click', function () { qIndex++; nextQuestion(); });
+    document.getElementById('nextRow').innerHTML = '';
+    document.getElementById('nextRow').appendChild(nextBtn);
+  }
+
+  function endGame() {
+    document.getElementById('gameScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+    document.getElementById('resultScore').textContent = score + ' / ' + queue.length;
+
+    var best = parseInt(localStorage.getItem(LS_BEST)) || 0;
+    if (score > best) {
+      localStorage.setItem(LS_BEST, score);
+      document.getElementById('resultSub').textContent = '🎉 최고 기록 경신!';
+      document.getElementById('resultEmoji').textContent = '🏆';
+    } else {
+      document.getElementById('resultSub').textContent = '최고 기록: ' + best + ' / ' + queue.length;
+      document.getElementById('resultEmoji').textContent = score >= queue.length * 0.7 ? '🎉' : '💪';
+    }
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('retryBtn').addEventListener('click', function () {
+    document.getElementById('resultScreen').classList.add('hidden');
+    document.getElementById('startScreen').classList.remove('hidden');
+    showBestScore();
+  });
+
+  showBestScore();
+})();
+</script>
+</body>
+</html>

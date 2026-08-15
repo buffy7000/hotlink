@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세계 국기 학습 - 색칠 · 인쇄 · 맞추기</title>
+<meta name="description" content="세계 50개국 국기 색칠, 인쇄용 도안, 국기 맞추기 게임을 한 곳에서">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --text2: #64748b;
+    --border: #e2e8f0;
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    padding: 48px 20px 64px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: var(--text2); margin-bottom: 36px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .card {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, transform .1s, box-shadow .15s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,99,235,.1); }
+  .card-emoji { font-size: 32px; margin-bottom: 12px; display: block; }
+  .card-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .card-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+  .flag-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 8px;
+  }
+  .flag-strip svg { width: 100%; aspect-ratio: 3/2; border-radius: 6px; border: 1px solid var(--border); display: block; }
+  .strip-title { font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>🌍 세계 국기 학습</h1>
+  <p class="subtitle">50개국 국기로 색칠하고, 인쇄하고, 맞춰보세요</p>
+
+  <div class="grid">
+    <a class="card" href="color.html">
+      <span class="card-emoji">🎨</span>
+      <div class="card-title">국기 색칠하기</div>
+      <div class="card-desc">국기를 골라 영역을 클릭해서 직접 색칠해보세요</div>
+    </a>
+    <a class="card" href="print.html">
+      <span class="card-emoji">🖨️</span>
+      <div class="card-title">인쇄용 도안</div>
+      <div class="card-desc">색상 참고 이미지가 포함된 흑백 도안을 인쇄해서 칠해보세요</div>
+    </a>
+    <a class="card" href="game.html">
+      <span class="card-emoji">🎯</span>
+      <div class="card-title">국기 맞추기 게임</div>
+      <div class="card-desc">국기를 보고 나라 이름을 맞히는 4지선다 퀴즈</div>
+    </a>
+  </div>
+
+  <div class="strip-title">수록된 50개국</div>
+  <div class="flag-strip" id="flagStrip"></div>
+</div>
+
+<script src="flags-data.js"></script>
+<script>
+(function () {
+  var strip = document.getElementById('flagStrip');
+  FLAGS.forEach(function (f) {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 300 200');
+    svg.setAttribute('title', f.name);
+    f.build().forEach(function (p) {
+      var el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      el.setAttribute('d', p.d);
+      el.setAttribute('fill', p.fill);
+      if (p.fillRule) el.setAttribute('fill-rule', p.fillRule);
+      svg.appendChild(el);
+    });
+    strip.appendChild(svg);
+  });
+})();
+</script>
+</body>
+</html>
