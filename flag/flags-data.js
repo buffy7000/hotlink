@@ -83,10 +83,12 @@
     // 동아시아
     { code: 'kr', name: '대한민국', build: function () {
         var parts = [field(W)];
-        // 태극 - 축이 좌상↔우하가 아닌 우상(양/빨강)↔좌하(음/파랑) 대각선이 되도록 45도 회전한 좌표 사용
-        parts.push({ id: 'taegeuk-red', d: 'M121.72,71.72 A40,40 0 0,1 178.28,128.28 A20,20 0 0,1 150,100 A20,20 0 0,0 121.72,71.72 Z', fill: '#C60C30' });
-        parts.push({ id: 'taegeuk-blue', d: 'M178.28,128.28 A40,40 0 0,1 121.72,71.72 A20,20 0 0,1 150,100 A20,20 0 0,0 178.28,128.28 Z', fill: '#003478' });
-        // 4괘 (건곤감리) - 각 괘의 실제 3선 패턴(false=이어진 선, true=끊긴 선)과 대각 배치를 반영
+        // 태극 - 위키미디어 공식 태극기 SVG(Flag_of_South_Korea.svg)의 실제 좌표를
+        // 반지름 50(깃발 높이 200의 절반, 국기법 규격) 기준으로 환산한 정확한 값
+        parts.push({ id: 'taegeuk-red', d: 'M170.801,113.868 A37.5,37.5 0 1,1 108.397,72.265 A50,50 0 1,1 191.603,127.735 Z', fill: '#C60C30' });
+        parts.push({ id: 'taegeuk-blue', d: 'M108.397,72.265 A50,50 0 1,0 191.603,127.735 A25,25 0 1,0 150,100 A25,25 0 1,1 108.397,72.265 Z', fill: '#003478' });
+        // 4괘 (건곤감리) - 각 괘의 실제 3선 패턴(false=이어진 선, true=끊긴 선)과 위치
+        // 좌상 건(이어짐3), 우상 리(이어짐-끊김-이어짐), 좌하 감(끊김-이어짐-끊김), 우하 곤(끊김3)
         function trigram(x, y, pattern, color) {
           var out = [], bw = 26, bh = 5, gap = 8;
           for (var i = 0; i < 3; i++) {
@@ -100,10 +102,10 @@
           }
           return out;
         }
-        parts = parts.concat(trigram(64, 44, [false, false, false], BLK));  // 건(乾) 좌상: 이어진 선 3개
-        parts = parts.concat(trigram(210, 44, [true, false, true], BLK));   // 감(坎) 우상: 끊김-이어짐-끊김
-        parts = parts.concat(trigram(64, 132, [false, true, false], BLK)); // 리(離) 좌하: 이어짐-끊김-이어짐
-        parts = parts.concat(trigram(210, 132, [true, true, true], BLK));   // 곤(坤) 우하: 끊긴 선 3개
+        parts = parts.concat(trigram(64, 44, [false, false, false], BLK));  // 건(乾) 좌상
+        parts = parts.concat(trigram(210, 44, [false, true, false], BLK));  // 리(離) 우상
+        parts = parts.concat(trigram(64, 132, [true, false, true], BLK));   // 감(坎) 좌하
+        parts = parts.concat(trigram(210, 132, [true, true, true], BLK));   // 곤(坤) 우하
         return parts;
       } },
     { code: 'kp', name: '북한', build: function () {

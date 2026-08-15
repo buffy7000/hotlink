@@ -54,6 +54,7 @@
   .toolbar { display: flex; justify-content: center; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
   .btn { padding: 10px 18px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface); font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); }
   .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .4; cursor: default; border-color: var(--border); color: var(--text); }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn.primary:hover { opacity: .9; color: #fff; }
 
@@ -86,6 +87,7 @@
       <div class="ref-label">↖ 왼쪽 위 작은 그림이 실제 색상 참고용입니다</div>
 
       <div class="toolbar">
+        <button class="btn" id="undoBtn" disabled>↶ 이전으로</button>
         <button class="btn" id="resetBtn">↺ 다시 칠하기</button>
         <a class="btn primary" id="printLink" href="print.html">🖨️ 이 국기 인쇄하기</a>
       </div>
@@ -108,6 +110,18 @@
 
   var currentColor = '#EF4444';
   var currentFlag = FLAGS[0];
+  var UNDO_LIMIT = 3;
+  var undoStack = [];
+
+  function pushUndo(el, prevFill) {
+    undoStack.push({ el: el, prevFill: prevFill });
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+    updateUndoBtn();
+  }
+
+  function updateUndoBtn() {
+    document.getElementById('undoBtn').disabled = undoStack.length === 0;
+  }
 
   function buildSvg(svgEl, flag, mode) {
     svgEl.innerHTML = '';
@@ -119,6 +133,9 @@
         el.setAttribute('fill', '#ffffff');
         el.dataset.trueColor = p.fill;
         el.addEventListener('click', function () {
+          var prevFill = el.getAttribute('fill');
+          if (prevFill === currentColor) return;
+          pushUndo(el, prevFill);
           el.setAttribute('fill', currentColor);
         });
       } else {
@@ -136,6 +153,8 @@
     document.querySelectorAll('.flag-list button').forEach(function (b) { b.classList.remove('active'); });
     if (btn) btn.classList.add('active');
     document.getElementById('printLink').href = 'print.html?flag=' + flag.code;
+    undoStack = [];
+    updateUndoBtn();
   }
 
   // 국가 목록
@@ -172,9 +191,19 @@
     paletteEl.appendChild(b);
   });
 
+  // 이전으로 (최대 3단계 되돌리기)
+  document.getElementById('undoBtn').addEventListener('click', function () {
+    var last = undoStack.pop();
+    if (!last) return;
+    last.el.setAttribute('fill', last.prevFill);
+    updateUndoBtn();
+  });
+
   // 다시 칠하기
   document.getElementById('resetBtn').addEventListener('click', function () {
     document.querySelectorAll('#colorSvg path').forEach(function (p) { p.setAttribute('fill', '#ffffff'); });
+    undoStack = [];
+    updateUndoBtn();
   });
 
   // URL 파라미터로 특정 국가 바로 선택
