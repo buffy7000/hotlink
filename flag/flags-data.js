@@ -56,6 +56,20 @@
     var d = 'M' + t1.map(function (p) { return p.join(','); }).join('L') + 'Z M' + t2.map(function (p) { return p.join(','); }).join('L') + 'Z';
     return { id: id, d: d, fill: color };
   }
+  function unionJack(x0, y0, w, h, navy) {
+    var parts = [];
+    if (navy) parts.push(rect(x0, y0, w, h, navy, 'uj-bg'));
+    parts.push(rect(x0, y0 + h * 0.425, w, h * 0.15, W, 'uj-hw'));
+    parts.push(rect(x0 + w * 0.45, y0, w * 0.10, h, W, 'uj-vw'));
+    parts.push(rect(x0, y0 + h * 0.46, w, h * 0.08, '#C8102E', 'uj-hr'));
+    parts.push(rect(x0 + w * 0.4733, y0, w * 0.0533, h, '#C8102E', 'uj-vr'));
+    var dw = w * 0.1333, dh = h * 0.13;
+    parts.push(poly([[x0, y0], [x0 + dw, y0], [x0, y0 + dh]], W, 'uj-d1'));
+    parts.push(poly([[x0 + w, y0], [x0 + w - dw, y0], [x0 + w, y0 + dh]], W, 'uj-d2'));
+    parts.push(poly([[x0, y0 + h], [x0 + dw, y0 + h], [x0, y0 + h - dh]], W, 'uj-d3'));
+    parts.push(poly([[x0 + w, y0 + h], [x0 + w - dw, y0 + h], [x0 + w, y0 + h - dh]], W, 'uj-d4'));
+    return parts;
+  }
   function nordicCross(bg, cross, bgId, crossId, vFrac) {
     vFrac = vFrac || 0.35;
     var vx = 300 * vFrac, barW = 28;
@@ -89,8 +103,9 @@
         parts.push({ id: 'taegeuk-blue', d: 'M108.397,72.265 A50,50 0 1,0 191.603,127.735 A25,25 0 1,0 150,100 A25,25 0 1,1 108.397,72.265 Z', fill: '#003478' });
         // 4괘 (건곤감리) - 각 괘의 실제 3선 패턴(false=이어진 선, true=끊긴 선)과 위치
         // 좌상 건(이어짐3), 우상 리(이어짐-끊김-이어짐), 좌하 감(끊김-이어짐-끊김), 우하 곤(끊김3)
+        // 국기법 규격: 괘의 너비 = 태극 반지름(50), 태극과의 간격 = 반지름의 절반(25)
         function trigram(x, y, pattern, color) {
-          var out = [], bw = 26, bh = 5, gap = 8;
+          var out = [], bw = 50, bh = 10, gap = 15;
           for (var i = 0; i < 3; i++) {
             var yy = y + i * gap;
             if (pattern[i]) {
@@ -102,10 +117,10 @@
           }
           return out;
         }
-        parts = parts.concat(trigram(64, 44, [false, false, false], BLK));  // 건(乾) 좌상
-        parts = parts.concat(trigram(210, 44, [false, true, false], BLK));  // 리(離) 우상
-        parts = parts.concat(trigram(64, 132, [true, false, true], BLK));   // 감(坎) 좌하
-        parts = parts.concat(trigram(210, 132, [true, true, true], BLK));   // 곤(坤) 우하
+        parts = parts.concat(trigram(20, 25, [false, false, false], BLK));  // 건(乾) 좌상
+        parts = parts.concat(trigram(230, 25, [false, true, false], BLK));  // 리(離) 우상
+        parts = parts.concat(trigram(20, 135, [true, false, true], BLK));   // 감(坎) 좌하
+        parts = parts.concat(trigram(230, 135, [true, true, true], BLK));   // 곤(坤) 우하
         return parts;
       } },
     { code: 'kp', name: '북한', build: function () {
@@ -220,16 +235,7 @@
       } },
     // 유럽
     { code: 'gb', name: '영국', build: function () {
-        var parts = [field('#012169')];
-        parts.push(rect(0, 85, 300, 30, W, 'cross-h-w'));
-        parts.push(rect(135, 0, 30, 200, W, 'cross-v-w'));
-        parts.push(rect(0, 92, 300, 16, '#C8102E', 'cross-h-r'));
-        parts.push(rect(142, 0, 16, 200, '#C8102E', 'cross-v-r'));
-        parts.push(poly([[0,0],[40,0],[0,26]], W, 'd1w'));
-        parts.push(poly([[300,0],[260,0],[300,26]], W, 'd2w'));
-        parts.push(poly([[0,200],[40,200],[0,174]], W, 'd3w'));
-        parts.push(poly([[300,200],[260,200],[300,174]], W, 'd4w'));
-        return parts;
+        return unionJack(0, 0, 300, 200, '#012169');
       } },
     { code: 'fr', name: '프랑스', build: function () { return vStripes(['#0055A4', W, '#EF4135']); } },
     { code: 'de', name: '독일', build: function () { return hStripes(['#000000', '#DD0000', '#FFCE00']); } },
@@ -279,12 +285,12 @@
         return parts;
       } },
     { code: 'ca', name: '캐나다', build: function () {
+        // 단풍잎은 위키미디어 공식 SVG(Flag_of_Canada) 경로를 축척 변환한 실제 좌표
         return [
           rect(0,0,75,200,'#FF0000','l'),
           rect(75,0,150,200,W,'m'),
           rect(225,0,75,200,'#FF0000','r'),
-          star(150, 92, 42, 15, 8, '#FF0000', 'leaf'),
-          poly([[146,128],[154,128],[150,152]], '#FF0000', 'leaf-stem')
+          { id: 'leaf', fill: '#FF0000', d: 'M152.812,162.969 L151.406,136.000 A2.9688,2.9688 0 0,1 154.875,132.937 L181.719,137.656 L178.094,127.656 A2.0312,2.0312 0 0,1 178.719,125.375 L208.125,101.562 L201.500,98.469 A2.0312,2.0312 0 0,1 200.438,96.000 L206.250,78.125 L189.312,81.719 A2.0312,2.0312 0 0,1 187.031,80.531 L183.750,72.812 L170.531,87.000 A2.0312,2.0312 0 0,1 167.062,85.219 L173.438,52.344 L163.219,58.250 A2.0312,2.0312 0 0,1 160.375,57.406 L150.000,37.031 L139.625,57.406 A2.0312,2.0312 0 0,1 136.781,58.250 L126.562,52.344 L132.938,85.219 A2.0312,2.0312 0 0,1 129.469,87.000 L116.250,72.812 L112.969,80.531 A2.0312,2.0312 0 0,1 110.688,81.719 L93.750,78.125 L99.562,96.000 A2.0312,2.0312 0 0,1 98.500,98.469 L91.875,101.562 L121.281,125.375 A2.0312,2.0312 0 0,1 121.906,127.656 L118.281,137.656 L145.125,132.937 A2.9688,2.9688 0 0,1 148.594,136.000 L147.188,162.969 Z' }
         ];
       } },
     { code: 'mx', name: '멕시코', build: function () {
@@ -351,30 +357,29 @@
       } },
     // 오세아니아
     { code: 'au', name: '호주', build: function () {
+        // 위키미디어 공식 SVG(Flag_of_Australia) 좌표 기준 - 유니언잭 캔턴 + 커먼웰스별 + 남십자성 5개
         var parts = [field('#00008B')];
-        parts.push(maskCanton(150,100,'#00205B','canton'));
-        parts.push(rect(150-8,0,16,100,W,'uv'));
-        parts.push(rect(0,50-8,150,16,W,'uh'));
-        parts.push(rect(150-5,0,10,100,'#C8102E','ur'));
-        parts.push(rect(0,50-5,150,10,'#C8102E','uh2'));
-        parts.push(star(75,150,26,10,7,W,'cwstar'));
-        var stars=[[220,40],[260,70],[230,120],[200,150]];
-        stars.forEach(function(p,i){parts.push(star(p[0],p[1],14,5,7,W,'sc'+i));});
-        parts.push(star(255,140,8,3,5,W,'sc4'));
+        parts = parts.concat(unionJack(0, 0, 150, 100, null));
+        parts.push(star(75, 150, 22, 9, 7, W, 'commonwealth'));
+        parts.push(star(225, 166.67, 11, 4.5, 7, W, 'alpha-crucis'));
+        parts.push(star(187.5, 87.5, 11, 4.5, 7, W, 'beta-crucis'));
+        parts.push(star(225, 33.33, 11, 4.5, 7, W, 'gamma-crucis'));
+        parts.push(star(258.33, 74.17, 11, 4.5, 7, W, 'delta-crucis'));
+        parts.push(star(240, 108.33, 6, 2.5, 5, W, 'epsilon-crucis'));
         return parts;
       } },
     { code: 'nz', name: '뉴질랜드', build: function () {
+        // 위키미디어 공식 SVG(Flag_of_New_Zealand) 좌표 기준 - 유니언잭 캔턴 + 흰테두리 붉은별 4개
         var parts = [field('#00247D')];
-        parts.push(maskCanton(150,100,'#00205B','canton'));
-        parts.push(rect(150-8,0,16,100,W,'uv'));
-        parts.push(rect(0,50-8,150,16,W,'uh'));
-        parts.push(rect(150-5,0,10,100,'#C8102E','ur'));
-        parts.push(rect(0,50-5,150,10,'#C8102E','uh2'));
-        var stars=[[220,50],[250,90],[225,140],[195,160]];
-        stars.forEach(function(p,i){
-          parts.push(star(p[0],p[1],16,6,5,W,'sw'+i));
-          parts.push(star(p[0],p[1],13,5,5,'#C8102E','sr'+i));
-        });
+        parts = parts.concat(unionJack(0, 0, 150, 100, null));
+        function rc(cx, cy, rw, rr) {
+          parts.push(star(cx, cy, rw, rw * 0.42, 5, W, 'w'));
+          parts.push(star(cx, cy, rr, rr * 0.42, 5, '#C8102E', 'r'));
+        }
+        rc(225, 40, 11.35, 7.5);      // gamma
+        rc(225, 160, 12.6, 8.75);     // alpha
+        rc(254.71, 74.43, 10.1, 6.25); // delta
+        rc(190.34, 86.5, 11.35, 7.5);  // beta
         return parts;
       } }
   ];
