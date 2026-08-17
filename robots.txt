@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /portfolio/
+Disallow: /tesla/
 
 Sitemap: https://hotlink.kr/sitemap.php
