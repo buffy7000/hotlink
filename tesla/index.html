@@ -109,10 +109,12 @@
 
       <div class="upload-row">
         <button class="btn primary" id="uploadBtn" disabled>🖼️ 선택한 구역에 이미지 적용</button>
+        <button class="btn" id="pasteBtn" disabled>📋 클립보드에서 붙여넣기</button>
         <button class="btn" id="clearBtn" disabled>선택 구역 지우기</button>
         <input type="file" id="fileInput" accept="image/*">
       </div>
-      <div class="hint">구역을 하나 이상 클릭해서 선택한 뒤(파란 테두리), <b>이미지 적용</b> 버튼으로 사진을 올리면 같은 이미지가 선택된 모든 구역에 적용됩니다.</div>
+      <div class="hint">구역을 하나 이상 클릭해서 선택한 뒤(파란 테두리), <b>이미지 적용</b> 버튼으로 파일을 올리거나 <b>클립보드에서 붙여넣기</b> 버튼(또는 Ctrl+V/Cmd+V)으로 복사해둔 이미지를 바로 붙여넣을 수 있어요.</div>
+      <div class="hint" id="pasteStatus"></div>
 
       <div class="adjust-row hidden" id="adjustRow">
         <div class="panel-title" style="margin-top:18px;">3. 선택한 구역 이미지 조정</div>
@@ -156,7 +158,7 @@
   // 후면 = 긴 조각 + 맨 아래 지그재그(범퍼)
   var ZONES = [
     { id: 'front',  label: '전면',       tplPts: '290,10 730,10 710,150 695,390 330,390 315,150',
-      photo: '285,410 260,430 240,560 215,600 230,730 35,700 30,650 60,520 135,430' },
+      photo: '285,410 260,430 240,560 215,600 230,730 35,700 30,650 60,520 135,430', rotate: 180 },
     { id: 'rear',   label: '후면',       tplPts: '330,390 695,390 710,650 830,790 830,900 800,1000 220,1000 190,900 190,790 310,650',
       photo: null },
     { id: 'left1',  label: '좌측 1열',   tplPts: '15,20 120,15 150,95 180,20 230,15 232,270 210,300 206,525 15,525 12,300',
@@ -209,6 +211,7 @@
       img.setAttribute('width', '1');
       img.setAttribute('height', '1');
       img.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      if (z.rotate) img.setAttribute('transform', 'rotate(' + z.rotate + ' 0.5 0.5)');
       pattern.appendChild(img);
       defs.appendChild(pattern);
 
@@ -246,6 +249,7 @@
     });
     var anySelected = Object.keys(selected).some(function (k) { return selected[k]; });
     document.getElementById('uploadBtn').disabled = !anySelected;
+    document.getElementById('pasteBtn').disabled = !anySelected;
     document.getElementById('clearBtn').disabled = !anySelected;
 
     var selectedWithImage = Object.keys(selected).filter(function (k) { return selected[k] && state[k]; });
@@ -306,8 +310,7 @@
     document.getElementById('fileInput').click();
   });
 
-  document.getElementById('fileInput').addEventListener('change', function (e) {
-    var file = e.target.files[0];
+  function applyFileToSelected(file) {
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function (ev) {
@@ -318,7 +321,51 @@
       refreshUI();
     };
     reader.readAsDataURL(file);
+  }
+
+  document.getElementById('fileInput').addEventListener('change', function (e) {
+    applyFileToSelected(e.target.files[0]);
     e.target.value = '';
+  });
+
+  // 클립보드 붙여넣기: 버튼 클릭(Async Clipboard API) 또는 Ctrl+V/Cmd+V 둘 다 지원
+  function showPasteStatus(msg) {
+    var el = document.getElementById('pasteStatus');
+    el.textContent = msg;
+    clearTimeout(showPasteStatus._t);
+    showPasteStatus._t = setTimeout(function () { el.textContent = ''; }, 4000);
+  }
+
+  document.getElementById('pasteBtn').addEventListener('click', async function () {
+    try {
+      var items = await navigator.clipboard.read();
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var imgType = item.types.find(function (t) { return t.indexOf('image/') === 0; });
+        if (imgType) {
+          var blob = await item.getType(imgType);
+          applyFileToSelected(blob);
+          return;
+        }
+      }
+      showPasteStatus('클립보드에 이미지가 없어요. 이미지를 먼저 복사한 뒤 다시 시도해주세요.');
+    } catch (err) {
+      showPasteStatus('클립보드 접근에 실패했어요. Ctrl+V(또는 Cmd+V)로 붙여넣기를 시도해보세요.');
+    }
+  });
+
+  document.addEventListener('paste', function (e) {
+    var anySelected = Object.keys(selected).some(function (k) { return selected[k]; });
+    if (!anySelected) return;
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image/') === 0) {
+        applyFileToSelected(items[i].getAsFile());
+        e.preventDefault();
+        break;
+      }
+    }
   });
 
   document.getElementById('clearBtn').addEventListener('click', function () {
