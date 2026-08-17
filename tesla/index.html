@@ -71,6 +71,15 @@
   .hint { font-size: 12px; color: var(--text2); margin-top: 10px; line-height: 1.6; }
   .hint b { color: var(--text); }
 
+  .adjust-controls { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .adjust-label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text2); font-weight: 700; }
+  .adjust-label input[type=range] { width: 200px; accent-color: var(--accent); height: 22px; }
+  .adjust-label input[type=color] {
+    width: 44px; height: 44px; padding: 0; border-radius: 8px; border: 2px solid var(--border);
+    background: none; cursor: pointer;
+  }
+  #scaleValue { color: var(--text); }
+
   .note {
     margin-top: 16px; padding: 12px 14px; border-radius: 10px;
     background: rgba(232,33,39,.08); border: 1px solid rgba(232,33,39,.25);
@@ -104,6 +113,20 @@
         <input type="file" id="fileInput" accept="image/*">
       </div>
       <div class="hint">구역을 하나 이상 클릭해서 선택한 뒤(파란 테두리), <b>이미지 적용</b> 버튼으로 사진을 올리면 같은 이미지가 선택된 모든 구역에 적용됩니다.</div>
+
+      <div class="adjust-row hidden" id="adjustRow">
+        <div class="panel-title" style="margin-top:18px;">3. 선택한 구역 이미지 조정</div>
+        <div class="adjust-controls">
+          <label class="adjust-label">
+            확대/축소 <span id="scaleValue">100%</span>
+            <input type="range" id="scaleSlider" min="50" max="300" value="100">
+          </label>
+          <label class="adjust-label">
+            배경색
+            <input type="color" id="bgColor" value="#ffffff">
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
@@ -129,18 +152,20 @@
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
   // 템플릿(1024x1024) 기준 6개 구역의 대략적인 외곽선 (테슬라 공식 도안 참고, 근사치)
+  // 전면 = 맨 위 사다리꼴(범퍼 트림) + 그 아래 방패모양(본넷) 하나로 합친 세트
+  // 후면 = 긴 조각 + 맨 아래 지그재그(범퍼)
   var ZONES = [
-    { id: 'rear',   label: '후면',       tplPts: '290,10 730,10 700,140 320,140',
-      photo: null },
-    { id: 'front',  label: '전면',       tplPts: '330,390 695,390 710,650 830,790 830,900 800,1000 220,1000 190,900 190,790 310,650',
+    { id: 'front',  label: '전면',       tplPts: '290,10 730,10 710,150 695,390 330,390 315,150',
       photo: '285,410 260,430 240,560 215,600 230,730 35,700 30,650 60,520 135,430' },
-    { id: 'left1',  label: '좌측 1열',   tplPts: '12,540 212,540 215,770 255,800 230,920 140,955 70,900 15,790',
-      photo: '270,435 430,390 445,560 270,590' },
-    { id: 'left2',  label: '좌측 2열',   tplPts: '15,20 120,15 150,95 180,20 230,15 232,270 210,300 206,525 15,525 12,300',
-      photo: '430,390 650,350 660,500 445,560' },
-    { id: 'right1', label: '우측 1열',   tplPts: '1012,540 812,540 809,770 769,800 794,920 884,955 954,900 1009,790',
+    { id: 'rear',   label: '후면',       tplPts: '330,390 695,390 710,650 830,790 830,900 800,1000 220,1000 190,900 190,790 310,650',
       photo: null },
-    { id: 'right2', label: '우측 2열',   tplPts: '1009,20 904,15 874,95 844,20 794,15 792,270 814,300 818,525 1009,525 1012,300',
+    { id: 'left1',  label: '좌측 1열',   tplPts: '15,20 120,15 150,95 180,20 230,15 232,270 210,300 206,525 15,525 12,300',
+      photo: '270,435 430,390 445,560 270,590' },
+    { id: 'left2',  label: '좌측 2열',   tplPts: '12,540 212,540 215,770 255,800 230,920 140,955 70,900 15,790',
+      photo: '430,390 650,350 660,500 445,560' },
+    { id: 'right1', label: '우측 1열',   tplPts: '1009,20 904,15 874,95 844,20 794,15 792,270 814,300 818,525 1009,525 1012,300',
+      photo: null },
+    { id: 'right2', label: '우측 2열',   tplPts: '1012,540 812,540 809,770 769,800 794,920 884,955 954,900 1009,790',
       photo: null }
   ];
 
@@ -173,6 +198,12 @@
       pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
       pattern.setAttribute('width', '1');
       pattern.setAttribute('height', '1');
+      var bgRect = document.createElementNS(SVG_NS, 'rect');
+      bgRect.setAttribute('id', 'bg-' + patternId);
+      bgRect.setAttribute('x', '0'); bgRect.setAttribute('y', '0');
+      bgRect.setAttribute('width', '1'); bgRect.setAttribute('height', '1');
+      bgRect.setAttribute('fill', '#ffffff');
+      pattern.appendChild(bgRect);
       var img = document.createElementNS(SVG_NS, 'image');
       img.setAttribute('id', 'img-' + patternId);
       img.setAttribute('width', '1');
@@ -216,6 +247,18 @@
     var anySelected = Object.keys(selected).some(function (k) { return selected[k]; });
     document.getElementById('uploadBtn').disabled = !anySelected;
     document.getElementById('clearBtn').disabled = !anySelected;
+
+    var selectedWithImage = Object.keys(selected).filter(function (k) { return selected[k] && state[k]; });
+    var adjustRow = document.getElementById('adjustRow');
+    if (selectedWithImage.length) {
+      adjustRow.classList.remove('hidden');
+      var ref = state[selectedWithImage[0]];
+      document.getElementById('scaleSlider').value = Math.round(ref.scale * 100);
+      document.getElementById('scaleValue').textContent = Math.round(ref.scale * 100) + '%';
+      document.getElementById('bgColor').value = ref.bg;
+    } else {
+      adjustRow.classList.add('hidden');
+    }
   }
 
   // 구역 버튼 목록
@@ -230,12 +273,32 @@
   });
 
   function applyImageToZone(id, dataUrl) {
-    state[id] = dataUrl;
+    state[id] = { dataUrl: dataUrl, scale: 1, bg: '#ffffff' };
     ['tplPts', 'photo'].forEach(function (key) {
       var z = ZONES.filter(function (zz) { return zz.id === id; })[0];
       if (!z[key]) return;
       var imgEl = document.getElementById('img-pat-' + key + '-' + id);
       if (imgEl) imgEl.setAttribute('href', dataUrl);
+    });
+  }
+
+  function applyImageTransform(id) {
+    var s = state[id];
+    if (!s) return;
+    var scale = s.scale;
+    var off = (1 - scale) / 2;
+    ['tplPts', 'photo'].forEach(function (key) {
+      var z = ZONES.filter(function (zz) { return zz.id === id; })[0];
+      if (!z[key]) return;
+      var imgEl = document.getElementById('img-pat-' + key + '-' + id);
+      var bgEl = document.getElementById('bg-pat-' + key + '-' + id);
+      if (imgEl) {
+        imgEl.setAttribute('width', scale);
+        imgEl.setAttribute('height', scale);
+        imgEl.setAttribute('x', off);
+        imgEl.setAttribute('y', off);
+      }
+      if (bgEl) bgEl.setAttribute('fill', s.bg);
     });
   }
 
@@ -271,6 +334,27 @@
     });
     updateFills();
     refreshUI();
+  });
+
+  function selectedZonesWithImage() {
+    return Object.keys(selected).filter(function (k) { return selected[k] && state[k]; });
+  }
+
+  document.getElementById('scaleSlider').addEventListener('input', function (e) {
+    var pct = parseInt(e.target.value);
+    document.getElementById('scaleValue').textContent = pct + '%';
+    selectedZonesWithImage().forEach(function (id) {
+      state[id].scale = pct / 100;
+      applyImageTransform(id);
+    });
+  });
+
+  document.getElementById('bgColor').addEventListener('input', function (e) {
+    var color = e.target.value;
+    selectedZonesWithImage().forEach(function (id) {
+      state[id].bg = color;
+      applyImageTransform(id);
+    });
   });
 
   function updateFills() {
