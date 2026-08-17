@@ -40,21 +40,11 @@
   .stage { position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: var(--surface2); }
   .stage img.base { width: 100%; display: block; }
   .stage svg.overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .zone { cursor: pointer; fill: rgba(232,33,39,0.0); stroke: rgba(255,255,255,0.35); stroke-width: 1.5; transition: fill .15s; }
+  .zone { cursor: pointer; fill: rgba(232,33,39,0.0); stroke: rgba(255,255,255,0.35); stroke-width: 1.5; transition: fill .15s; touch-action: none; }
   .zone:hover { fill: rgba(232,33,39,0.28); }
   .zone.filled { stroke: rgba(255,255,255,0.15); }
+  .zone.filled[data-role="tplPts"] { cursor: move; }
   .zone.selected { stroke: #fff; stroke-width: 2.5; }
-
-  .zone-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-  .zone-btn {
-    padding: 11px 14px; border-radius: 10px; border: 2px solid var(--border);
-    background: var(--surface2); color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer;
-    min-height: 44px;
-  }
-  .zone-btn:hover { border-color: var(--accent); }
-  .zone-btn.active { border-color: var(--accent); background: rgba(232,33,39,.15); }
-  .zone-btn .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #475569; margin-right: 6px; }
-  .zone-btn.has-image .dot { background: #22c55e; }
 
   .upload-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
   .btn {
@@ -71,6 +61,7 @@
   .hint { font-size: 12px; color: var(--text2); margin-top: 10px; line-height: 1.6; }
   .hint b { color: var(--text); }
 
+  .hidden { display: none !important; }
   .adjust-controls { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
   .adjust-label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text2); font-weight: 700; }
   .adjust-label input[type=range] { width: 200px; accent-color: var(--accent); height: 22px; }
@@ -94,26 +85,24 @@
     <h1>🎨 테슬라 도장작업장</h1>
     <a class="back-link" href="/">← hotlink.kr</a>
   </div>
-  <p class="subtitle">Model Y · 구역을 선택하고 이미지를 올려서 랩 디자인을 미리 확인해보세요</p>
+  <p class="subtitle">Model Y · 템플릿에서 구역을 클릭해 선택하고 이미지를 올려서 랩 디자인을 미리 확인해보세요</p>
 
   <div class="layout">
     <div class="panel">
-      <div class="panel-title">1. 디자인 템플릿 (테슬라 공식 도안)</div>
+      <div class="panel-title">1. 디자인 템플릿 (테슬라 공식 도안) — 구역을 클릭해서 선택하세요</div>
       <div class="stage" id="templateStage">
         <img class="base" src="assets/modely-template.png" alt="Model Y 템플릿">
         <svg class="overlay" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg>
       </div>
 
-      <div class="panel-title" style="margin-top:18px;">2. 구역 선택 (여러 개 선택 후 한 번에 적용 가능)</div>
-      <div class="zone-list" id="zoneList"></div>
-
+      <div class="panel-title" style="margin-top:18px;">2. 이미지 적용 (여러 구역 선택 후 한 번에 적용 가능)</div>
       <div class="upload-row">
         <button class="btn primary" id="uploadBtn" disabled>🖼️ 선택한 구역에 이미지 적용</button>
         <button class="btn" id="pasteBtn" disabled>📋 클립보드에서 붙여넣기</button>
         <button class="btn" id="clearBtn" disabled>선택 구역 지우기</button>
         <input type="file" id="fileInput" accept="image/*">
       </div>
-      <div class="hint">구역을 하나 이상 클릭해서 선택한 뒤(파란 테두리), <b>이미지 적용</b> 버튼으로 파일을 올리거나 <b>클립보드에서 붙여넣기</b> 버튼(또는 Ctrl+V/Cmd+V)으로 복사해둔 이미지를 바로 붙여넣을 수 있어요.</div>
+      <div class="hint">템플릿에서 구역을 하나 이상 클릭해서 선택한 뒤(흰 테두리), <b>이미지 적용</b> 버튼으로 파일을 올리거나 <b>클립보드에서 붙여넣기</b> 버튼(또는 Ctrl+V/Cmd+V)으로 복사해둔 이미지를 바로 붙여넣을 수 있어요.</div>
       <div class="hint" id="pasteStatus"></div>
 
       <div class="adjust-row hidden" id="adjustRow">
@@ -127,7 +116,9 @@
             배경색
             <input type="color" id="bgColor" value="#ffffff">
           </label>
+          <button class="btn" id="resetPosBtn">↺ 위치/크기 초기화</button>
         </div>
+        <div class="hint">템플릿 위에서 이미지가 채워진 구역을 <b>클릭한 채로 드래그</b>하면 위치를 옮길 수 있어요.</div>
       </div>
     </div>
 
@@ -182,18 +173,38 @@
     });
   }
 
+  function getDefs(svgEl) {
+    return svgEl.querySelector('defs') || (function () {
+      var d = document.createElementNS(SVG_NS, 'defs');
+      svgEl.appendChild(d);
+      return d;
+    })();
+  }
+
+  // 템플릿 도안의 흰색(칠할 수 있는) 영역에만 이미지가 보이도록 하는 공유 마스크.
+  // 도안 PNG 자체를 마스크로 써서, 손으로 그린 구역 다각형보다 정확하게 흰 부분만 남김.
+  function buildWhiteMask(svgEl) {
+    var defs = getDefs(svgEl);
+    var mask = document.createElementNS(SVG_NS, 'mask');
+    mask.setAttribute('id', 'whiteMask');
+    mask.setAttribute('maskUnits', 'userSpaceOnUse');
+    mask.setAttribute('x', '0'); mask.setAttribute('y', '0');
+    mask.setAttribute('width', '1024'); mask.setAttribute('height', '1024');
+    var maskImg = document.createElementNS(SVG_NS, 'image');
+    maskImg.setAttribute('href', 'assets/modely-template.png');
+    maskImg.setAttribute('x', '0'); maskImg.setAttribute('y', '0');
+    maskImg.setAttribute('width', '1024'); maskImg.setAttribute('height', '1024');
+    mask.appendChild(maskImg);
+    defs.appendChild(mask);
+  }
+
   function buildOverlay(svgEl, key) {
     ZONES.forEach(function (z) {
       var pts = z[key];
       if (!pts) return;
       var g = document.createElementNS(SVG_NS, 'g');
       var patternId = 'pat-' + key + '-' + z.id;
-
-      var defs = svgEl.querySelector('defs') || (function () {
-        var d = document.createElementNS(SVG_NS, 'defs');
-        svgEl.appendChild(d);
-        return d;
-      })();
+      var defs = getDefs(svgEl);
       var pattern = document.createElementNS(SVG_NS, 'pattern');
       pattern.setAttribute('id', patternId);
       pattern.setAttribute('patternUnits', 'objectBoundingBox');
@@ -220,7 +231,7 @@
       poly.setAttribute('class', 'zone');
       poly.dataset.zone = z.id;
       poly.dataset.role = key;
-      poly.addEventListener('click', function () { toggleSelect(z.id); });
+      attachZoneInteraction(poly, z, key);
       g.appendChild(poly);
       svgEl.appendChild(g);
     });
@@ -228,6 +239,45 @@
 
   var tplSvg = document.querySelector('#templateStage .overlay');
   var prevSvg = document.querySelector('#previewStage .overlay');
+
+  // 클릭(선택)과 드래그(이미지 위치 이동)를 구분: 실제 이동이 있었을 때만 드래그로 처리
+  function attachZoneInteraction(poly, z, key) {
+    if (key !== 'tplPts') {
+      poly.addEventListener('click', function () { toggleSelect(z.id); });
+      return;
+    }
+    poly.setAttribute('mask', 'url(#whiteMask)');
+    var startX = 0, startY = 0, moved = false, bbox = null;
+
+    poly.addEventListener('pointerdown', function (e) {
+      startX = e.clientX; startY = e.clientY;
+      moved = false;
+      bbox = poly.getBBox();
+      poly.setPointerCapture(e.pointerId);
+    });
+
+    poly.addEventListener('pointermove', function (e) {
+      if (e.buttons === 0) return;
+      var dxPx = e.clientX - startX, dyPx = e.clientY - startY;
+      if (!moved && Math.abs(dxPx) < 3 && Math.abs(dyPx) < 3) return;
+      moved = true;
+      if (!state[z.id]) return;
+      var rect = tplSvg.getBoundingClientRect();
+      var scaleX = 1024 / rect.width, scaleY = 1024 / rect.height;
+      var s = state[z.id];
+      s.offsetX += (dxPx * scaleX) / bbox.width;
+      s.offsetY += (dyPx * scaleY) / bbox.height;
+      startX = e.clientX; startY = e.clientY;
+      applyImageTransform(z.id);
+    });
+
+    poly.addEventListener('pointerup', function (e) {
+      poly.releasePointerCapture(e.pointerId);
+      if (!moved) toggleSelect(z.id);
+    });
+  }
+
+  buildWhiteMask(tplSvg);
   buildOverlay(tplSvg, 'tplPts');
   buildOverlay(prevSvg, 'photo');
 
@@ -241,11 +291,6 @@
       var id = el.dataset.zone;
       el.classList.toggle('selected', !!selected[id]);
       el.classList.toggle('filled', !!state[id]);
-    });
-    document.querySelectorAll('.zone-btn').forEach(function (btn) {
-      var id = btn.dataset.zone;
-      btn.classList.toggle('active', !!selected[id]);
-      btn.classList.toggle('has-image', !!state[id]);
     });
     var anySelected = Object.keys(selected).some(function (k) { return selected[k]; });
     document.getElementById('uploadBtn').disabled = !anySelected;
@@ -265,19 +310,8 @@
     }
   }
 
-  // 구역 버튼 목록
-  var zoneListEl = document.getElementById('zoneList');
-  ZONES.forEach(function (z) {
-    var btn = document.createElement('button');
-    btn.className = 'zone-btn';
-    btn.dataset.zone = z.id;
-    btn.innerHTML = '<span class="dot"></span>' + z.label;
-    btn.addEventListener('click', function () { toggleSelect(z.id); });
-    zoneListEl.appendChild(btn);
-  });
-
   function applyImageToZone(id, dataUrl) {
-    state[id] = { dataUrl: dataUrl, scale: 1, bg: '#ffffff' };
+    state[id] = { dataUrl: dataUrl, scale: 1, bg: '#ffffff', offsetX: 0, offsetY: 0 };
     ['tplPts', 'photo'].forEach(function (key) {
       var z = ZONES.filter(function (zz) { return zz.id === id; })[0];
       if (!z[key]) return;
@@ -299,8 +333,8 @@
       if (imgEl) {
         imgEl.setAttribute('width', scale);
         imgEl.setAttribute('height', scale);
-        imgEl.setAttribute('x', off);
-        imgEl.setAttribute('y', off);
+        imgEl.setAttribute('x', off + s.offsetX);
+        imgEl.setAttribute('y', off + s.offsetY);
       }
       if (bgEl) bgEl.setAttribute('fill', s.bg);
     });
@@ -402,6 +436,16 @@
       state[id].bg = color;
       applyImageTransform(id);
     });
+  });
+
+  document.getElementById('resetPosBtn').addEventListener('click', function () {
+    selectedZonesWithImage().forEach(function (id) {
+      state[id].scale = 1;
+      state[id].offsetX = 0;
+      state[id].offsetY = 0;
+      applyImageTransform(id);
+    });
+    refreshUI();
   });
 
   function updateFills() {
