@@ -45,6 +45,11 @@
   .zone.filled { stroke: rgba(255,255,255,0.15); }
   .zone.filled[data-role="tplPts"] { cursor: move; }
   .zone.selected { stroke: #fff; stroke-width: 2.5; }
+  .zone-invert {
+    fill: #ffffff; mix-blend-mode: difference; pointer-events: none;
+    opacity: 0; transition: opacity .1s;
+  }
+  .zone-invert.selected { opacity: 1; }
 
   .upload-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
   .btn {
@@ -233,6 +238,15 @@
       poly.dataset.role = key;
       attachZoneInteraction(poly, z, key);
       g.appendChild(poly);
+
+      // 선택 시 색상 반전 효과 (mix-blend-mode: difference) - 클릭/드래그를 가로채지 않도록 별도 오버레이
+      var invertPoly = document.createElementNS(SVG_NS, 'polygon');
+      invertPoly.setAttribute('points', pts);
+      invertPoly.setAttribute('class', 'zone-invert');
+      invertPoly.dataset.zone = z.id;
+      if (key === 'tplPts') invertPoly.setAttribute('mask', 'url(#whiteMask)');
+      g.appendChild(invertPoly);
+
       svgEl.appendChild(g);
     });
   }
@@ -291,6 +305,9 @@
       var id = el.dataset.zone;
       el.classList.toggle('selected', !!selected[id]);
       el.classList.toggle('filled', !!state[id]);
+    });
+    document.querySelectorAll('.zone-invert').forEach(function (el) {
+      el.classList.toggle('selected', !!selected[el.dataset.zone]);
     });
     var anySelected = Object.keys(selected).some(function (k) { return selected[k]; });
     document.getElementById('uploadBtn').disabled = !anySelected;
