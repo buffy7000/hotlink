@@ -1,5 +1,8 @@
 <?php
-// force-redeploy: 서버에 배포된 파일과 git 내용 불일치 여부 확인용
+// TEMP DEBUG: 500 에러 원인 확인용, 원인 파악 후 제거 예정
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once 'BaseCrawler.php';
 
 class RuliwebCrawler extends BaseCrawler {
