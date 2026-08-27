@@ -146,7 +146,7 @@ function generate_topic_page(Database $db, array $communityMeta, string $keyword
         $isCurrent = ($key === $currentKey);
         $timelineItems .= '<div class="timeline-item toggle-container' . ($isCurrent ? ' current' : '') . '">'
             . '<div class="timeline-date">' . h($labelFn($key)) . ($isCurrent ? ' · 현재' : '') . '</div>'
-            . '<div class="timeline-title">' . h($topPost['title']) . '</div>'
+            . '<div class="timeline-title"><a href="' . h($topPost['url']) . '" rel="nofollow">' . h($topPost['title']) . '</a></div>'
             . '<div class="timeline-count">관련 글 ' . count($bucketPosts) . '개</div>';
 
         if (!empty($restPosts)) {
