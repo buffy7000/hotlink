@@ -28,14 +28,16 @@ function topicRenderTrending() {
         return;
       }
 
+      // 순위 고정된 느낌을 없애려고 방문할 때마다 순서를 섞어서 보여준다.
+      for (var i = topics.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = topics[i]; topics[i] = topics[j]; topics[j] = tmp;
+      }
+
       topics.forEach(function (t) {
         var a = document.createElement('a');
         a.href = t.url;
-        var rank = document.createElement('span');
-        rank.className = 'rank';
-        rank.textContent = t.rank;
-        a.appendChild(rank);
-        a.appendChild(document.createTextNode(t.keyword));
+        a.textContent = t.keyword;
         list.appendChild(a);
       });
     })
