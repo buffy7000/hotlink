@@ -1,0 +1,47 @@
+name: Crawl Todayhumor
+
+on:
+  schedule:
+    - cron: '25 * * * *'  # 매시 25분에 실행 (hotlink.kr 서버가 Cloudflare JS 챌린지에 막혀 Actions에서 시도)
+  workflow_dispatch:
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, dom, mbstring
+
+      - name: Crawl Todayhumor
+        run: |
+          echo "크롤링 시작..."
+          php crawler/todayhumor_cli.php > /tmp/todayhumor_posts.json
+          echo "파싱 결과:"
+          cat /tmp/todayhumor_posts.json | python3 -m json.tool --no-ensure-ascii || cat /tmp/todayhumor_posts.json
+
+      - name: Save to DB via API
+        env:
+          API_URL: ${{ secrets.HOTLINK_CRAWLER_API_URL }}
+          API_KEY: ${{ secrets.HOTLINK_CRAWLER_API_KEY }}
+        run: |
+          for attempt in 1 2 3; do
+            BODY=$(curl -s -X POST "$API_URL" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -H "X-API-Key: $API_KEY" \
+              -d @/tmp/todayhumor_posts.json)
+            if echo "$BODY" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+              echo "서버 응답(시도 ${attempt}): $BODY"
+              exit 0
+            fi
+            echo "시도 ${attempt} 실패(JSON 아님), 5초 후 재시도..."
+            sleep 5
+          done
+          echo "3회 모두 실패, 응답: $BODY"
+          exit 1
