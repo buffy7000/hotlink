@@ -55,13 +55,7 @@
 
   .panel { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
 
-  /* 최신 글 모아보기 */
-  .post-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 13.5px; }
-  .post-row:last-child { border-bottom: none; }
-  .post-row a { color: var(--text-color); text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .post-row a:hover { color: var(--primary-color); }
   .community-tag { flex-shrink: 0; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
-  .post-meta { flex-shrink: 0; color: var(--muted-text-color); font-size: 12px; display: flex; gap: 8px; }
 
   /* 커뮤니티별 인기글 */
   .community-card { padding: 14px; border-bottom: 1px solid var(--border-color); }
@@ -73,6 +67,28 @@
   .community-card li { font-size: 13px; padding: 3px 0; }
   .community-card li a { color: var(--text-color); text-decoration: none; }
   .community-card li a:hover { color: var(--primary-color); }
+  .more-btn {
+    margin-top: 8px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    background: var(--bg-color); border: 1px solid var(--border-color); color: var(--muted-text-color); cursor: pointer;
+  }
+  .more-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+  /* 타임라인 */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline-item { position: relative; padding: 10px 14px 10px 14px; margin-bottom: 4px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -20px; top: 16px;
+    width: 9px; height: 9px; border-radius: 50%; background: #cbd5e1;
+  }
+  .timeline-item.current::before { background: var(--primary-color); box-shadow: 0 0 0 4px rgba(59,130,246,.2); }
+  .timeline-item::after {
+    content: ''; position: absolute; left: -16px; top: 25px; bottom: -4px;
+    width: 1px; background: var(--border-color);
+  }
+  .timeline-item:last-child::after { display: none; }
+  .timeline-date { font-size: 12px; color: var(--muted-text-color); font-weight: 700; margin-bottom: 2px; }
+  .timeline-title { font-size: 14px; font-weight: 600; }
+  .timeline-count { font-size: 12px; color: var(--muted-text-color); margin-top: 2px; }
 
   /* 관련 토픽 */
   .related-topics { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -85,10 +101,6 @@
 
   .footer { margin-top: 30px; font-size: 12px; color: var(--muted-text-color); text-align: center; }
   .footer a { color: var(--muted-text-color); }
-
-  @media (max-width: 480px) {
-    .post-meta { display: none; }
-  }
 </style>
 </head>
 <body>
@@ -109,16 +121,16 @@
   </div>
 
   <div class="section">
-    <div class="section-title">최신 글 모아보기</div>
+    <div class="section-title">커뮤니티별 인기글</div>
     <div class="panel">
-      {{LATEST_POSTS_ROWS}}
+      {{COMMUNITY_SUMMARY_ROWS}}
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">커뮤니티별 인기글</div>
-    <div class="panel">
-      {{COMMUNITY_SUMMARY_ROWS}}
+    <div class="section-title">과거 이슈 타임라인</div>
+    <div class="panel timeline">
+      {{TIMELINE_ITEMS}}
     </div>
   </div>
 
@@ -132,5 +144,15 @@
   </div>
 </div>
 
+<script>
+function topicToggleMore(btn) {
+  var card = btn.closest('.community-card');
+  var hidden = card.querySelectorAll('.extra-post');
+  var isHidden = hidden.length && hidden[0].style.display === 'none';
+  hidden.forEach(function (el) { el.style.display = isHidden ? '' : 'none'; });
+  var remaining = hidden.length;
+  btn.textContent = isHidden ? '접기' : '더보기 (' + remaining + '개 더)';
+}
+</script>
 </body>
 </html>
