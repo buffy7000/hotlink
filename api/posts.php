@@ -180,7 +180,7 @@ try {
     // group_limit 모드: 커뮤니티별 상위 N개 보장 (UNION ALL)
     if (isset($_GET['group_limit'])) {
         $groupLimit = min(max(intval($_GET['group_limit']), 1), 20);
-        $groupCommunityIds = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // clien 제외
+        $groupCommunityIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
         $siteMap = [
             1 => 'ppomppu', 2 => 'clien', 3 => 'natepann', 4 => 'ruliweb',
