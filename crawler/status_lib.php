@@ -50,9 +50,9 @@ function crawler_compute_status(Database $db) {
         }
 
         $logStmt = $db->query(
-            "SELECT status, error_message, created_at
+            "SELECT status, error_message, crawled_at
              FROM crawl_logs WHERE community_id = ?
-             ORDER BY created_at DESC LIMIT 1",
+             ORDER BY crawled_at DESC LIMIT 1",
             [$id]
         );
         $lastLog = $logStmt->fetch(PDO::FETCH_ASSOC) ?: null;
@@ -68,7 +68,7 @@ function crawler_compute_status(Database $db) {
             'posts_24h'         => intval($row['cnt24h'] ?? 0),
             'last_log_status'   => $lastLog['status'] ?? null,
             'last_log_error'    => $lastLog['error_message'] ?? null,
-            'last_log_at'       => $lastLog['created_at'] ?? null,
+            'last_log_at'       => $lastLog['crawled_at'] ?? null,
         ];
     }
 
