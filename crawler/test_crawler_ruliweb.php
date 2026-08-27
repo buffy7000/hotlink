@@ -34,14 +34,17 @@ class RuliwebCrawler extends BaseCrawler {
             echo "URL: {$url}\n";
             
             $html = $this->makeRequest($url);
-            
+
+            // TEMP DEBUG: 파싱 전에 원본 저장 (파싱 단계에서 죽어도 파일은 남도록)
+            file_put_contents(__DIR__ . "/debug_ruliweb_page{$page}.html", $html);
+
             if (strlen($html) < 1000) {
                 throw new Exception("HTML 응답이 너무 짧습니다.");
             }
-            
+
             echo "HTML 길이: " . strlen($html) . " 바이트\n";
             echo str_repeat("-", 60) . "\n";
-            
+
             $posts = $this->parseBestPosts($html, $limit);
             
             if (!empty($posts)) {
