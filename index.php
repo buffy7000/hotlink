@@ -106,7 +106,8 @@ function escapeOgContent($content) {
   
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  
+  <link rel="stylesheet" href="/assets/trending-bar.css">
+
   <style>
     :root {
       --bg-color: #f8fafc;
@@ -1294,6 +1295,11 @@ function escapeOgContent($content) {
   <input type="date" class="date-selector-native" id="dateSelect">
 </div> -->
 
+<div class="trending-bar" style="margin: 12px 16px 0;">
+  <div class="trending-bar-label">🔥 인기급상승 토픽</div>
+  <div class="trending-bar-list"><span class="trending-bar-empty">불러오는 중...</span></div>
+</div>
+
 <!-- 2. 정렬만 -->
 <div class="filter-section">
   <div class="sort-section">
@@ -2188,5 +2194,6 @@ if (document.readyState === 'loading') {
 })();
 
   </script>
+<script src="/assets/trending-bar.js"></script>
 </body>
 </html>
