@@ -19,14 +19,6 @@ jobs:
           php-version: '8.1'
           extensions: curl, dom, mbstring
 
-      - name: Debug connectivity
-        run: |
-          echo "-- hot.php redirect chain --"
-          curl -s -D - -o /dev/null -L "https://www.ppomppu.co.kr/hot.php?category=2" | grep -iE "^HTTP|^location"
-          echo "-- runner egress IP --"
-          curl -s https://api.ipify.org
-          echo
-
       - name: Crawl Ppomppu
         run: |
           echo "크롤링 시작..."

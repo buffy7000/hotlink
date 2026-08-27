@@ -6,14 +6,21 @@ $baseUrl   = 'https://www.ppomppu.co.kr';
 $targetUrl = $baseUrl . '/hot.php?category=2';
 $limit     = 50;
 
+// 뽐뿌는 첫 요청에 302(…&ppck=1)로 쿠키 확인 리다이렉트를 보낸다.
+// 쿠키 저장소 없이 리다이렉트를 따라가면 두 번째 요청에 쿠키가 실려가지 않아 403이 뜬다.
+$cookieJar = tempnam(sys_get_temp_dir(), 'ppomppu_cookie_');
+
 $ch = curl_init();
 curl_setopt_array($ch, [
     CURLOPT_URL            => $targetUrl,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_MAXREDIRS      => 5,
     CURLOPT_TIMEOUT        => 30,
     CURLOPT_CONNECTTIMEOUT => 15,
     CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_COOKIEJAR      => $cookieJar,
+    CURLOPT_COOKIEFILE     => $cookieJar,
     CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     CURLOPT_ENCODING       => 'gzip,deflate',
     CURLOPT_HTTPHEADER     => [
@@ -25,6 +32,7 @@ $html  = curl_exec($ch);
 $code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
 $errno = curl_errno($ch);
+@unlink($cookieJar);
 
 if (!$html || $code !== 200) {
     fwrite(STDERR, "크롤링 실패: HTTP {$code}\n");
