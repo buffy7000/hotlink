@@ -87,8 +87,8 @@ function escapeOgContent($content) {
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>핫링크-커뮤니티 인기글</title>
-  <meta name="description" content="클리앙, 루리웹, 뽐뿌 등 주요 커뮤니티 인기글을 한 곳에서 확인하세요">
+  <title>커뮤니티 모음 사이트 | 클리앙·오유·뽐뿌 인기글 한번에 - 핫링크</title>
+  <meta name="description" content="클리앙, 오늘의유머, 뽐뿌, 루리웹 등 주요 커뮤니티 인기글을 한 페이지에서 모아보세요. 실시간 업데이트, 커뮤니티별 반응 비교.">
   <meta name="keywords" content="커뮤니티 인기글, 클리앙, 루리웹, 뽐뿌, 네이트판, 오유, 보배드림">
   
   <!-- Open Graph 태그 -->
