@@ -65,8 +65,9 @@ function topic_tokenize_title($title) {
             }
         }
 
-        // 한글이 포함되지 않으면(영어/숫자/이모지 등) 제외
-        if (!preg_match('/\p{Hangul}/u', $w)) continue;
+        // 완성형 한글 음절이 없으면 제외 (영어/숫자/이모지 + "ㅋㅋ","ㄷㄷ","ㅠㅠ" 같은
+        // 자음/모음 낱자 반복도 \p{Hangul}엔 걸리지만 실제 음절은 아니라서 별도 배제)
+        if (!preg_match('/[\x{AC00}-\x{D7A3}]/u', $w)) continue;
 
         // 숫자가 절반 이상이면("1번","300번" 등 카운트성 단어) 제외
         $digitCount = preg_match_all('/[0-9]/u', $w);
