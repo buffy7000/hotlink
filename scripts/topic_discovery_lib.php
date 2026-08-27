@@ -88,7 +88,7 @@ function topic_tokenize_title($title) {
  *
  * @return array{scanned:int,newCandidates:array,updatedCandidates:array}
  */
-function topic_discover_candidates(Database $db, $hoursWindow = 48, $minPosts = 5, $minCommunities = 3, $sampleLimit = 3000) {
+function topic_discover_candidates(Database $db, $hoursWindow = 48, $minPosts = 20, $minCommunities = 3, $sampleLimit = 3000) {
     topic_ensure_candidates_table($db);
 
     // LIMIT/INTERVAL은 PDO 플레이스홀더 대신 정수 캐스팅 후 직접 삽입

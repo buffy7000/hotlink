@@ -27,7 +27,7 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $db->query(
             "SELECT keyword, post_count, community_count, score, first_seen_at
-             FROM topic_candidates WHERE status = 'candidate'
+             FROM topic_candidates WHERE status = 'candidate' AND post_count >= 20
              ORDER BY score DESC LIMIT 50",
             []
         );
