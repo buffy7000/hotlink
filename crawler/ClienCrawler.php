@@ -342,31 +342,32 @@ if ($titleNodes->length > 0) {
             echo str_repeat("=", 70) . "\n";
             
             $allPosts = [];
-            
-            for ($page = 1; $page <= $pages; $page++) {
-                echo "\n{$page}페이지 크롤링 중...\n";
-                
+
+            // 클리앙 po 파라미터는 0부터 시작(0=1페이지). 1부터 돌리면 진짜 1페이지(최상위 공감글)를 건너뛰게 된다.
+            for ($page = 0; $page < $pages; $page++) {
+                echo "\n" . ($page + 1) . "페이지 크롤링 중...\n";
+
                 $url = $this->parkLikesUrl . "&po={$page}";
                 echo "대상 URL: {$url}\n";
                 echo str_repeat("-", 60) . "\n";
-                
+
                 $html = $this->makeRequest($url);
-                
+
                 if (strlen($html) < 1000) {
                     throw new Exception("HTML 응답이 너무 짧습니다.");
                 }
-                
+
                 $posts = $this->parseParkPosts($html, 50);
-                
+
                 // 공감수 필터링
                 $filteredPosts = array_filter($posts, function($post) use ($minLikes) {
                     return $post['likes_count'] >= $minLikes;
                 });
-                
+
                 $allPosts = array_merge($allPosts, $filteredPosts);
-                echo "{$page}페이지에서 " . count($filteredPosts) . "개 게시글 수집 (공감 {$minLikes}개 이상)\n";
-                
-                if ($page < $pages) {
+                echo ($page + 1) . "페이지에서 " . count($filteredPosts) . "개 게시글 수집 (공감 {$minLikes}개 이상)\n";
+
+                if ($page < $pages - 1) {
                     echo "다음 페이지까지 2초 대기...\n";
                     sleep(2);
                 }
@@ -392,31 +393,32 @@ if ($titleNodes->length > 0) {
             echo str_repeat("=", 70) . "\n";
             
             $allPosts = [];
-            
-            for ($page = 1; $page <= $pages; $page++) {
-                echo "\n{$page}페이지 크롤링 중...\n";
-                
+
+            // 클리앙 po 파라미터는 0부터 시작(0=1페이지). 1부터 돌리면 진짜 1페이지(최상위 댓글글)를 건너뛰게 된다.
+            for ($page = 0; $page < $pages; $page++) {
+                echo "\n" . ($page + 1) . "페이지 크롤링 중...\n";
+
                 $url = $this->parkCommentsUrl . "&po={$page}";
                 echo "대상 URL: {$url}\n";
                 echo str_repeat("-", 60) . "\n";
-                
+
                 $html = $this->makeRequest($url);
-                
+
                 if (strlen($html) < 1000) {
                     throw new Exception("HTML 응답이 너무 짧습니다.");
                 }
-                
+
                 $posts = $this->parseParkPosts($html, 50);
-                
+
                 // 댓글수 필터링
                 $filteredPosts = array_filter($posts, function($post) use ($minComments) {
                     return $post['comments_count'] >= $minComments;
                 });
-                
+
                 $allPosts = array_merge($allPosts, $filteredPosts);
-                echo "{$page}페이지에서 " . count($filteredPosts) . "개 게시글 수집 (댓글 {$minComments}개 이상)\n";
-                
-                if ($page < $pages) {
+                echo ($page + 1) . "페이지에서 " . count($filteredPosts) . "개 게시글 수집 (댓글 {$minComments}개 이상)\n";
+
+                if ($page < $pages - 1) {
                     echo "다음 페이지까지 2초 대기...\n";
                     sleep(2);
                 }
