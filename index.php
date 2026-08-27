@@ -1177,13 +1177,11 @@ function escapeOgContent($content) {
         <span class="nav-menu">뽐뿌</span>
       </a>
     </li>
-    <!-- 클리앙 메뉴 항목 삭제 
     <li class="nav-item-wrapper">
-  <a href="#" class="nav-item" data-community="clien">
-    <span class="nav-menu">클리앙</span>
-  </a>
-</li>
-클리앙 메뉴 항목 삭제-->
+      <a href="#" class="nav-item" data-community="clien">
+        <span class="nav-menu">클리앙</span>
+      </a>
+    </li>
 
 <li class="nav-item-wrapper">
   <a href="#" class="nav-item" data-community="natepann">
