@@ -109,6 +109,7 @@
 
   function fmtMinutes(mins) {
     if (mins === null || mins === undefined) return '기록 없음';
+    if (mins < 0) return '방금 전';
     if (mins < 60) return mins + '분 전';
     var h = Math.floor(mins / 60), m = mins % 60;
     return h + '시간 ' + m + '분 전';
