@@ -3,5 +3,6 @@ Allow: /
 Disallow: /portfolio/
 Disallow: /tesla/
 Disallow: /status.php
+Disallow: /topic-candidates.php
 
 Sitemap: https://hotlink.kr/sitemap.php
