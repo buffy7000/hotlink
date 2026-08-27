@@ -26,9 +26,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once __DIR__ . '/../../config/database.php';
 
 $body = file_get_contents('php://input');
-$posts = json_decode($body, true);
+$payload = json_decode($body, true);
 
-if (!is_array($posts) || empty($posts)) {
+// 두 가지 형식 지원:
+// 1) 봉투 형식(신규): {"community_id":1,"status":"success"|"error","error_message":"...","posts":[...]}
+// 2) 평면 배열(기존): [{"community_id":1, ...}, ...]  — posts에 community_id가 각자 들어있음
+$reportedFailure = null; // ['community_id' => .., 'error_message' => ..]
+
+if (isset($payload['posts']) && is_array($payload['posts'])) {
+    $posts = $payload['posts'];
+    if (($payload['status'] ?? 'success') === 'error') {
+        $reportedFailure = [
+            'community_id' => intval($payload['community_id'] ?? 0),
+            'error_message' => $payload['error_message'] ?? '알 수 없는 오류',
+        ];
+    }
+} elseif (is_array($payload)) {
+    $posts = $payload;
+} else {
+    $posts = [];
+}
+
+if (empty($posts) && !$reportedFailure) {
     echo json_encode(['success' => true, 'saved' => 0, 'message' => '저장할 데이터 없음']);
     exit;
 }
@@ -93,6 +112,14 @@ try {
         $db->query(
             "INSERT INTO crawl_logs (community_id, status, posts_count, error_message) VALUES (?, 'success', ?, NULL)",
             [$cid, $saved]
+        );
+    }
+
+    // 크롤 자체가 실패했다고 보고된 경우, 게시글 0개여도 반드시 실패 로그를 남긴다.
+    if ($reportedFailure && $reportedFailure['community_id'] > 0) {
+        $db->query(
+            "INSERT INTO crawl_logs (community_id, status, posts_count, error_message) VALUES (?, 'error', 0, ?)",
+            [$reportedFailure['community_id'], $reportedFailure['error_message']]
         );
     }
 

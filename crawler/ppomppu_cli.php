@@ -35,15 +35,16 @@ $errno = curl_errno($ch);
 @unlink($cookieJar);
 
 if (!$html || $code !== 200) {
-    fwrite(STDERR, "크롤링 실패: HTTP {$code}\n");
-    fwrite(STDERR, "curl 오류 [{$errno}]: {$error}\n");
-    echo json_encode([]);
+    $msg = "HTTP {$code}" . ($error ? " / curl 오류 [{$errno}]: {$error}" : '');
+    fwrite(STDERR, "크롤링 실패: {$msg}\n");
+    echo json_encode(['community_id' => 1, 'status' => 'error', 'error_message' => $msg, 'posts' => []], JSON_UNESCAPED_UNICODE);
     exit(0);
 }
 
 if (strlen($html) < 1000) {
-    fwrite(STDERR, "HTML 응답이 너무 짧습니다 (" . strlen($html) . "바이트)\n");
-    echo json_encode([]);
+    $msg = 'HTML 응답이 너무 짧습니다 (' . strlen($html) . '바이트)';
+    fwrite(STDERR, "{$msg}\n");
+    echo json_encode(['community_id' => 1, 'status' => 'error', 'error_message' => $msg, 'posts' => []], JSON_UNESCAPED_UNICODE);
     exit(0);
 }
 
@@ -218,4 +219,13 @@ if ($postLinks) {
 }
 
 fwrite(STDERR, "총 " . count($posts) . "개 파싱 완료\n");
-echo json_encode($posts, JSON_UNESCAPED_UNICODE);
+
+$status = count($posts) > 0 ? 'success' : 'error';
+$errorMessage = $status === 'error' ? '파싱된 게시글이 없습니다 (선택자/페이지 구조 확인 필요)' : null;
+
+echo json_encode([
+    'community_id'  => 1,
+    'status'        => $status,
+    'error_message' => $errorMessage,
+    'posts'         => $posts,
+], JSON_UNESCAPED_UNICODE);
