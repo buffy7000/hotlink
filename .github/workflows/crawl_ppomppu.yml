@@ -31,11 +31,19 @@ jobs:
           API_URL: ${{ secrets.HOTLINK_CRAWLER_API_URL }}  # https://hotlink.kr/crawler/api/save_posts.php
           API_KEY: ${{ secrets.HOTLINK_CRAWLER_API_KEY }}
         run: |
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "$API_URL" \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -H "X-API-Key: $API_KEY" \
-            -d @/tmp/ppomppu_posts.json)
-          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
-          BODY=$(echo "$RESPONSE" | grep -v "HTTP_STATUS")
-          echo "HTTP 상태코드: $HTTP_STATUS"
-          echo "서버 응답: $BODY"
+          # hotlink.kr 호스팅사의 봇 차단이 간헐적으로 Actions IP를 챌린지 페이지로
+          # 막을 때가 있어, JSON이 올 때까지 최대 3회 재시도한다.
+          for attempt in 1 2 3; do
+            BODY=$(curl -s -X POST "$API_URL" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -H "X-API-Key: $API_KEY" \
+              -d @/tmp/ppomppu_posts.json)
+            if echo "$BODY" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+              echo "서버 응답(시도 ${attempt}): $BODY"
+              exit 0
+            fi
+            echo "시도 ${attempt} 실패(JSON 아님), 5초 후 재시도..."
+            sleep 5
+          done
+          echo "3회 모두 실패, 응답: $BODY"
+          exit 1
