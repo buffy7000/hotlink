@@ -115,6 +115,14 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
         <priority>0.8</priority>
     </url>
 
+    <!-- 토픽 모아보기 인덱스 -->
+    <url>
+        <loc><?php echo $base_url; ?>/topic/</loc>
+        <lastmod><?php echo $last_modified; ?></lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
     <!-- 토픽 페이지 (topic/ 폴더에 생성된 파일을 그대로 스캔) -->
     <?php
     $topic_dir = __DIR__ . '/topic';
