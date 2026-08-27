@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>크롤러 상태 - hotlink.kr</title>
+<title>핫링크 상태</title>
 <style>
   :root {
     --bg: #0f1115;
@@ -28,9 +28,6 @@
   .wrap { max-width: 900px; margin: 0 auto; }
   .topbar { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
   h1 { font-size: 22px; font-weight: 800; }
-  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
-  .back-link { font-size: 13px; color: var(--text2); text-decoration: none; margin-left: auto; }
-  .back-link:hover { color: var(--error); }
 
   .summary { display: flex; gap: 8px; flex-wrap: wrap; }
   .summary-chip {
@@ -57,7 +54,7 @@
   .error-msg { color: var(--text2); font-size: 11px; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .muted { color: var(--text2); }
 
-  .footer { margin-top: 16px; font-size: 12px; color: var(--text2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer { margin: 10px 0 16px; font-size: 12px; color: var(--text2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .loading { padding: 40px; text-align: center; color: var(--text2); font-size: 13px; }
 
   @media (max-width: 640px) {
@@ -73,10 +70,13 @@
 
 <div class="wrap">
   <div class="topbar">
-    <h1>🩺 크롤러 상태</h1>
-    <a class="back-link" href="/">← hotlink.kr</a>
+    <h1>🩺 핫링크 상태</h1>
   </div>
-  <p class="subtitle">사이트별 크롤링 정상 여부를 확인합니다. 장애 발생 시 Slack으로 자동 알림이 갑니다.</p>
+
+  <div class="footer" id="statusLine">
+    <span id="checkedAt"></span>
+    <span class="summary" id="summary"></span>
+  </div>
 
   <div class="panel">
     <div class="loading" id="loadingMsg">불러오는 중...</div>
@@ -93,11 +93,6 @@
       </thead>
       <tbody id="statusBody"></tbody>
     </table>
-  </div>
-
-  <div class="footer">
-    <span id="checkedAt"></span>
-    <span class="summary" id="summary"></span>
   </div>
 </div>
 
