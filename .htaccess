@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# 확장자 없는 URL(/topic/박수홍)을 실제 정적 파일(/topic/박수홍.html)로 연결
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [L]

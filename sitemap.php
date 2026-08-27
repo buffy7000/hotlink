@@ -114,5 +114,20 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
-    
+
+    <!-- 토픽 페이지 (topic/ 폴더에 생성된 파일을 그대로 스캔) -->
+    <?php
+    $topic_dir = __DIR__ . '/topic';
+    $topic_files = is_dir($topic_dir) ? glob($topic_dir . '/*.html') : [];
+    foreach ($topic_files as $file):
+        $keyword = basename($file, '.html');
+    ?>
+    <url>
+        <loc><?php echo $base_url; ?>/topic/<?php echo rawurlencode($keyword); ?></loc>
+        <lastmod><?php echo date('Y-m-d\TH:i:s+00:00', filemtime($file)); ?></lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <?php endforeach; ?>
+
 </urlset>
