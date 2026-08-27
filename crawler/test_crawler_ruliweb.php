@@ -1,4 +1,5 @@
 <?php
+// force-redeploy: 서버에 배포된 파일과 git 내용 불일치 여부 확인용
 require_once 'BaseCrawler.php';
 
 class RuliwebCrawler extends BaseCrawler {
