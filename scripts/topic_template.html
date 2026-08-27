@@ -34,6 +34,27 @@
   }
   .wrap { max-width: 720px; margin: 0 auto; }
 
+  /* 인기급상승 토픽 바 */
+  .trending-bar {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(90deg, #fff1f2, #fff7ed);
+    border: 1px solid #fecdd3; border-radius: 12px;
+    padding: 10px 16px; margin-bottom: 18px;
+  }
+  .trending-bar-label {
+    flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 800; color: #e11d48; white-space: nowrap;
+  }
+  .trending-bar-list { display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; }
+  .trending-bar-list::-webkit-scrollbar { display: none; }
+  .trending-bar-list a {
+    flex-shrink: 0; display: flex; align-items: baseline; gap: 5px;
+    font-size: 13px; font-weight: 600; color: var(--text-color); text-decoration: none; white-space: nowrap;
+  }
+  .trending-bar-list a:hover { color: #e11d48; }
+  .trending-bar-list .rank { font-size: 12px; font-weight: 800; color: #e11d48; }
+  .trending-bar-empty { font-size: 12.5px; color: var(--muted-text-color); white-space: nowrap; }
+
   .breadcrumb { font-size: 13px; color: var(--muted-text-color); margin-bottom: 14px; }
   .breadcrumb a { color: var(--muted-text-color); text-decoration: none; }
   .breadcrumb a:hover { color: var(--primary-color); }
@@ -95,13 +116,6 @@
   .timeline-posts li a:hover { color: var(--primary-color); }
   .timeline-item .more-btn { margin-top: 8px; }
 
-  /* 관련 토픽 */
-  .related-topics { display: flex; flex-wrap: wrap; gap: 8px; }
-  .related-topics a {
-    padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
-    background: var(--card-bg-color); border: 1px solid var(--border-color); color: var(--text-color); text-decoration: none;
-  }
-  .related-topics a:hover { border-color: var(--primary-color); color: var(--primary-color); }
   .empty-state { padding: 20px 14px; color: var(--muted-text-color); font-size: 13px; text-align: center; }
 
   .footer { margin-top: 30px; font-size: 12px; color: var(--muted-text-color); text-align: center; }
@@ -111,6 +125,11 @@
 <body>
 
 <div class="wrap">
+  <div class="trending-bar">
+    <div class="trending-bar-label">🔥 인기급상승 토픽</div>
+    <div class="trending-bar-list">{{RELATED_TOPICS_SECTION}}</div>
+  </div>
+
   <div class="breadcrumb"><a href="/">핫링크</a> › <a href="/topic/">토픽</a> › {{KEYWORD}}</div>
 
   <div class="header">
@@ -123,11 +142,6 @@
       <span class="badge">댓글 {{COMMENT_COUNT}}</span>
       <span class="badge">마지막 갱신 {{LAST_UPDATED}}</span>
     </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">급상승 중인 토픽</div>
-    {{RELATED_TOPICS_SECTION}}
   </div>
 
   <div class="section">

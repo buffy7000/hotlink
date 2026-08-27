@@ -193,7 +193,9 @@ foreach ($buckets as $key => $data) {
 }
 
 // ── 섹션: 급상승 중인 토픽 (추적 키워드 목록이 아직 없어 비워둠) ──
-$relatedTopicsSection = '<div class="panel"><div class="empty-state">아직 준비 중이에요. 곧 다른 급상승 토픽을 함께 보여드릴게요.</div></div>';
+// 추적 키워드 목록이 생기면 여기서 각 키워드의 급상승 여부를 계산해
+// <a href="/topic/키워드"><span class="rank">N</span>키워드</a> 형태로 채운다.
+$relatedTopicsSection = '<span class="trending-bar-empty">다른 급상승 토픽을 곧 보여드릴게요</span>';
 
 // ── 템플릿 조립 ─────────────────────────────────────────────
 $template = file_get_contents(__DIR__ . '/topic_template.html');
