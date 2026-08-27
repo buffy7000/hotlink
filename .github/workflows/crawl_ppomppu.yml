@@ -19,6 +19,15 @@ jobs:
           php-version: '8.1'
           extensions: curl, dom, mbstring
 
+      - name: Debug connectivity
+        run: |
+          echo "-- hot.php --"
+          curl -s -o /dev/null -w "%{http_code}\n" "https://www.ppomppu.co.kr/hot.php?category=2"
+          echo "-- rss --"
+          curl -s -o /dev/null -w "%{http_code}\n" "https://www.ppomppu.co.kr/rss.php?id=freeboard"
+          echo "-- www with modern UA --"
+          curl -s -o /dev/null -w "%{http_code}\n" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" "https://www.ppomppu.co.kr/hot.php?category=2"
+
       - name: Crawl Ppomppu
         run: |
           echo "크롤링 시작..."
