@@ -1,8 +1,4 @@
 <?php
-// TEMP DEBUG: 500 에러 원인 확인용, 원인 파악 후 제거 예정
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once 'BaseCrawler.php';
 
 class RuliwebCrawler extends BaseCrawler {
@@ -20,35 +16,28 @@ class RuliwebCrawler extends BaseCrawler {
    
     
     public function crawlBestPosts($orderby = 'replycount', $range = '1h', $limit = 50) {
-    file_put_contents(__DIR__ . '/debug_ruliweb_trace.log', "1:crawlBestPosts 진입\n", FILE_APPEND);
     $allPosts = [];          // ⭐️ 추가: 전체 게시글 저장용
     $totalSaved = 0;         // ⭐️ 추가: 총 저장 개수
-
+    
     // ⭐️ 추가: for 루프로 3페이지 반복
     for ($page = 1; $page <= 3; $page++) {
-        file_put_contents(__DIR__ . '/debug_ruliweb_trace.log', "2:page {$page} 루프 시작\n", FILE_APPEND);
         try {
             echo "\n루리웹 베스트 {$page}페이지 크롤링 시작...\n";  // ⭐️ 수정: 페이지 번호 표시
             echo str_repeat("=", 60) . "\n";
-
+            
             // URL 파라미터 설정
             $url = $this->targetUrl . "?orderby={$orderby}&range={$range}&page={$page}";  // ⭐️ 수정: &page= 추가
             echo "URL: {$url}\n";
-
-            file_put_contents(__DIR__ . '/debug_ruliweb_trace.log', "3:makeRequest 호출 직전, url={$url}\n", FILE_APPEND);
+            
             $html = $this->makeRequest($url);
-            file_put_contents(__DIR__ . '/debug_ruliweb_trace.log', "4:makeRequest 반환, 길이=" . strlen($html) . "\n", FILE_APPEND);
-
-            // TEMP DEBUG: 파싱 전에 원본 저장 (파싱 단계에서 죽어도 파일은 남도록)
-            file_put_contents(__DIR__ . "/debug_ruliweb_page{$page}.html", $html);
-
+            
             if (strlen($html) < 1000) {
                 throw new Exception("HTML 응답이 너무 짧습니다.");
             }
-
+            
             echo "HTML 길이: " . strlen($html) . " 바이트\n";
             echo str_repeat("-", 60) . "\n";
-
+            
             $posts = $this->parseBestPosts($html, $limit);
             
             if (!empty($posts)) {
@@ -277,17 +266,9 @@ private function parsePostTime($timeString) {
 echo "<h2>루리웹 크롤러 테스트</h2>\n";
 echo "<pre>\n";
 
-@unlink(__DIR__ . '/debug_ruliweb_trace.log');
-file_put_contents(__DIR__ . '/debug_ruliweb_trace.log', "0:실행 코드 진입\n", FILE_APPEND);
-try {
-    $crawler = new RuliwebCrawler();
-    file_put_contents(__DIR__ . '/debug_ruliweb_trace.log', "0.5:객체 생성 완료\n", FILE_APPEND);
-    $result = $crawler->crawlHotPosts(50);
-    echo "\n테스트 완료: {$result}개 게시글 저장됨\n";
-} catch (\Throwable $e) {
-    echo "\nCAUGHT " . get_class($e) . ": " . $e->getMessage() . "\n";
-    echo "위치: " . $e->getFile() . ":" . $e->getLine() . "\n";
-    echo $e->getTraceAsString() . "\n";
-}
+$crawler = new RuliwebCrawler();
+$result = $crawler->crawlHotPosts(50);
+
+echo "\n테스트 완료: {$result}개 게시글 저장됨\n";
 echo "</pre>\n";
 ?>
