@@ -1,4 +1,3 @@
-```php
 <?php
 require_once 'BaseCrawler.php';
 
@@ -75,7 +74,9 @@ class HumorunivCrawler extends BaseCrawler {
         $xpath = new DOMXPath($dom);
         
         // 게시글 목록 찾기 - a.list_body_href 구조
-        $items = $xpath->query('//a[@class="list_body_href"]');
+        // 사이트 개편으로 class="list_body_href post_link"처럼 클래스가 추가되어
+        // 정확히 일치(=)하는 대신 포함(contains) 여부로 찾아야 함
+        $items = $xpath->query('//a[contains(concat(" ", normalize-space(@class), " "), " list_body_href ")]');
         
         if (!$items || $items->length == 0) {
             echo "게시글 리스트를 찾을 수 없습니다.\n";
@@ -374,4 +375,3 @@ $result = $crawler->crawlHotPosts(30);
 echo "\n테스트 완료: {$result}개 게시글 저장됨\n";
 echo "</pre>\n";
 ?>
-```
