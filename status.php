@@ -32,9 +32,9 @@
   .back-link { font-size: 13px; color: var(--text2); text-decoration: none; margin-left: auto; }
   .back-link:hover { color: var(--error); }
 
-  .summary { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .summary { display: flex; gap: 8px; flex-wrap: wrap; }
   .summary-chip {
-    padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
     background: var(--surface2); border: 1px solid var(--border);
   }
 
@@ -76,9 +76,7 @@
     <h1>🩺 크롤러 상태</h1>
     <a class="back-link" href="/">← hotlink.kr</a>
   </div>
-  <p class="subtitle">사이트별 크롤링 정상 여부를 실시간으로 확인합니다. 장애 발생 시 Slack으로 자동 알림이 갑니다.</p>
-
-  <div class="summary" id="summary"></div>
+  <p class="subtitle">사이트별 크롤링 정상 여부를 확인합니다. 장애 발생 시 Slack으로 자동 알림이 갑니다.</p>
 
   <div class="panel">
     <div class="loading" id="loadingMsg">불러오는 중...</div>
@@ -99,7 +97,7 @@
 
   <div class="footer">
     <span id="checkedAt"></span>
-    <span>10초마다 자동 갱신</span>
+    <span class="summary" id="summary"></span>
   </div>
 </div>
 
@@ -152,8 +150,20 @@
       .catch(function () {});
   }
 
+  // 매시 10분에 맞춰 자동 갱신 (그 후 1시간 간격 유지)
+  function scheduleHourlyRefresh() {
+    var now = new Date();
+    var next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 10, 0, 0);
+    if (next <= now) next.setHours(next.getHours() + 1);
+    var delay = next - now;
+    setTimeout(function () {
+      load();
+      setInterval(load, 60 * 60 * 1000);
+    }, delay);
+  }
+
   load();
-  setInterval(load, 10000);
+  scheduleHourlyRefresh();
 })();
 </script>
 </body>
