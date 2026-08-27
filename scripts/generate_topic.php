@@ -53,7 +53,7 @@ $likeParam = '%' . $safeKeyword . '%';
 $aggStmt = $db->query(
     "SELECT COUNT(*) AS post_count, COALESCE(SUM(comments_count),0) AS comment_count,
             COUNT(DISTINCT community_id) AS community_count,
-            MIN(created_at) AS min_date, MAX(created_at) AS max_date
+            MAX(created_at) AS max_date
      FROM posts WHERE title LIKE ?",
     [$likeParam]
 );
@@ -78,7 +78,7 @@ $last24h = intval($trend['last24h']);
 $prev7dAvg = intval($trend['prev7d']) / 7;
 $isTrending = $last24h >= 2 && $last24h > $prev7dAvg * 1.5;
 
-// 3. 전체 매칭 글 (타임라인/커뮤니티별 집계용으로 최대 1000개까지)
+// 3. 전체 매칭 글 (커뮤니티별 집계용으로 최대 1000개까지)
 $postsStmt = $db->query(
     "SELECT id, community_id, title, url, views_count, comments_count, created_at
      FROM posts WHERE title LIKE ? ORDER BY created_at DESC LIMIT 1000",
@@ -116,7 +116,7 @@ foreach (array_slice($allPosts, 0, 30) as $p) {
         . '</div>';
 }
 
-// ── 섹션 3: 커뮤니티별 인기글 (상위 4개 커뮤니티, 세로 배치) ───
+// ── 섹션 3: 커뮤니티별 인기글 (매칭된 모든 커뮤니티, 커뮤니티당 5개) ───
 $byCommunity = [];
 foreach ($allPosts as $p) {
     $cid = $p['community_id'];
@@ -127,76 +127,24 @@ foreach ($allPosts as $p) {
     $byCommunity[$cid]['comment_sum'] += intval($p['comments_count']);
 }
 uasort($byCommunity, function ($a, $b) { return count($b['posts']) - count($a['posts']); });
-$topCommunities = array_slice($byCommunity, 0, 4, true);
 
 $communityRows = '';
-foreach ($topCommunities as $cid => $data) {
+foreach ($byCommunity as $cid => $data) {
     $topByViews = $data['posts'];
     usort($topByViews, function ($a, $b) { return $b['views_count'] - $a['views_count']; });
-    $top3 = array_slice($topByViews, 0, 3);
+    $top5 = array_slice($topByViews, 0, 5);
 
     $communityRows .= '<div class="community-card">'
         . '<div class="community-card-head">' . communityTag($cid, $communityMeta)
         . '<span class="stats">글 ' . count($data['posts']) . '개 · 댓글 ' . number_format($data['comment_sum']) . '개</span>'
         . '</div><ul>';
-    foreach ($top3 as $p) {
+    foreach ($top5 as $p) {
         $communityRows .= '<li><a href="' . h($p['url']) . '" target="_blank" rel="noopener nofollow">' . h($p['title']) . '</a></li>';
     }
     $communityRows .= '</ul></div>';
 }
 
-// ── 섹션 4: 과거 이슈 타임라인 ──────────────────────────────
-$minDate = strtotime($agg['min_date']);
-$maxDate = strtotime($agg['max_date']);
-$spanDays = max(1, ($maxDate - $minDate) / 86400);
-
-if ($spanDays >= 365) {
-    $granularity = 'year';
-    $bucketFn = function ($ts) { return date('Y', $ts); };
-    $labelFn = function ($key) { return $key . '년'; };
-} elseif ($spanDays >= 60) {
-    $granularity = 'month';
-    $bucketFn = function ($ts) { return date('Y-m', $ts); };
-    $labelFn = function ($key) { return date('Y년 n월', strtotime($key . '-01')); };
-} else {
-    $granularity = 'week';
-    $bucketFn = function ($ts) { return date('o-\WW', $ts); };
-    $labelFn = function ($key) {
-        [$year, $week] = explode('-W', $key);
-        $ts = strtotime($year . 'W' . str_pad($week, 2, '0', STR_PAD_LEFT));
-        return date('n월 j일', $ts) . ' 주';
-    };
-}
-
-$buckets = [];
-foreach ($allPosts as $p) {
-    $ts = strtotime($p['created_at']);
-    $key = $bucketFn($ts);
-    if (!isset($buckets[$key])) {
-        $buckets[$key] = ['posts' => [], 'sort_ts' => $ts];
-    }
-    $buckets[$key]['posts'][] = $p;
-    if ($ts > $buckets[$key]['sort_ts']) $buckets[$key]['sort_ts'] = $ts;
-}
-uasort($buckets, function ($a, $b) { return $a['sort_ts'] <=> $b['sort_ts']; });
-
-$timelineItems = '';
-$bucketKeys = array_keys($buckets);
-$currentKey = end($bucketKeys);
-foreach ($buckets as $key => $data) {
-    $topPost = $data['posts'][0];
-    foreach ($data['posts'] as $p) {
-        if ($p['views_count'] > $topPost['views_count']) $topPost = $p;
-    }
-    $isCurrent = ($key === $currentKey);
-    $timelineItems .= '<div class="timeline-item' . ($isCurrent ? ' current' : '') . '">'
-        . '<div class="timeline-date">' . h($labelFn($key)) . ($isCurrent ? ' · 현재' : '') . '</div>'
-        . '<div class="timeline-title">' . h($topPost['title']) . '</div>'
-        . '<div class="timeline-count">관련 글 ' . count($data['posts']) . '개</div>'
-        . '</div>';
-}
-
-// ── 섹션 5: 함께 급상승 중인 토픽 (추적 키워드 목록이 아직 없어 비워둠) ──
+// ── 섹션 5(구 4): 함께 급상승 중인 토픽 (추적 키워드 목록이 아직 없어 비워둠) ──
 $relatedTopicsSection = '<div class="panel"><div class="empty-state">아직 준비 중이에요. 곧 다른 급상승 토픽을 함께 보여드릴게요.</div></div>';
 
 // ── 템플릿 조립 ─────────────────────────────────────────────
@@ -222,7 +170,6 @@ $replacements = [
     '{{LAST_UPDATED}}'             => fmtDateTime($agg['max_date']),
     '{{LATEST_POSTS_ROWS}}'        => $latestRows,
     '{{COMMUNITY_SUMMARY_ROWS}}'   => $communityRows,
-    '{{TIMELINE_ITEMS}}'           => $timelineItems,
     '{{RELATED_TOPICS_SECTION}}'   => $relatedTopicsSection,
     '{{GENERATED_AT}}'             => date('Y-m-d H:i:s'),
 ];
@@ -235,6 +182,5 @@ $outPath = $outDir . '/' . $safeKeyword . '.html';
 file_put_contents($outPath, $html);
 
 echo "글 {$postCount}개, 커뮤니티 {$agg['community_count']}개, 급상승: " . ($isTrending ? 'Y' : 'N') . "\n";
-echo "타임라인 granularity: {$granularity}, 구간 수: " . count($buckets) . "\n";
 echo "생성 완료: {$outPath}\n";
 echo "URL: {$canonicalUrl}\n";
