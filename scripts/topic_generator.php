@@ -163,8 +163,9 @@ function generate_topic_page(Database $db, array $communityMeta, string $keyword
         $timelineItems .= '</div>';
     }
 
-    // ── 급상승 중인 토픽 (추적 키워드 목록이 아직 없어 비워둠) ──
-    $relatedTopicsSection = '<span class="trending-bar-empty">다른 급상승 토픽을 곧 보여드릴게요</span>';
+    // 급상승 중인 토픽 바는 이제 정적으로 굽지 않는다. topic.js가 매 방문마다
+    // /api/trending_topics.php를 호출해서 채운다 (여러 페이지가 항상 같은 최신
+    // 상태를 보게 하기 위함 - 재생성 없이도 실시간 반영됨).
 
     // ── 템플릿 조립 ─────────────────────────────────────────────
     $template = file_get_contents(__DIR__ . '/topic_template.html');
@@ -188,7 +189,6 @@ function generate_topic_page(Database $db, array $communityMeta, string $keyword
         '{{LAST_UPDATED}}'             => topic_fmt_datetime($agg['max_date']),
         '{{COMMUNITY_SUMMARY_ROWS}}'   => $communityRows,
         '{{TIMELINE_ITEMS}}'           => $timelineItems,
-        '{{RELATED_TOPICS_SECTION}}'   => $relatedTopicsSection,
         '{{GENERATED_AT}}'             => date('Y-m-d H:i:s'),
     ];
 
