@@ -1,0 +1,41 @@
+name: Crawl Ppomppu
+
+on:
+  schedule:
+    - cron: '5 * * * *'  # 매시 5분에 실행 (hotlink.kr 서버 IP가 뽐뿌에서 차단되어 Actions에서 대신 크롤링)
+  workflow_dispatch:       # GitHub UI에서 수동 실행 가능
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, dom, mbstring
+
+      - name: Crawl Ppomppu
+        run: |
+          echo "크롤링 시작..."
+          php crawler/ppomppu_cli.php > /tmp/ppomppu_posts.json
+          echo "파싱 결과:"
+          cat /tmp/ppomppu_posts.json | python3 -m json.tool --no-ensure-ascii || cat /tmp/ppomppu_posts.json
+
+      - name: Save to DB via API
+        env:
+          API_URL: ${{ secrets.HOTLINK_CRAWLER_API_URL }}  # https://hotlink.kr/crawler/api/save_posts.php
+          API_KEY: ${{ secrets.HOTLINK_CRAWLER_API_KEY }}
+        run: |
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "$API_URL" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -H "X-API-Key: $API_KEY" \
+            -d @/tmp/ppomppu_posts.json)
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+          BODY=$(echo "$RESPONSE" | grep -v "HTTP_STATUS")
+          echo "HTTP 상태코드: $HTTP_STATUS"
+          echo "서버 응답: $BODY"
