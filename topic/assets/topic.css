@@ -19,7 +19,7 @@ body {
 /* 인기급상승 토픽 바 */
 .trending-bar {
   display: flex; align-items: center; gap: 14px;
-  background: linear-gradient(90deg, #eef2ff, #f5f3ff);
+  background: linear-gradient(90deg, #fff1f2, #fff7ed);
   border: 1px solid #fecdd3; border-radius: 12px;
   padding: 10px 16px; margin-bottom: 18px;
 }
