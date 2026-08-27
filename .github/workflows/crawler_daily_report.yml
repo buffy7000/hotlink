@@ -1,0 +1,26 @@
+name: Crawler Daily Report
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 09:00 KST(UTC 00:00)에 전체 현황 Slack 리포트
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send daily report
+        env:
+          API_KEY: ${{ secrets.HOTLINK_CRAWLER_API_KEY }}
+        run: |
+          for attempt in 1 2 3; do
+            BODY=$(curl -s -H "X-API-Key: $API_KEY" "https://hotlink.kr/crawler/api/daily_report.php")
+            if echo "$BODY" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+              echo "응답(시도 ${attempt}): $BODY"
+              exit 0
+            fi
+            echo "시도 ${attempt} 실패(JSON 아님), 5초 후 재시도..."
+            sleep 5
+          done
+          echo "3회 모두 실패, 응답: $BODY"
+          exit 1
