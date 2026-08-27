@@ -89,6 +89,11 @@
   .timeline-date { font-size: 12px; color: var(--muted-text-color); font-weight: 700; margin-bottom: 2px; }
   .timeline-title { font-size: 14px; font-weight: 600; }
   .timeline-count { font-size: 12px; color: var(--muted-text-color); margin-top: 2px; }
+  .timeline-posts { list-style: none; margin-top: 8px; }
+  .timeline-posts li { font-size: 12.5px; padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+  .timeline-posts li a { color: var(--text-color); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .timeline-posts li a:hover { color: var(--primary-color); }
+  .timeline-item .more-btn { margin-top: 8px; }
 
   /* 관련 토픽 */
   .related-topics { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -146,12 +151,12 @@
 
 <script>
 function topicToggleMore(btn) {
-  var card = btn.closest('.community-card');
-  var hidden = card.querySelectorAll('.extra-post');
+  var container = btn.closest('.toggle-container');
+  var hidden = container.querySelectorAll('.extra-post');
   var isHidden = hidden.length && hidden[0].style.display === 'none';
   hidden.forEach(function (el) { el.style.display = isHidden ? '' : 'none'; });
-  var remaining = hidden.length;
-  btn.textContent = isHidden ? '접기' : '더보기 (' + remaining + '개 더)';
+  if (!btn.dataset.moreLabel) btn.dataset.moreLabel = btn.textContent;
+  btn.textContent = isHidden ? '접기' : btn.dataset.moreLabel;
 }
 </script>
 </body>

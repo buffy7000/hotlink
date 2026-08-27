@@ -116,7 +116,7 @@ foreach ($byCommunity as $cid => $data) {
     usort($topByViews, function ($a, $b) { return $b['views_count'] - $a['views_count']; });
     $total = count($topByViews);
 
-    $communityRows .= '<div class="community-card">'
+    $communityRows .= '<div class="community-card toggle-container">'
         . '<div class="community-card-head">' . communityTag($cid, $communityMeta)
         . '<span class="stats">글 ' . $total . '개 · 댓글 ' . number_format($data['comment_sum']) . '개</span>'
         . '</div><ul>';
@@ -167,16 +167,29 @@ $timelineItems = '';
 $bucketKeys = array_keys($buckets);
 $currentKey = end($bucketKeys);
 foreach ($buckets as $key => $data) {
-    $topPost = $data['posts'][0];
-    foreach ($data['posts'] as $p) {
-        if ($p['views_count'] > $topPost['views_count']) $topPost = $p;
-    }
+    $bucketPosts = $data['posts'];
+    usort($bucketPosts, function ($a, $b) { return $b['views_count'] - $a['views_count']; });
+    $topPost = $bucketPosts[0];
+    $restPosts = array_slice($bucketPosts, 1); // 헤드라인으로 이미 보여준 글 제외 나머지
+
     $isCurrent = ($key === $currentKey);
-    $timelineItems .= '<div class="timeline-item' . ($isCurrent ? ' current' : '') . '">'
+    $timelineItems .= '<div class="timeline-item toggle-container' . ($isCurrent ? ' current' : '') . '">'
         . '<div class="timeline-date">' . h($labelFn($key)) . ($isCurrent ? ' · 현재' : '') . '</div>'
         . '<div class="timeline-title">' . h($topPost['title']) . '</div>'
-        . '<div class="timeline-count">관련 글 ' . count($data['posts']) . '개</div>'
-        . '</div>';
+        . '<div class="timeline-count">관련 글 ' . count($bucketPosts) . '개</div>';
+
+    if (!empty($restPosts)) {
+        $timelineItems .= '<ul class="timeline-posts">';
+        foreach ($restPosts as $p) {
+            $timelineItems .= '<li class="extra-post" style="display:none">'
+                . communityTag($p['community_id'], $communityMeta)
+                . '<a href="' . h($p['url']) . '" rel="nofollow">' . h($p['title']) . '</a></li>';
+        }
+        $timelineItems .= '</ul>'
+            . '<button type="button" class="more-btn" onclick="topicToggleMore(this)">더보기 (' . count($restPosts) . '개 글 보기)</button>';
+    }
+
+    $timelineItems .= '</div>';
 }
 
 // ── 섹션: 급상승 중인 토픽 (추적 키워드 목록이 아직 없어 비워둠) ──
