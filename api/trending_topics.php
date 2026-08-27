@@ -22,23 +22,18 @@ try {
     $db = new Database();
     $results = [];
 
+    // 토픽 페이지 수가 아직 적어서 "급상승" 임계값으로 거르면 대부분 빠짐.
+    // 존재하는 토픽 전체를 최근 3일 활동량 순으로 보여주고, 토픽이 많아지면
+    // 자연스럽게 실제로 활발한 것들이 상위로 올라오는 방식으로 둔다.
     foreach ($keywords as $kw) {
         $like = '%' . $kw . '%';
         $stmt = $db->query(
-            "SELECT
-                SUM(CASE WHEN created_at >= NOW() - INTERVAL 1 DAY THEN 1 ELSE 0 END) AS last24h,
-                SUM(CASE WHEN created_at < NOW() - INTERVAL 1 DAY AND created_at >= NOW() - INTERVAL 8 DAY THEN 1 ELSE 0 END) AS prev7d
-             FROM posts WHERE title LIKE ?",
+            "SELECT COUNT(*) AS recent
+             FROM posts WHERE title LIKE ? AND created_at >= NOW() - INTERVAL 3 DAY",
             [$like]
         );
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $last24h = intval($row['last24h']);
-        $prev7dAvg = intval($row['prev7d']) / 7;
-        $isTrending = $last24h >= 2 && $last24h > $prev7dAvg * 1.5;
-
-        if ($isTrending) {
-            $results[] = ['keyword' => $kw, 'score' => $last24h];
-        }
+        $results[] = ['keyword' => $kw, 'score' => intval($row['recent'])];
     }
 
     usort($results, function ($a, $b) { return $b['score'] - $a['score']; });
