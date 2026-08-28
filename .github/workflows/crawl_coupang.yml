@@ -22,15 +22,7 @@ jobs:
         run: |
           echo "쿠팡 골드박스 API 호출 중..."
           php coupang/goldbox_cli.php > /tmp/coupang_products.json
-          echo "결과 요약:"
-          python3 -c "
-import json
-with open('/tmp/coupang_products.json') as f:
-    d = json.load(f)
-print('status:', d['status'])
-print('error_message:', d.get('error_message'))
-print('products:', len(d.get('products', [])))
-"
+          echo "결과 파일 크기: $(wc -c < /tmp/coupang_products.json) bytes"
 
       - name: Save to DB via API
         env:
