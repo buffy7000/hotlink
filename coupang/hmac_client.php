@@ -63,7 +63,13 @@ function send_http_request($method, $url, $query = null, $body = null, $access_k
         $decoded_response = json_decode($response, true);
         error_log("API Error - HTTP Code: $http_code, Response: " . print_r($decoded_response, true));
     }
-    
+
+    if (isset($_GET['debug_raw'])) {
+        echo "\n[DEBUG] Server time (gmdate): " . gmdate('Y-m-d H:i:s') . " UTC\n";
+        echo "[DEBUG] HTTP Code: $http_code\n";
+        echo "[DEBUG] Raw Response: " . substr((string)$response, 0, 3000) . "\n";
+    }
+
     // Parse and return JSON response
     return json_decode($response, true);
 }
