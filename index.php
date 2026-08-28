@@ -1164,6 +1164,11 @@ function escapeOgContent($content) {
   </div>
 </div>
 
+<div class="trending-bar" style="margin: 12px 16px 0;">
+  <div class="trending-bar-label">🔥 인기급상승 토픽</div>
+  <div class="trending-bar-list"><span class="trending-bar-empty">불러오는 중...</span></div>
+</div>
+
 <!-- 1. 네이버 엔터테인먼트 스타일 커뮤니티 선택 - 헤더 밖으로 이동 -->
 <div class="community-section">
   <div class="section-label">커뮤니티 선택</div>
@@ -1294,11 +1299,6 @@ function escapeOgContent($content) {
   
   <input type="date" class="date-selector-native" id="dateSelect">
 </div> -->
-
-<div class="trending-bar" style="margin: 12px 16px 0;">
-  <div class="trending-bar-label">🔥 인기급상승 토픽</div>
-  <div class="trending-bar-list"><span class="trending-bar-empty">불러오는 중...</span></div>
-</div>
 
 <!-- 2. 정렬만 -->
 <div class="filter-section">
