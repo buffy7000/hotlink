@@ -43,7 +43,16 @@ if ($status !== 'success' || empty($products)) {
 
 try {
     $crawler = new CoupangGoldboxCrawler();
-    $result = $crawler->saveProducts($products);
+
+    // saveProducts() 내부(saveGoldboxProducts)는 원래 브라우저 수동 실행용으로 만들어져
+    // 진행 상황을 echo로 출력한다. 이 응답은 JSON API라 그 출력이 섞이면 안 되므로 버퍼링해 버린다.
+    // (예외가 나도 버퍼가 남지 않도록 finally에서 정리)
+    ob_start();
+    try {
+        $result = $crawler->saveProducts($products);
+    } finally {
+        ob_end_clean();
+    }
 
     echo json_encode([
         'success' => true,
