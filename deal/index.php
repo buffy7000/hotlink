@@ -874,27 +874,6 @@ a.list-item:visited .item-title {
   </ul>
 </div>
 
-<div class="filter-section">
-  <div class="sort-section">
-    <nav class="sort-controls">
-      <ul>
-        <li class="on" data-sort="latest" aria-current="true">
-          <a href="javascript:void(0);" data-sort="latest">📅 최신</a>
-        </li>
-        <li data-sort="comments" aria-current="false">
-          <a href="javascript:void(0);" data-sort="comments">💬 댓글</a>
-        </li>
-        <li data-sort="views" aria-current="false">
-          <a href="javascript:void(0);" data-sort="views">👁 조회</a>
-        </li>
-        <li data-sort="likes" aria-current="false">
-          <a href="javascript:void(0);" data-sort="likes">👍 추천</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-</div>
-
 <!-- 배너 -->
 <div id="topBanner" style="
   background: linear-gradient(90deg, rgba(100,116,139,0.9) 0%, rgba(71,85,105,0.9) 50%, rgba(51,65,85,0.9) 100%);
@@ -962,29 +941,6 @@ a.list-item:visited .item-title {
       }
     };
 
-
-    // 정렬 버튼 클릭
-    document.addEventListener('click', function(e) {
-      var sortLink = e.target.closest('.sort-controls a');
-      if (sortLink && sortLink.dataset.sort) {
-        e.preventDefault();
-        var sortValue = sortLink.dataset.sort;
-        var parentLi = sortLink.parentElement;
-        
-        // 모든 li에서 on 클래스 제거하고 aria-current를 false로
-        document.querySelectorAll('.sort-controls li').forEach(function(li) {
-          li.classList.remove('on');
-          li.setAttribute('aria-current', 'false');
-        });
-        
-        // 클릭된 항목에 on 클래스 추가하고 aria-current를 true로
-        parentLi.classList.add('on');
-        parentLi.setAttribute('aria-current', 'true');
-        
-        currentSettings.sort = sortValue;
-        renderList();
-      }
-    });
 
 // 핫딜 사이트 선택
 document.addEventListener('click', function(e) {
@@ -1260,16 +1216,6 @@ if (dbSource) {
       
 
       
-      document.querySelectorAll('.sort-controls li').forEach(function(li) {
-        li.classList.remove('on');
-        li.setAttribute('aria-current', 'false');
-      });
-      var activeSortLi = document.querySelector('.sort-controls li[data-sort="' + currentSettings.sort + '"]');
-      if (activeSortLi) {
-        activeSortLi.classList.add('on');
-        activeSortLi.setAttribute('aria-current', 'true');
-      }
-
       // 핫딜 사이트 UI 복원
       document.querySelectorAll('.nav-item').forEach(function(btn) {
         if (btn.dataset.source === currentSettings.source) {
