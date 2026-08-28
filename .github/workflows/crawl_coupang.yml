@@ -1,5 +1,4 @@
 name: Crawl Coupang Goldbox
-
 on:
   schedule:
     - cron: '35 * * * *'  # 매시 35분에 실행 (hotlink.kr 서버 IP가 쿠팡 전체 도메인에서 차단되어 Actions에서 대신 호출)
