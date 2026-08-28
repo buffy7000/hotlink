@@ -1300,6 +1300,28 @@ function escapeOgContent($content) {
   <div class="trending-bar-list"><span class="trending-bar-empty">불러오는 중...</span></div>
 </div>
 
+<!-- 2. 정렬만 -->
+<div class="filter-section">
+  <div class="sort-section">
+    <nav class="sort-controls">
+      <ul>
+        <li class="on" data-sort="hot" aria-current="true">
+          <a href="javascript:void(0);" data-sort="hot">🔥 인기</a>
+        </li>
+        <li data-sort="latest" aria-current="false">
+          <a href="javascript:void(0);" data-sort="latest">📅 최신</a>
+        </li>
+        <li data-sort="comments" aria-current="false">
+          <a href="javascript:void(0);" data-sort="comments">💬 댓글</a>
+        </li>
+        <li data-sort="views" aria-current="false">
+          <a href="javascript:void(0);" data-sort="views">👁 조회</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
 <!-- 3. 날짜 네비게이션 + 시간 선택 -->
 <div class="date-navigation-section">
   <button class="date-nav-btn" id="prevDateBtn">
@@ -1468,7 +1490,7 @@ function escapeOgContent($content) {
       var listEl = document.getElementById('list');
       var currentSettings = {
         time: '12h',
-        sort: 'latest',
+        sort: 'hot',
         communities: ['all'],
         date: formatDateForInput(new Date()),
         isToday: true
@@ -1556,6 +1578,31 @@ function escapeOgContent($content) {
           });
         }
       });
+
+
+// 정렬 버튼 클릭
+document.addEventListener('click', function(e) {
+  var sortLink = e.target.closest('.sort-controls a');
+  if (sortLink && sortLink.dataset.sort) {
+    e.preventDefault();
+    var sortValue = sortLink.dataset.sort;
+    var parentLi = sortLink.parentElement;
+    
+    // 모든 li에서 on 클래스 제거하고 aria-current를 false로
+    document.querySelectorAll('.sort-controls li').forEach(function(li) {
+      li.classList.remove('on');
+      li.setAttribute('aria-current', 'false');
+    });
+    
+    // 클릭된 항목에 on 클래스 추가하고 aria-current를 true로
+    parentLi.classList.add('on');
+    parentLi.setAttribute('aria-current', 'true');
+    
+    currentSettings.sort = sortValue;
+
+    renderList();
+  }
+});
 
 
 // 단일 선택 방식 커뮤니티 선택
@@ -1933,6 +1980,7 @@ function init() {
   const urlParams = new URLSearchParams(window.location.search);
   const urlCommunity = urlParams.get('communities');
   const urlDate = urlParams.get('date');
+  const urlSort = urlParams.get('sort');
   const urlTime = urlParams.get('time');
   const highlightId = urlParams.get('highlight');  // ← post_id 대신 highlight
   
@@ -1959,6 +2007,14 @@ function init() {
     }
   }
   
+  // 정렬 파라미터 처리
+  if (urlSort) {
+    const validSorts = ['hot', 'latest', 'comments', 'views'];
+    if (validSorts.includes(urlSort)) {
+      currentSettings.sort = urlSort;
+    }
+  }
+
   // 4. UI 복원
   if (currentSettings.time) {
     document.getElementById('timeSelect').value = currentSettings.time;
@@ -1967,6 +2023,16 @@ function init() {
   // 날짜 표시 업데이트
   updateDateDisplay();
   
+  document.querySelectorAll('.sort-controls li').forEach(function(li) {
+    li.classList.remove('on');
+    li.setAttribute('aria-current', 'false');
+  });
+  var activeSortLi = document.querySelector('.sort-controls li[data-sort="' + currentSettings.sort + '"]');
+  if (activeSortLi) {
+    activeSortLi.classList.add('on');
+    activeSortLi.setAttribute('aria-current', 'true');
+  }
+
   // 5. 커뮤니티 UI 복원
   document.querySelectorAll('.nav-item').forEach(function(btn) {
     if (currentSettings.communities.includes(btn.dataset.community)) {
