@@ -1,0 +1,56 @@
+name: Crawl Coupang Goldbox
+
+on:
+  schedule:
+    - cron: '35 * * * *'  # 매시 35분에 실행 (hotlink.kr 서버 IP가 쿠팡 전체 도메인에서 차단되어 Actions에서 대신 호출)
+  workflow_dispatch:
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl
+
+      - name: Call Coupang Goldbox API
+        run: |
+          echo "쿠팡 골드박스 API 호출 중..."
+          php coupang/goldbox_cli.php > /tmp/coupang_products.json
+          echo "결과 요약:"
+          python3 -c "
+import json
+with open('/tmp/coupang_products.json') as f:
+    d = json.load(f)
+print('status:', d['status'])
+print('error_message:', d.get('error_message'))
+print('products:', len(d.get('products', [])))
+"
+
+      - name: Save to DB via API
+        env:
+          API_URL: ${{ secrets.HOTLINK_CRAWLER_API_URL }}
+          API_KEY: ${{ secrets.HOTLINK_CRAWLER_API_KEY }}
+        run: |
+          SAVE_URL=$(python3 -c "print('$API_URL'.replace('crawler/api/save_posts.php', 'coupang/api/save_goldbox.php'))")
+          echo "저장 엔드포인트: $SAVE_URL"
+          for attempt in 1 2 3; do
+            BODY=$(curl -s -X POST "$SAVE_URL" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -H "X-API-Key: $API_KEY" \
+              -d @/tmp/coupang_products.json)
+            if echo "$BODY" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+              echo "서버 응답(시도 ${attempt}): $BODY"
+              exit 0
+            fi
+            echo "시도 ${attempt} 실패(JSON 아님), 5초 후 재시도..."
+            sleep 5
+          done
+          echo "3회 모두 실패, 응답: $BODY"
+          exit 1

@@ -12,7 +12,8 @@ require_once(__DIR__ . '/QuasarzoneHotdealCrawler.php');
 require_once(__DIR__ . '/ClienHotdealCrawler.php');
 require_once(__DIR__ . '/EomisaeHotdealCrawler.php');
 require_once(__DIR__ . '/RuliwebHotdealCrawler.php');
-require_once(__DIR__ . '/../coupang/CoupangGoldboxCrawler.php');
+// 쿠팡은 서버 IP가 쿠팡 측에 전체 도메인 차단되어 있어 여기서 호출하지 않음.
+// GitHub Actions(crawl_coupang.yml)가 API 호출 + coupang/api/save_goldbox.php 저장을 대신 수행한다.
 
 
 function writeLog($message) {
@@ -35,7 +36,6 @@ class HotdealCrawlerManager {
             'quasarzone' => new QuasarzoneHotdealCrawler(),
             'clien' => new ClienHotdealCrawler(),
             'eomisae' => new EomisaeHotdealCrawler(),
-            'coupang' => new CoupangGoldboxCrawler(),
         ];
     }
     

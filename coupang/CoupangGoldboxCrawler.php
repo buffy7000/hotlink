@@ -220,34 +220,23 @@ private function generatePublicId() {
     
     /**
      * 다른 크롤러와 동일한 인터페이스를 위한 메소드
-     * 
+     *
      * @param int|null $limit 사용하지 않음 (골드박스는 API에서 모든 상품 반환)
      * @return int 처리된 상품 수
      */
     public function crawlHotdeals($limit = null) {
         return $this->crawlGoldboxProducts();
     }
+
+    /**
+     * GitHub Actions 등 외부에서 이미 수집한 쿠팡 원본 상품 배열을 저장한다.
+     * (hotlink.kr 서버 IP가 쿠팡에 차단되어 API 호출은 Actions에서 수행하고,
+     *  결과 저장만 DB에 접근 가능한 이 서버에서 수행하기 위함)
+     *
+     * @param array $products 쿠팡 골드박스 API의 원본 data 배열
+     * @return array ['new' => int, 'updated' => int]
+     */
+    public function saveProducts($products) {
+        return $this->saveGoldboxProducts($products);
+    }
 }
-
-
-
-
-// 실행
-if (isset($_SERVER['HTTP_HOST'])) {
-    echo "<pre style='font-family: monospace; white-space: pre-wrap;'>";
-}
-
-try {
-    $crawler = new CoupangGoldboxCrawler();
-    $result = $crawler->crawlGoldboxProducts();
-    
-    echo "\n최종 결과: {$result}개 처리 완료\n";
-    
-} catch (Exception $e) {
-    echo "오류 발생: " . $e->getMessage() . "\n";
-}
-
-if (isset($_SERVER['HTTP_HOST'])) {
-    echo "</pre>";
-}
-?>
