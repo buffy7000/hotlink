@@ -1042,7 +1042,7 @@ function renderEventItem(item, rank) {
   
   var thumbnailHtml = '';
   if (item.thumbnail_url) {
-    thumbnailHtml = '<img src="' + escapeHtml(item.thumbnail_url) + '" alt="이벤트 이미지" class="event-thumbnail" onerror="this.parentNode.innerHTML=\'<div class=&quot;no-thumbnail&quot;>이미지<br>없음</div>\'">';
+    thumbnailHtml = '<img src="' + escapeHtml(item.thumbnail_url) + '" alt="이벤트 이미지" class="event-thumbnail" onerror="this.outerHTML=\'<div class=&quot;no-thumbnail&quot;>이미지<br>없음</div>\'">';
   } else {
     thumbnailHtml = '<div class="no-thumbnail">이미지<br>없음</div>';
   }
