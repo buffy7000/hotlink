@@ -60,51 +60,79 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
-  .currency-select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: inherit;
-    background: #fff;
-    margin-bottom: 14px;
-  }
+  .converter-card { padding: 10px; }
 
-  .input-label {
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .amount-input-row {
+  .exchange-row {
     display: flex;
     align-items: center;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 4px 14px;
-    background: #fafbfc;
+    justify-content: space-between;
+    background: #f6f7fb;
+    border-radius: 14px;
+    padding: 10px 14px;
+    gap: 10px;
   }
 
-  .amount-input-row input {
+  .cur-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .cur-left .flag { font-size: 24px; line-height: 1; }
+
+  .cur-text .cur-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  .cur-text .cur-code {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.25;
+  }
+
+  .cur-right {
+    text-align: right;
+    min-width: 0;
     flex: 1;
+  }
+
+  .cur-right .amount-input {
+    width: 100%;
     border: none;
     background: transparent;
     outline: none;
+    text-align: right;
     font-size: 24px;
-    font-weight: 700;
-    padding: 10px 0;
+    font-weight: 800;
     font-family: inherit;
     color: var(--text);
-    min-width: 0;
+    padding: 0;
   }
 
-  .amount-input-row .unit {
-    font-size: 14px;
+  .cur-right .result-main {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    word-break: break-all;
+  }
+
+  .cur-right .cur-sub {
+    font-size: 12px;
     color: var(--muted);
-    font-weight: 600;
-    margin-left: 6px;
+    margin-top: 1px;
+  }
+
+  .equals-divider {
+    text-align: center;
+    color: #b0b6c2;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 4px 0;
   }
 
   .quick-add-row {
@@ -142,29 +170,7 @@
     text-decoration: underline;
   }
 
-  .result-card {
-    text-align: center;
-    padding: 24px 20px;
-  }
-
-  .result-label {
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 600;
-  }
-
-  .result-value {
-    font-size: 34px;
-    font-weight: 800;
-    color: var(--primary-dark);
-    margin-top: 6px;
-    word-break: break-all;
-  }
-
   .rate-info {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--border);
     font-size: 12.5px;
     color: var(--muted);
     display: flex;
@@ -283,15 +289,35 @@
     <h1>✈️ 여행 환율 계산기</h1>
   </header>
 
-  <div class="card">
-    <select class="currency-select" id="currencySelect">
-      <option value="VND">🇻🇳 베트남 동 (VND)</option>
-    </select>
+  <div class="card converter-card">
+    <div class="exchange-row">
+      <div class="cur-left">
+        <span class="flag">🇻🇳</span>
+        <div class="cur-text">
+          <div class="cur-name">베트남</div>
+          <div class="cur-code">VND</div>
+        </div>
+      </div>
+      <div class="cur-right">
+        <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
+        <div class="cur-sub" id="amountSub">0 동</div>
+      </div>
+    </div>
 
-    <div class="input-label">동(VND) 금액 입력</div>
-    <div class="amount-input-row">
-      <input type="text" inputmode="numeric" id="amountInput" placeholder="0" autocomplete="off">
-      <span class="unit">동</span>
+    <div class="equals-divider">=</div>
+
+    <div class="exchange-row">
+      <div class="cur-left">
+        <span class="flag">🇰🇷</span>
+        <div class="cur-text">
+          <div class="cur-name">대한민국</div>
+          <div class="cur-code">KRW</div>
+        </div>
+      </div>
+      <div class="cur-right">
+        <div class="result-main" id="resultValue">0</div>
+        <div class="cur-sub" id="resultSub">0 원</div>
+      </div>
     </div>
 
     <div class="quick-add-row">
@@ -303,10 +329,7 @@
     <button class="clear-btn" id="clearBtn">입력 지우기</button>
   </div>
 
-  <div class="card result-card">
-    <div class="result-label">환산 금액</div>
-    <div class="result-value" id="resultValue">0원</div>
-
+  <div class="card rate-card">
     <div class="rate-info">
       <span id="rateInfoText">환율 불러오는 중...</span>
     </div>
@@ -345,7 +368,9 @@
   var MAX_RECENT = 4;
 
   var amountInput = document.getElementById('amountInput');
+  var amountSub = document.getElementById('amountSub');
   var resultValue = document.getElementById('resultValue');
+  var resultSub = document.getElementById('resultSub');
   var rateInfoText = document.getElementById('rateInfoText');
   var fixedToggle = document.getElementById('fixedToggle');
   var fixedRateWrap = document.getElementById('fixedRateWrap');
@@ -392,6 +417,20 @@
     return n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
   }
 
+  // 큰 금액을 "1만", "2억 3만"처럼 한글 단위로 읽어주는 보조 표시 (참고 이미지의 서브텍스트 스타일)
+  function toKoreanUnit(n) {
+    n = Math.round(n);
+    if (n === 0) return '0';
+    var eok = Math.floor(n / 100000000);
+    var man = Math.floor((n % 100000000) / 10000);
+    var rest = n % 10000;
+    var parts = [];
+    if (eok) parts.push(eok.toLocaleString('ko-KR') + '억');
+    if (man) parts.push(man.toLocaleString('ko-KR') + '만');
+    if (rest || parts.length === 0) parts.push(rest.toLocaleString('ko-KR'));
+    return parts.join(' ');
+  }
+
   function parseAmount() {
     var raw = amountInput.value.replace(/[^0-9]/g, '');
     return raw ? parseInt(raw, 10) : 0;
@@ -423,13 +462,17 @@
 
   function calcAndRender() {
     var amount = parseAmount();
+    amountSub.textContent = toKoreanUnit(amount) + ' 동';
+
     var rate = activeRatePer1();
     if (rate === null || rate === undefined || isNaN(rate)) {
-      resultValue.textContent = '환율 확인 중...';
+      resultValue.textContent = '-';
+      resultSub.textContent = '환율 확인 중...';
       return;
     }
     var result = amount * rate;
-    resultValue.textContent = formatNumber(result) + '원';
+    resultValue.textContent = formatNumber(result);
+    resultSub.textContent = toKoreanUnit(result) + ' 원';
   }
 
   function renderRecent() {
