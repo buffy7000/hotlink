@@ -320,6 +320,28 @@
     <h1>✈️ 여행 환율 계산기</h1>
   </header>
 
+  <div class="card rate-card">
+    <div class="rate-info">
+      <span id="rateInfoText">환율 불러오는 중...</span>
+    </div>
+
+    <div class="fixed-toggle-row">
+      <label>
+        <div class="switch">
+          <input type="checkbox" id="fixedToggle">
+          <span class="slider"></span>
+        </div>
+        고정환율 사용
+      </label>
+    </div>
+
+    <div class="fixed-rate-input-wrap" id="fixedRateWrap">
+      <span>100동 =</span>
+      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 5.2">
+      <span>원</span>
+    </div>
+  </div>
+
   <div class="card converter-card">
     <div class="exchange-row">
       <div class="cur-left">
@@ -360,28 +382,6 @@
         <div class="result-main" id="resultValue">0</div>
         <div class="cur-sub" id="resultSub">0 원</div>
       </div>
-    </div>
-  </div>
-
-  <div class="card rate-card">
-    <div class="rate-info">
-      <span id="rateInfoText">환율 불러오는 중...</span>
-    </div>
-
-    <div class="fixed-toggle-row">
-      <label>
-        <div class="switch">
-          <input type="checkbox" id="fixedToggle">
-          <span class="slider"></span>
-        </div>
-        고정환율 사용
-      </label>
-    </div>
-
-    <div class="fixed-rate-input-wrap" id="fixedRateWrap">
-      <span>100동 =</span>
-      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 5.2">
-      <span>원</span>
     </div>
   </div>
 
