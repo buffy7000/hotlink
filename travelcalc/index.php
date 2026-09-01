@@ -153,6 +153,11 @@
     margin-top: 1px;
   }
 
+  /* X 아이콘(22px)+간격(6px)만큼 오른쪽을 비워서 숫자 입력란의 우측 끝과 세로로 맞춤 */
+  #amountSub {
+    padding-right: 28px;
+  }
+
   .equals-divider {
     text-align: center;
     color: #b0b6c2;
@@ -261,11 +266,17 @@
     font-family: inherit;
   }
 
+  .recent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
   .section-title {
     font-size: 13px;
     font-weight: 700;
     color: var(--muted);
-    margin-bottom: 8px;
   }
 
   .recent-item {
@@ -291,8 +302,6 @@
   }
 
   .recent-clear {
-    display: block;
-    margin: 10px auto 0;
     background: none;
     border: none;
     font-size: 12px;
@@ -377,9 +386,11 @@
   </div>
 
   <div class="card">
-    <div class="section-title">최근 계산 내역</div>
+    <div class="recent-header">
+      <div class="section-title">최근 계산 내역</div>
+      <button class="recent-clear" id="recentClearBtn" style="display:none;">초기화</button>
+    </div>
     <div id="recentList"><div class="empty-recent">아직 계산 내역이 없습니다</div></div>
-    <button class="recent-clear" id="recentClearBtn" style="display:none;">내역 지우기</button>
   </div>
 </div>
 
