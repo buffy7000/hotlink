@@ -304,6 +304,14 @@
       </div>
     </div>
 
+    <div class="quick-add-row">
+      <button class="quick-add-btn" data-add="5000">+5,000</button>
+      <button class="quick-add-btn" data-add="10000">+10,000</button>
+      <button class="quick-add-btn" data-add="50000">+50,000</button>
+      <button class="quick-add-btn" data-add="100000">+100,000</button>
+    </div>
+    <button class="clear-btn" id="clearBtn">입력 지우기</button>
+
     <div class="equals-divider">=</div>
 
     <div class="exchange-row">
@@ -319,14 +327,6 @@
         <div class="cur-sub" id="resultSub">0 원</div>
       </div>
     </div>
-
-    <div class="quick-add-row">
-      <button class="quick-add-btn" data-add="5000">+5,000</button>
-      <button class="quick-add-btn" data-add="10000">+10,000</button>
-      <button class="quick-add-btn" data-add="50000">+50,000</button>
-      <button class="quick-add-btn" data-add="100000">+100,000</button>
-    </div>
-    <button class="clear-btn" id="clearBtn">입력 지우기</button>
   </div>
 
   <div class="card rate-card">
@@ -507,16 +507,22 @@
     renderRecent();
   }
 
-  var recordTimer = null;
-  function scheduleRecord() {
-    clearTimeout(recordTimer);
-    recordTimer = setTimeout(function () {
-      var amount = parseAmount();
-      var rate = activeRatePer1();
-      if (amount > 0 && rate) {
-        pushRecent(amount, amount * rate);
-      }
-    }, 900);
+  // 히스토리 기록 방식: 입력/버튼 클릭마다 쌓지 않고, 계산기를 "떠날 때"(포커스 이탈,
+  // 계산기 바깥 클릭, 페이지 이탈) 딱 한 번만 최종 금액을 기록한다.
+  var pendingCommit = false;
+
+  function markDirty() {
+    pendingCommit = true;
+  }
+
+  function commitIfPending() {
+    if (!pendingCommit) return;
+    pendingCommit = false;
+    var amount = parseAmount();
+    var rate = activeRatePer1();
+    if (amount > 0 && rate) {
+      pushRecent(amount, amount * rate);
+    }
   }
 
   // 입력 이벤트
@@ -524,15 +530,25 @@
     var digits = amountInput.value.replace(/[^0-9]/g, '');
     amountInput.value = digits ? parseInt(digits, 10).toLocaleString('ko-KR') : '';
     calcAndRender();
-    scheduleRecord();
+    markDirty();
   });
 
-  amountInput.addEventListener('blur', function () {
-    clearTimeout(recordTimer);
-    var amount = parseAmount();
-    var rate = activeRatePer1();
-    if (amount > 0 && rate) pushRecent(amount, amount * rate);
+  amountInput.addEventListener('blur', commitIfPending);
+
+  amountInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') amountInput.blur();
   });
+
+  // 계산기 카드 바깥을 탭/클릭하면 그때까지의 최종 금액을 기록
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.converter-card')) commitIfPending();
+  });
+
+  // 탭 전환/페이지 이탈 시에도 유실되지 않도록 기록
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) commitIfPending();
+  });
+  window.addEventListener('pagehide', commitIfPending);
 
   // 빠른 입력 버튼
   document.querySelectorAll('.quick-add-btn').forEach(function (btn) {
@@ -542,13 +558,14 @@
       var next = current + add;
       amountInput.value = next.toLocaleString('ko-KR');
       calcAndRender();
-      scheduleRecord();
+      markDirty();
     });
   });
 
   document.getElementById('clearBtn').addEventListener('click', function () {
     amountInput.value = '';
     calcAndRender();
+    pendingCommit = false;
     amountInput.focus();
   });
 
