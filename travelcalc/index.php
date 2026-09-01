@@ -100,8 +100,16 @@
     flex: 1;
   }
 
+  .amount-input-line {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
   .cur-right .amount-input {
     width: 100%;
+    min-width: 0;
     border: none;
     background: transparent;
     outline: none;
@@ -112,6 +120,25 @@
     color: var(--text);
     padding: 0;
   }
+
+  .clear-icon-btn {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: #e2e6ee;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .clear-icon-btn:active { background: #cbd2e0; }
 
   .cur-right .result-main {
     font-size: 24px;
@@ -163,19 +190,6 @@
   @media (max-width: 380px) {
     .quick-add-row { gap: 3px; }
     .quick-add-btn { font-size: 9.5px; }
-  }
-
-  .clear-btn {
-    margin-top: 8px;
-    width: 100%;
-    padding: 8px 0;
-    border: none;
-    background: none;
-    color: var(--muted);
-    font-size: 12px;
-    cursor: pointer;
-    font-family: inherit;
-    text-decoration: underline;
   }
 
   .rate-info {
@@ -307,7 +321,10 @@
         </div>
       </div>
       <div class="cur-right">
-        <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
+        <div class="amount-input-line">
+          <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
+          <button type="button" class="clear-icon-btn" id="clearBtn" aria-label="입력 지우기">✕</button>
+        </div>
         <div class="cur-sub" id="amountSub">0 동</div>
       </div>
     </div>
@@ -319,7 +336,6 @@
       <button class="quick-add-btn" data-add="50000">+50,000</button>
       <button class="quick-add-btn" data-add="100000">+100,000</button>
     </div>
-    <button class="clear-btn" id="clearBtn">입력 지우기</button>
 
     <div class="equals-divider">=</div>
 
@@ -378,6 +394,7 @@
 
   var amountInput = document.getElementById('amountInput');
   var amountSub = document.getElementById('amountSub');
+  var clearBtn = document.getElementById('clearBtn');
   var resultValue = document.getElementById('resultValue');
   var resultSub = document.getElementById('resultSub');
   var rateInfoText = document.getElementById('rateInfoText');
@@ -472,6 +489,7 @@
   function calcAndRender() {
     var amount = parseAmount();
     amountSub.textContent = toKoreanUnit(amount) + ' 동';
+    clearBtn.style.visibility = amount > 0 ? 'visible' : 'hidden';
 
     var rate = activeRatePer1();
     if (rate === null || rate === undefined || isNaN(rate)) {
@@ -578,7 +596,7 @@
     });
   });
 
-  document.getElementById('clearBtn').addEventListener('click', function () {
+  clearBtn.addEventListener('click', function () {
     amountInput.value = '';
     calcAndRender();
     clearTimeout(idleTimer);
