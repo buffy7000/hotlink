@@ -137,25 +137,33 @@
 
   .quick-add-row {
     display: flex;
-    gap: 8px;
+    gap: 5px;
     margin-top: 10px;
   }
 
   .quick-add-btn {
     flex: 1;
-    padding: 10px 0;
+    min-width: 0;
+    padding: 9px 0;
     border: 1px solid var(--border);
     background: #fff;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 9px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--primary);
     cursor: pointer;
     font-family: inherit;
+    white-space: nowrap;
     transition: background 0.15s ease;
   }
 
   .quick-add-btn:active { background: #eff6ff; }
+
+  /* 소형 화면(~380px 이하)에서도 5개 버튼 텍스트가 안 잘리도록 축소 */
+  @media (max-width: 380px) {
+    .quick-add-row { gap: 3px; }
+    .quick-add-btn { font-size: 9.5px; }
+  }
 
   .clear-btn {
     margin-top: 8px;
@@ -305,6 +313,7 @@
     </div>
 
     <div class="quick-add-row">
+      <button class="quick-add-btn" data-add="1000">+1,000</button>
       <button class="quick-add-btn" data-add="5000">+5,000</button>
       <button class="quick-add-btn" data-add="10000">+10,000</button>
       <button class="quick-add-btn" data-add="50000">+50,000</button>
