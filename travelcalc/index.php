@@ -365,7 +365,7 @@
   var CURRENCY = 'VND';
   var SETTINGS_KEY = 'travelcalc_settings_' + CURRENCY;
   var RECENT_KEY = 'travelcalc_recent';
-  var MAX_RECENT = 4;
+  var MAX_RECENT = 20;
 
   var amountInput = document.getElementById('amountInput');
   var amountSub = document.getElementById('amountSub');
@@ -507,15 +507,22 @@
     renderRecent();
   }
 
-  // 히스토리 기록 방식: 입력/버튼 클릭마다 쌓지 않고, 계산기를 "떠날 때"(포커스 이탈,
-  // 계산기 바깥 클릭, 페이지 이탈) 딱 한 번만 최종 금액을 기록한다.
+  // 히스토리 기록 방식: 입력/버튼 클릭마다 쌓지 않고,
+  // 1) 계산기를 "떠날 때"(포커스 이탈, 계산기 바깥 클릭, 페이지 이탈) 즉시 기록하거나
+  // 2) 버튼만 누르고 아무 데도 안 벗어나는 경우를 위해, 5초간 조작이 없으면 자동으로 기록한다.
+  // 두 트리거 모두 같은 commitIfPending()을 호출해 중복 기록되지 않는다.
   var pendingCommit = false;
+  var idleTimer = null;
+  var IDLE_COMMIT_MS = 5000;
 
   function markDirty() {
     pendingCommit = true;
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(commitIfPending, IDLE_COMMIT_MS);
   }
 
   function commitIfPending() {
+    clearTimeout(idleTimer);
     if (!pendingCommit) return;
     pendingCommit = false;
     var amount = parseAmount();
@@ -565,6 +572,7 @@
   document.getElementById('clearBtn').addEventListener('click', function () {
     amountInput.value = '';
     calcAndRender();
+    clearTimeout(idleTimer);
     pendingCommit = false;
     amountInput.focus();
   });
