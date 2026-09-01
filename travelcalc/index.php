@@ -322,8 +322,8 @@
     </div>
 
     <div class="fixed-rate-input-wrap" id="fixedRateWrap">
-      <span>1,000동 =</span>
-      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 52">
+      <span>100동 =</span>
+      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 5.2">
       <span>원</span>
     </div>
   </div>
@@ -362,7 +362,7 @@
       var raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
-    return { useFixed: false, fixedRatePer1000: null };
+    return { useFixed: false, fixedRatePer100: null };
   }
 
   function saveSettings(settings) {
@@ -398,25 +398,25 @@
   }
 
   function activeRatePer1() {
-    if (settings.useFixed && settings.fixedRatePer1000) {
-      return settings.fixedRatePer1000 / 1000;
+    if (settings.useFixed && settings.fixedRatePer100) {
+      return settings.fixedRatePer100 / 100;
     }
     return liveRatePer1;
   }
 
   function renderRateInfo() {
-    if (settings.useFixed && settings.fixedRatePer1000) {
-      rateInfoText.innerHTML = '고정환율 사용 중: <b>1,000동 = ' + formatRate(settings.fixedRatePer1000) + '원</b>';
+    if (settings.useFixed && settings.fixedRatePer100) {
+      rateInfoText.innerHTML = '고정환율 사용 중: <b>100동 = ' + formatRate(settings.fixedRatePer100) + '원</b>';
       return;
     }
     if (liveRatePer1 === null) {
       rateInfoText.textContent = '환율 불러오는 중...';
       return;
     }
-    var per1000 = liveRatePer1 * 1000;
+    var per100 = liveRatePer1 * 100;
     var dateStr = '';
     try { dateStr = new Date(liveUpdatedAt).toLocaleDateString('ko-KR'); } catch (e) {}
-    var html = '오늘의 환율: <b>1,000동 = ' + formatRate(per1000) + '원</b>' + (dateStr ? ' (' + dateStr + ' 기준)' : '');
+    var html = '오늘의 환율: <b>100동 = ' + formatRate(per100) + '원</b>' + (dateStr ? ' (' + dateStr + ' 기준)' : '');
     if (liveStale) html += ' <span class="badge-stale">· 최신 갱신 실패, 이전 환율 표시 중</span>';
     rateInfoText.innerHTML = html;
   }
@@ -512,16 +512,16 @@
   // 고정환율 토글
   fixedToggle.checked = !!settings.useFixed;
   fixedRateWrap.classList.toggle('show', !!settings.useFixed);
-  if (settings.fixedRatePer1000) {
-    fixedRateInput.value = settings.fixedRatePer1000;
+  if (settings.fixedRatePer100) {
+    fixedRateInput.value = settings.fixedRatePer100;
   }
 
   fixedToggle.addEventListener('change', function () {
     settings.useFixed = fixedToggle.checked;
-    if (settings.useFixed && !settings.fixedRatePer1000 && liveRatePer1 !== null) {
+    if (settings.useFixed && !settings.fixedRatePer100 && liveRatePer1 !== null) {
       // 처음 켤 때 현재 실시간 환율값을 기본값으로 채워줌
-      settings.fixedRatePer1000 = Math.round(liveRatePer1 * 1000 * 100) / 100;
-      fixedRateInput.value = settings.fixedRatePer1000;
+      settings.fixedRatePer100 = Math.round(liveRatePer1 * 100 * 100) / 100;
+      fixedRateInput.value = settings.fixedRatePer100;
     }
     saveSettings(settings);
     fixedRateWrap.classList.toggle('show', settings.useFixed);
@@ -531,7 +531,7 @@
 
   fixedRateInput.addEventListener('input', function () {
     var val = parseFloat(fixedRateInput.value.replace(/,/g, ''));
-    settings.fixedRatePer1000 = isNaN(val) ? null : val;
+    settings.fixedRatePer100 = isNaN(val) ? null : val;
     saveSettings(settings);
     renderRateInfo();
     calcAndRender();
