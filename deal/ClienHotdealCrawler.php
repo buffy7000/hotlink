@@ -477,22 +477,5 @@ class ClienJirumCrawler {
     }
 }
 
-// 실행
-if (isset($_SERVER['HTTP_HOST'])) {
-    echo "<pre style='font-family: monospace; white-space: pre-wrap;'>";
-}
-
-try {
-    $crawler = new ClienJirumCrawler();
-    $result = $crawler->crawlSinglePage(30); // 1페이지에서 30개
-    
-    echo "\n최종 결과: {$result}개 처리 완료\n";
-    
-} catch (Exception $e) {
-    echo "오류 발생: " . $e->getMessage() . "\n";
-}
-
-if (isset($_SERVER['HTTP_HOST'])) {
-    echo "</pre>";
-}
-?>
+// run_crawler_deal.php의 HotdealCrawlerManager가 유일한 실행 경로다.
+// (require만 해도 즉시 크롤링이 실행되던 하단 코드는 제거 - 쿠팡 크롤러와 동일한 이중실행 버그였음)

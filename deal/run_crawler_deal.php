@@ -33,11 +33,14 @@ class HotdealCrawlerManager {
 
     public function __construct() {
         // 실제 클래스명은 파일명과 다르므로(QuasarzoneMultiPageCrawler, ClienJirumCrawler,
-        // EomisaeCrawler) 각 크롤러 파일의 class 선언과 반드시 일치시켜야 한다.
+        // EomisaeCrawler, RuliwebCrawler) 각 크롤러 파일의 class 선언과 반드시 일치시켜야 한다.
+        // 응답이 느리거나 막힐 위험이 있는 어미새/루리웹을 먼저 실행해, 혹시 스크립트가
+        // 도중에 끊기더라도 뒤에 있다는 이유만으로 아예 시도조차 못 하는 일이 없게 한다.
         $this->crawlers = [
+            'eomisae' => new EomisaeCrawler(),
+            'ruliweb' => new RuliwebCrawler(),
             'quasarzone' => new QuasarzoneMultiPageCrawler(),
             'clien' => new ClienJirumCrawler(),
-            'eomisae' => new EomisaeCrawler(),
         ];
     }
 
@@ -75,6 +78,7 @@ class HotdealCrawlerManager {
             case 'clien':
                 return (int) $crawler->crawlHotdeals($limit);
             case 'eomisae':
+            case 'ruliweb':
                 return $crawler->crawl() ? 1 : 0;
             default:
                 throw new Exception("등록되지 않은 사이트: {$siteName}");

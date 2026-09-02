@@ -55,7 +55,8 @@ class RuliwebCrawler {
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT => 30,
+            CURLOPT_TIMEOUT => 10, // ruliweb.com이 서버 IP에서 타임아웃되는 경우가 있어 뒤 사이트를 굶기지 않도록 짧게 설정
+            CURLOPT_CONNECTTIMEOUT => 5,
             CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_ENCODING => 'gzip, deflate',
@@ -322,20 +323,5 @@ class RuliwebCrawler {
     }
 }
 
-// 실행
-if (isset($_SERVER['HTTP_HOST'])) {
-    echo "<pre style='font-family: monospace; white-space: pre-wrap;'>";
-}
-
-try {
-    $crawler = new RuliwebCrawler();
-    $result = $crawler->crawl();
-    echo $result ? "\n크롤링 성공\n" : "\n크롤링 실패\n";
-} catch (Exception $e) {
-    echo "오류 발생: " . $e->getMessage() . "\n";
-}
-
-if (isset($_SERVER['HTTP_HOST'])) {
-    echo "</pre>";
-}
-?>
+// run_crawler_deal.php의 HotdealCrawlerManager가 유일한 실행 경로다.
+// (require만 해도 즉시 크롤링이 실행되던 하단 코드는 제거 - 쿠팡 크롤러와 동일한 이중실행 버그였음)
