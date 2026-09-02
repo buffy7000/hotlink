@@ -6,6 +6,9 @@
 
 ini_set('display_errors', 'stderr');
 error_reporting(E_ALL);
+// GitHub Actions 러너는 기본 UTC라, date()가 서버(KST)와 9시간 어긋나
+// 방금 저장한 글이 "3시간 이내" 필터에서 누락되는 문제가 있었다.
+date_default_timezone_set('Asia/Seoul');
 
 $baseUrl = 'https://eomisae.co.kr';
 $hotdealUrl = 'https://eomisae.co.kr/fs';

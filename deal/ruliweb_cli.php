@@ -6,6 +6,9 @@
 
 ini_set('display_errors', 'stderr');
 error_reporting(E_ALL);
+// GitHub Actions 러너는 기본 UTC라, date()가 서버(KST)와 9시간 어긋나
+// "N시간 전"/"N분 전" 같은 상대시간 변환 결과가 틀어지는 문제가 있었다.
+date_default_timezone_set('Asia/Seoul');
 
 $baseUrl = 'https://bbs.ruliweb.com';
 $hotdealUrl = 'https://bbs.ruliweb.com/news/board/1020?page=1&view=thumbnail';
