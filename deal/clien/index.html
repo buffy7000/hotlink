@@ -9,8 +9,8 @@
   <div id="app"></div>
   
   <script>
-    // 메인 페이지의 HTML을 가져와서 삽입
-    fetch('/deal/index.html')
+    // 메인 페이지의 HTML을 가져와서 삽입 (index.html은 정적 사본이라 계속 낡아가므로 삭제, 실제 서비스 중인 index.php를 직접 사용)
+    fetch('/deal/index.php')
       .then(response => response.text())
       .then(html => {
         // body 내용만 추출

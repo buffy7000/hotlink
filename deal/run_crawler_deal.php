@@ -30,45 +30,62 @@ function writeLog($message) {
 
 class HotdealCrawlerManager {
     private $crawlers = [];
-    
+
     public function __construct() {
+        // 실제 클래스명은 파일명과 다르므로(QuasarzoneMultiPageCrawler, ClienJirumCrawler,
+        // EomisaeCrawler) 각 크롤러 파일의 class 선언과 반드시 일치시켜야 한다.
         $this->crawlers = [
-            'quasarzone' => new QuasarzoneHotdealCrawler(),
-            'clien' => new ClienHotdealCrawler(),
-            'eomisae' => new EomisaeHotdealCrawler(),
+            'quasarzone' => new QuasarzoneMultiPageCrawler(),
+            'clien' => new ClienJirumCrawler(),
+            'eomisae' => new EomisaeCrawler(),
         ];
     }
-    
+
     public function runAll($limit = 50) {
         writeLog("핫딜 크롤링 시작");
-        
+
         $totalProcessed = 0;
-        
+
         foreach ($this->crawlers as $siteName => $crawler) {
             try {
                 writeLog("[$siteName] 크롤링 시작");
-                
-                $processed = $crawler->crawlHotdeals($limit);
+
+                $processed = $this->runCrawler($siteName, $crawler, $limit);
                 $totalProcessed += $processed;
-                
+
                 writeLog("[$siteName] 완료: {$processed}개 처리");
-                
+
                 sleep(2);
-                
-            } catch (Exception $e) {
+
+            } catch (Throwable $e) {
+                // 클래스/메서드 불일치 같은 Error도 여기서 잡아 나머지 사이트 크롤링은 계속 진행한다.
                 writeLog("[$siteName] 실패: " . $e->getMessage());
             }
         }
-        
+
         writeLog("크롤링 완료: 총 {$totalProcessed}개 처리");
         return $totalProcessed;
+    }
+
+    // 사이트별로 진입 메서드/시그니처가 달라 여기서 흡수한다.
+    private function runCrawler($siteName, $crawler, $limit) {
+        switch ($siteName) {
+            case 'quasarzone':
+                return (int) $crawler->crawlMultiplePages($limit, 2);
+            case 'clien':
+                return (int) $crawler->crawlHotdeals($limit);
+            case 'eomisae':
+                return $crawler->crawl() ? 1 : 0;
+            default:
+                throw new Exception("등록되지 않은 사이트: {$siteName}");
+        }
     }
 }
 
 try {
     $manager = new HotdealCrawlerManager();
     $manager->runAll(50);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     writeLog("ERROR: " . $e->getMessage());
 }
 ?>
