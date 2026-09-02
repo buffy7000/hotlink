@@ -390,6 +390,62 @@ function escapeOgContent($content) {
   position: relative;
 }
 
+.category-section {
+  position: sticky;
+  top: 46px;
+  z-index: 97;
+  background: var(--card-bg-color);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.category-nav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.category-nav::-webkit-scrollbar { display: none; }
+
+.category-item {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  color: var(--muted-text-color);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.category-item.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.category-item:hover:not(.active) {
+  background: #e2e8f0;
+}
+
+.category-label {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 500;
+}
+
 /* 리스트 컨테이너 */
 .list-container {
   background: var(--card-bg-color);
@@ -874,6 +930,20 @@ a.list-item:visited .item-title {
   </ul>
 </div>
 
+<div class="category-section">
+  <ul class="category-nav">
+    <li><a href="#" class="category-item active" data-category="all">전체</a></li>
+    <li><a href="#" class="category-item" data-category="game_app">게임/앱</a></li>
+    <li><a href="#" class="category-item" data-category="digital">디지털/가전</a></li>
+    <li><a href="#" class="category-item" data-category="food">식품</a></li>
+    <li><a href="#" class="category-item" data-category="living_kitchen">생활/주방</a></li>
+    <li><a href="#" class="category-item" data-category="fashion_beauty">패션/뷰티</a></li>
+    <li><a href="#" class="category-item" data-category="giftcard">상품권/쿠폰</a></li>
+    <li><a href="#" class="category-item" data-category="baby_pet">유아/반려동물</a></li>
+    <li><a href="#" class="category-item" data-category="etc">기타</a></li>
+  </ul>
+</div>
+
 <!-- 배너 -->
 <div id="topBanner" style="
   background: linear-gradient(90deg, rgba(100,116,139,0.9) 0%, rgba(71,85,105,0.9) 50%, rgba(51,65,85,0.9) 100%);
@@ -922,7 +992,19 @@ a.list-item:visited .item-title {
     var currentSettings = {
       time: '3d',
       sort: 'latest',
-      source: 'all'
+      source: 'all',
+      category: 'all'
+    };
+
+    var categoryLabels = {
+      game_app: '게임/앱',
+      giftcard: '상품권/쿠폰',
+      baby_pet: '유아/반려동물',
+      fashion_beauty: '패션/뷰티',
+      food: '식품',
+      living_kitchen: '생활/주방',
+      digital: '디지털/가전',
+      etc: '기타'
     };
 
     // 배너 토글 함수
@@ -966,6 +1048,24 @@ document.addEventListener('click', function(e) {
     
     // URL 업데이트
     updateURL(sourceValue);
+    renderList();
+  }
+});
+
+// 카테고리 선택
+document.addEventListener('click', function(e) {
+  var categoryItem = e.target.closest('.category-item');
+  if (categoryItem && categoryItem.dataset.category) {
+    e.preventDefault();
+
+    document.querySelectorAll('.category-item').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    categoryItem.classList.add('active');
+
+    currentSettings.category = categoryItem.dataset.category;
+
+    removeHighlight();
     renderList();
   }
 });
@@ -1032,7 +1132,7 @@ function removeHighlight() {
 
 
 function loadHotdealsData() {
-  var url = '/api/hotdeals.php?source=' + currentSettings.source + '&sort=' + currentSettings.sort + '&time=' + currentSettings.time;
+  var url = '/api/hotdeals.php?source=' + currentSettings.source + '&category=' + currentSettings.category + '&sort=' + currentSettings.sort + '&time=' + currentSettings.time;
   
   // 하이라이트된 항목이 있는지 확인
   var hasHighlight = document.querySelector('.highlighted-item');
@@ -1119,8 +1219,9 @@ return '<div class="list-item-wrapper" style="display: flex; align-items: flex-s
     
     '<div class="item-meta">' +
     '<div class="source-label" data-community="' + communityInfo.key + '">' + communityInfo.shortName + '</div>' +
+    (item.category && categoryLabels[item.category] ? '<span class="category-label">' + categoryLabels[item.category] + '</span>' : '') +
     '<span class="meta-item">⏰ ' + formatTimeAgo(item.original_created_at) + '</span>' +
-    
+
     '</div>' +
     '</div>' +
     '</a>' +

@@ -6,6 +6,7 @@
 
 // SimpleHotdealDB 클래스 로드
 require_once(__DIR__ . '/SimpleHotdealDB.php');
+require_once(__DIR__ . '/CategoryClassifier.php');
 
 class ClienJirumCrawler {
     private $db;
@@ -396,21 +397,22 @@ class ClienJirumCrawler {
                 );
                 
                 if ($existing) {
-                    // 업데이트: 댓글수, 조회수, 상태 업데이트
+                    // 업데이트: 댓글수, 조회수, 상태, 카테고리(분류기 개선 시 재분류되도록) 업데이트
                     $this->db->query("
-                        UPDATE hotdeals SET 
-                        view_count = ?, comment_count = ?, status = ?
+                        UPDATE hotdeals SET
+                        view_count = ?, comment_count = ?, status = ?, category = ?
                         WHERE id = ?
                     ", [
-                        $hotdeal['view_count'], 
+                        $hotdeal['view_count'],
                         $hotdeal['comment_count'],
                         $hotdeal['status'],
+                        classify_hotdeal_category($hotdeal['title']),
                         $existing['id']
                     ]);
                     $updatedCount++;
-                    
+
                     echo "    업데이트: ID {$hotdeal['original_id']} (댓글: {$existing['comment_count']} → {$hotdeal['comment_count']}, 조회: {$existing['view_count']} → {$hotdeal['view_count']}, 상태: {$existing['status']} → {$hotdeal['status']})\n";
-                    
+
                 } else {
                     // 신규 저장
                     $publicId = $this->generatePublicId();
@@ -418,13 +420,14 @@ class ClienJirumCrawler {
                         INSERT INTO hotdeals (
                             public_id, source_id, original_id, title, original_url,
                             thumbnail_url, author_name, view_count, comment_count, like_count,
-                            price, store_name, original_created_at, crawled_at, status
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            price, store_name, category, original_created_at, crawled_at, status
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ", [
                         $publicId, $this->sourceId, $hotdeal['original_id'], $hotdeal['title'],
                         $hotdeal['original_url'], $hotdeal['thumbnail_url'], $hotdeal['author_name'],
                         $hotdeal['view_count'], $hotdeal['comment_count'], $hotdeal['like_count'],
-                        $hotdeal['price'], $hotdeal['store_name'], $hotdeal['original_created_at'],
+                        $hotdeal['price'], $hotdeal['store_name'], classify_hotdeal_category($hotdeal['title']),
+                        $hotdeal['original_created_at'],
                         $hotdeal['crawled_at'], $hotdeal['status']
                     ]);
                     $newCount++;

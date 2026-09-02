@@ -11,6 +11,7 @@ ini_set('display_errors', 1);
 try {
     // 파라미터 받기
     $source = $_GET['source'] ?? 'all';
+    $category = $_GET['category'] ?? 'all';
     $sort = $_GET['sort'] ?? 'latest';
     $time = $_GET['time'] ?? '24h';
     $id = $_GET['id'] ?? null;
@@ -28,7 +29,7 @@ try {
     
     // 개별 항목 조회인 경우
     if ($id) {
-        $sql = "SELECT 
+        $sql = "SELECT
                     public_id,
                     source_id,
                     original_id,
@@ -41,8 +42,9 @@ try {
                     like_count,
                     price,
                     store_name,
+                    category,
                     original_created_at
-                FROM hotdeals 
+                FROM hotdeals
                 WHERE status = 'active' AND public_id = ?
                 LIMIT 1";
         
@@ -105,7 +107,14 @@ if ($source !== 'all') {
     // 전체 선택시 모든 핫딜 사이트 (source_id = 2, 3, 5, 6, 99)
     $sourceCondition = "AND source_id IN (2, 3, 5, 6, 99)";
 }
-    
+
+// 카테고리 조건 (deal/CategoryClassifier.php의 hotdeal_categories()와 코드가 일치해야 함)
+$validCategories = ['game_app', 'giftcard', 'baby_pet', 'fashion_beauty', 'food', 'living_kitchen', 'digital', 'etc'];
+$categoryCondition = '';
+if ($category !== 'all' && in_array($category, $validCategories, true)) {
+    $categoryCondition = "AND category = " . $pdo->quote($category);
+}
+
     // 정렬 조건
     $orderBy = '';
     switch($sort) {
@@ -128,7 +137,7 @@ if ($source !== 'all') {
 
     
     // 쿼리 실행
-    $sql = "SELECT 
+    $sql = "SELECT
                 public_id,
                 source_id,
                 original_id,
@@ -141,10 +150,12 @@ if ($source !== 'all') {
                 like_count,
                 price,
                 store_name,
+                category,
                 original_created_at
-            FROM hotdeals 
-            WHERE status = 'active' 
-            {$sourceCondition} 
+            FROM hotdeals
+            WHERE status = 'active'
+            {$sourceCondition}
+            {$categoryCondition}
             {$timeCondition}
             {$orderBy}
             LIMIT 100";
@@ -162,6 +173,7 @@ if ($source !== 'all') {
         'type' => 'list',
         'debug' => [
             'source' => $source,
+            'category' => $category,
             'sort' => $sort,
             'time' => $time,
             'sql' => $sql

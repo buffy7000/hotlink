@@ -5,6 +5,7 @@
  */
 // SimpleHotdealDB 클래스 로드
 require_once(__DIR__ . '/SimpleHotdealDB.php');
+require_once(__DIR__ . '/CategoryClassifier.php');
 
 class EomisaeCrawler {
     private $db;
@@ -338,32 +339,33 @@ private function parseDate($dateText) {
             );
             
             if ($existing) {
-                // 업데이트: 제목, 조회수, 댓글수, 이미지URL 갱신
+                // 업데이트: 제목, 조회수, 댓글수, 이미지URL, 카테고리(분류기 개선 시 재분류) 갱신
                 $this->db->query("
-                    UPDATE hotdeals 
-                    SET title = ?,view_count = ?, comment_count = ?, thumbnail_url = ?, crawled_at = NOW()
+                    UPDATE hotdeals
+                    SET title = ?, view_count = ?, comment_count = ?, thumbnail_url = ?, category = ?, crawled_at = NOW()
                     WHERE id = ?
                 ", [
                     $item['title'],
                     $item['view_count'],
                     $item['comment_count'],
                     $item['thumbnail_url'],
+                    classify_hotdeal_category($item['title']),
                     $existing['id']
                 ]);
-                
+
                 echo "  업데이트: " . substr($item['title'], 0, 30) . "...\n";
                 return false; // 새로운 아이템이 아님
             } else {
                 // 새로운 아이템 삽입
                 $publicId = $this->generatePublicId();
-                
+
                 $this->db->query("
                     INSERT INTO hotdeals (
-                        public_id, source_id, original_id, title, original_url, 
-                        thumbnail_url, author_name, view_count, comment_count, 
-                        like_count, price, store_name, original_created_at, 
+                        public_id, source_id, original_id, title, original_url,
+                        thumbnail_url, author_name, view_count, comment_count,
+                        like_count, price, store_name, category, original_created_at,
                         crawled_at, status
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'active')
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'active')
                 ", [
                     $publicId,
                     $this->sourceId,
@@ -377,6 +379,7 @@ private function parseDate($dateText) {
                     $item['like_count'],
                     $item['price'],
                     $item['store_name'],
+                    classify_hotdeal_category($item['title']),
                     $item['original_created_at']
                 ]);
                 

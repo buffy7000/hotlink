@@ -4,6 +4,7 @@
  * 파일명: RuliwebHotdealCrawler.php
  */
 require_once(__DIR__ . '/SimpleHotdealDB.php');
+require_once(__DIR__ . '/CategoryClassifier.php');
 
 class RuliwebCrawler {
     private $db;
@@ -276,31 +277,33 @@ class RuliwebCrawler {
             
             if ($existing) {
                 $this->db->query("
-                    UPDATE hotdeals 
-                    SET view_count = ?, comment_count = ?, like_count = ?, crawled_at = NOW()
+                    UPDATE hotdeals
+                    SET view_count = ?, comment_count = ?, like_count = ?, category = ?, crawled_at = NOW()
                     WHERE id = ?
                 ", [
                     $item['view_count'],
                     $item['comment_count'],
                     $item['like_count'],
+                    classify_hotdeal_category($item['title']),
                     $existing['id']
                 ]);
                 return false;
             } else {
                 $publicId = $this->generatePublicId();
-                
+
                 $this->db->query("
                     INSERT INTO hotdeals (
-                        public_id, source_id, original_id, title, original_url, 
-                        thumbnail_url, author_name, view_count, comment_count, 
-                        like_count, price, store_name, original_created_at, 
+                        public_id, source_id, original_id, title, original_url,
+                        thumbnail_url, author_name, view_count, comment_count,
+                        like_count, price, store_name, category, original_created_at,
                         crawled_at, status
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'active')
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'active')
                 ", [
                     $publicId, $this->sourceId, $item['original_id'],
                     $item['title'], $item['original_url'], $item['thumbnail_url'],
                     $item['author_name'], $item['view_count'], $item['comment_count'],
                     $item['like_count'], $item['price'], $item['store_name'],
+                    classify_hotdeal_category($item['title']),
                     $item['original_created_at']
                 ]);
                 return true;
