@@ -267,7 +267,7 @@ class RuliwebCrawler {
         return null;
     }
     
-    private function saveItem($item) {
+    public function saveItem($item) {
         try {
             $existing = $this->db->fetch(
                 "SELECT id FROM hotdeals WHERE source_id = ? AND original_id = ?",

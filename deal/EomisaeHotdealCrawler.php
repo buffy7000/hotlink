@@ -329,7 +329,7 @@ private function parseDate($dateText) {
         return $src;
     }
     
-    private function saveItem($item) {
+    public function saveItem($item) {
         try {
             // 중복 체크
             $existing = $this->db->fetch(
