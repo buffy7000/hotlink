@@ -18,8 +18,9 @@ class JobKoreaCrawler extends BaseJobCrawler {
     public function crawl() {
         echo "[잡코리아] 크롤링 시작...\n";
 
-        $allJobs = [];
-        $page    = 1;
+        $allJobs  = [];
+        $page     = 1;
+        $complete = false; // 마지막 페이지까지 정상적으로 다 돌았는지 (중간에 요청 실패 시 false)
 
         while (true) {
             $url = $this->searchUrl . '&PageNo=' . $page;
@@ -33,10 +34,10 @@ class JobKoreaCrawler extends BaseJobCrawler {
             $jobs = $this->parseJobs($html);
             echo "[잡코리아] 페이지 {$page}: " . count($jobs) . "개 수집\n";
 
-            if (empty($jobs)) break;
+            if (empty($jobs)) { $complete = true; break; }
             $allJobs = array_merge($allJobs, $jobs);
 
-            if (!$this->hasNextPage($html, $page + 1)) break;
+            if (!$this->hasNextPage($html, $page + 1)) { $complete = true; break; }
             $page++;
             sleep(1);
         }
@@ -46,7 +47,12 @@ class JobKoreaCrawler extends BaseJobCrawler {
             return 0;
         }
 
-        $saved = $this->saveJobs($allJobs);
+        // 페이지네이션 중간에 요청이 실패했으면 일부 페이지만 수집된 상태이므로
+        // 마감 동기화(syncJobs)를 건너뛰고 저장만 한다 (안 보인 페이지의 공고가 잘못 마감 처리되는 것 방지)
+        $saved = $complete ? $this->syncJobs($allJobs) : $this->saveJobs($allJobs);
+        if (!$complete) {
+            echo "[잡코리아] 페이지 수집이 중간에 끊겨 마감 동기화는 건너뜀\n";
+        }
         echo "[잡코리아] 총 {$saved}개 저장 완료\n";
         return $saved;
     }
