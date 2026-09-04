@@ -53,10 +53,13 @@ try {
                 crawled_at = CURRENT_TIMESTAMP";
 
     $saved = 0;
+    $urlsBySite = [];
     foreach ($jobs as $job) {
+        $siteId = intval($job['site_id'] ?? 1);
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':site_id'    => intval($job['site_id'] ?? 1),
+            ':site_id'    => $siteId,
             ':title'      => $job['title']      ?? null,
             ':url'        => $job['url']         ?? null,
             ':period'     => $job['period']      ?? null,
@@ -68,9 +71,24 @@ try {
             ':category'   => $job['category']    ?? null,
         ]);
         $saved++;
+
+        if (!empty($job['url'])) {
+            $urlsBySite[$siteId][] = $job['url'];
+        }
     }
 
-    echo json_encode(['success' => true, 'saved' => $saved]);
+    // 사이트별로 이번 크롤링 결과에 없는 기존 공고는 '마감' 처리
+    // (해당 사이트가 마감 공고를 목록에서 바로 제거하는 경우)
+    $closed = 0;
+    foreach ($urlsBySite as $siteId => $urls) {
+        $placeholders = implode(',', array_fill(0, count($urls), '?'));
+        $stmt = $pdo->prepare("UPDATE jobs SET status = '마감'
+            WHERE site_id = ? AND status != '마감' AND url NOT IN ({$placeholders})");
+        $stmt->execute(array_merge([$siteId], $urls));
+        $closed += $stmt->rowCount();
+    }
+
+    echo json_encode(['success' => true, 'saved' => $saved, 'closed' => $closed]);
 
 } catch (Exception $e) {
     http_response_code(500);

@@ -25,7 +25,7 @@ class DesignNineCrawler extends BaseJobCrawler {
             return 0;
         }
 
-        $saved = $this->saveJobs($jobs);
+        $saved = $this->syncJobs($jobs);
         echo "[디자인그룹나인] {$saved}개 저장 완료\n";
         return $saved;
     }

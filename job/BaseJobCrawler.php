@@ -96,8 +96,8 @@ abstract class BaseJobCrawler {
         return $saved;
     }
 
-    // 오늘 크롤링된 공고로 저장 + 목록에서 사라진(마감) 공고는 삭제
-    // 채용 사이트가 마감 공고를 목록에서 바로 제거하는 경우(OKKY 등) 사용
+    // 오늘 크롤링된 공고로 저장 + 목록에서 사라진 기존 공고는 '마감' 처리
+    // 채용 사이트가 마감 공고를 목록에서 바로 제거하는 경우(OKKY, 유니드잡, 디자인그룹나인 등) 사용
     protected function syncJobs(array $jobs) {
         $saved = $this->saveJobs($jobs);
 
@@ -110,13 +110,14 @@ abstract class BaseJobCrawler {
         }
 
         $placeholders = implode(',', array_fill(0, count($urls), '?'));
-        $sql = "DELETE FROM jobs WHERE site_id = ? AND url NOT IN ({$placeholders})";
+        $sql = "UPDATE jobs SET status = '마감'
+                WHERE site_id = ? AND status != '마감' AND url NOT IN ({$placeholders})";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(array_merge([$this->siteId], $urls));
 
-        $deleted = $stmt->rowCount();
-        if ($deleted > 0) {
-            echo "[{$this->siteCode}] 마감/삭제된 공고 {$deleted}개 제거\n";
+        $closed = $stmt->rowCount();
+        if ($closed > 0) {
+            echo "[{$this->siteCode}] 마감 처리된 공고 {$closed}개\n";
         }
 
         return $saved;
