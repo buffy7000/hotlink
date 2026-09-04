@@ -26,7 +26,7 @@ class OkkyCrawler extends BaseJobCrawler {
             return 0;
         }
 
-        $saved = $this->saveJobs($jobs);
+        $saved = $this->syncJobs($jobs);
         echo "[OKKY] {$saved}개 저장 완료\n";
         return $saved;
     }
