@@ -58,6 +58,8 @@
 
   /* card */
   .card-wrap { position: relative; margin-bottom: 8px; }
+  .card-wrap.visited { opacity: .55; transition: opacity .15s; }
+  .card-wrap.visited:hover { opacity: .85; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 42px 14px 14px; cursor: pointer; transition: border-color .15s, background .15s; text-decoration: none; display: block; }
   .card:hover { border-color: var(--accent); background: var(--surface2); }
   .card-badges { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
@@ -117,6 +119,7 @@
   var currentStatus = '접수중';
   var favOnly = false;
   var favorites = JSON.parse(localStorage.getItem('jobFavorites') || '[]');
+  var visited = JSON.parse(localStorage.getItem('jobVisited') || '[]');
   var NEWTAB_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
 
   function fetchJobs() {
@@ -168,12 +171,23 @@
     return favorites.indexOf(url) !== -1;
   }
 
+  function isVisited(url) {
+    return visited.indexOf(url) !== -1;
+  }
+
+  function markVisited(url) {
+    if (!url || isVisited(url)) return;
+    visited.push(url);
+    localStorage.setItem('jobVisited', JSON.stringify(visited));
+  }
+
   function buildCard(job, code) {
     var displayStatus = normalizeStatus(job, code);
     var isActive = displayStatus.indexOf('접수') !== -1;
     var fav = isFav(job.url);
+    var seen = isVisited(job.url);
     var h = '';
-    h += '<div class="card-wrap">';
+    h += '<div class="card-wrap' + (seen ? ' visited' : '') + '">';
     h += '<div class="card" data-url="' + esc(job.url) + '">';
     h += '<div class="card-badges">';
     h += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
@@ -355,11 +369,18 @@
     render();
   });
 
-  // 카드 클릭: 현재 창으로 이동 (새 창 아이콘 클릭 시는 제외 - 새 창 아이콘 자체가 처리)
+  // 카드 클릭: 읽음 처리 + 현재 창으로 이동 (새 창 아이콘은 새 탭으로 열리며 별도 처리)
   document.getElementById('contentEl').addEventListener('click', function (e) {
-    if (e.target.closest('.card-newtab') || e.target.closest('.fav-btn')) return;
+    var newtabLink = e.target.closest('.card-newtab');
+    if (newtabLink) {
+      markVisited(newtabLink.getAttribute('href'));
+      render();
+      return;
+    }
+    if (e.target.closest('.fav-btn')) return;
     var card = e.target.closest('.card');
     if (!card) return;
+    markVisited(card.dataset.url);
     window.location.href = card.dataset.url;
   });
 
