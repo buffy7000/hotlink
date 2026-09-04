@@ -21,6 +21,11 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; font-size: 14px; min-height: 100vh; }
 
+  /* PC 등 넓은 화면에서는 모바일처럼 가운데 좁은 폭으로 표시 */
+  @media (min-width: 640px) {
+    .page { max-width: 480px; margin: 0 auto; background: var(--surface); min-height: 100vh; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  }
+
   /* header */
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 10; }
   .header-back { color: var(--text2); text-decoration: none; font-size: 13px; }
@@ -91,6 +96,8 @@
 </head>
 <body>
 
+<div class="page">
+
 <div class="header">
   <h1><a href="/job" style="text-decoration:none;color:inherit;">💼 프리랜서 모아</a></h1>
   <button class="fav-header-btn" id="favFilterBtn">☆ 즐겨찾기</button>
@@ -109,6 +116,8 @@
 
 <div class="content" id="contentEl">
   <div class="loading"><div class="spinner"></div><br>불러오는 중...</div>
+</div>
+
 </div>
 
 <script>
