@@ -39,8 +39,16 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 
-    $sql = "INSERT INTO jobs (site_id, title, url, period, status, budget, experience, deadline, location, category)
-            VALUES (:site_id, :title, :url, :period, :status, :budget, :experience, :deadline, :location, :category)
+    // first_seen_at 컬럼이 없으면 추가 (최초 발견 시각 기록용, 신규 배지 판단에 사용)
+    try {
+        $pdo->exec("ALTER TABLE jobs ADD COLUMN first_seen_at DATETIME NULL DEFAULT NULL");
+    } catch (Exception $e) {
+        // 이미 컬럼이 있으면 무시
+    }
+
+    // first_seen_at은 INSERT 시에만 NOW()로 채우고 UPDATE에서는 건드리지 않는다
+    $sql = "INSERT INTO jobs (site_id, title, url, period, status, budget, experience, deadline, location, category, first_seen_at)
+            VALUES (:site_id, :title, :url, :period, :status, :budget, :experience, :deadline, :location, :category, NOW())
             ON DUPLICATE KEY UPDATE
                 title      = VALUES(title),
                 period     = VALUES(period),

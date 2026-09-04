@@ -72,6 +72,7 @@
   .badge-active { background: rgba(63,175,66,.18); color: var(--green); border: 1px solid rgba(63,175,66,.3); }
   .badge-closed { background: rgba(136,136,136,.15); color: var(--text3); border: 1px solid var(--border); }
   .badge-cat { background: rgba(79,156,249,.12); color: var(--accent); border: 1px solid rgba(79,156,249,.25); }
+  .badge-new { background: rgba(232,64,64,.14); color: var(--red); border: 1px solid rgba(232,64,64,.3); }
   .card-title { font-size: 14px; font-weight: 600; line-height: 1.45; color: var(--text); }
   .card-newtab { display: inline-flex; align-items: center; justify-content: center; vertical-align: -2px; margin-left: 5px; color: var(--text3); transition: color .15s; }
   .card-newtab:hover { color: var(--accent); }
@@ -184,6 +185,14 @@
     return visited.indexOf(url) !== -1;
   }
 
+  // firstSeenAt(최초 발견 시각, "YYYY-MM-DD HH:MM:SS")이 24시간 이내인지 확인
+  function isWithin24h(firstSeenAt) {
+    if (!firstSeenAt) return false;
+    var t = new Date(firstSeenAt.replace(' ', 'T')).getTime();
+    if (isNaN(t)) return false;
+    return (Date.now() - t) < 24 * 60 * 60 * 1000;
+  }
+
   function markVisited(url) {
     if (!url || isVisited(url)) return;
     visited.push(url);
@@ -202,6 +211,7 @@
     h += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
     var siteName = allData[code] && allData[code].site_name;
     if (siteName) h += '<span class="badge badge-cat">' + esc(siteName) + '</span>';
+    if (isWithin24h(job.firstSeenAt)) h += '<span class="badge badge-new">NEW</span>';
     h += '</div>';
     h += '<div class="card-title">' + esc(job.title);
     h += '<a class="card-newtab" href="' + esc(job.url) + '" target="_blank" rel="noopener" title="새 창으로 열기" aria-label="새 창으로 열기">' + NEWTAB_ICON + '</a>';

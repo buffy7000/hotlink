@@ -68,6 +68,7 @@ try {
             'agency'     => $row['agency'],
             'client'     => $row['client'],
             'crawledAt'  => $row['crawled_at'],
+            'firstSeenAt' => $row['first_seen_at'] ?? null,
         ];
     }
 

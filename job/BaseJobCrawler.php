@@ -28,6 +28,18 @@ abstract class BaseJobCrawler {
         } catch (PDOException $e) {
             die("DB 연결 실패: " . $e->getMessage());
         }
+
+        $this->ensureFirstSeenColumn();
+    }
+
+    // first_seen_at 컬럼이 없으면 추가 (최초 발견 시각 기록용, 신규 배지 판단에 사용)
+    // DEFAULT 없이 nullable로 추가해야 기존 행이 전부 "방금 등록"으로 오인되지 않음
+    private function ensureFirstSeenColumn() {
+        try {
+            $this->pdo->exec("ALTER TABLE jobs ADD COLUMN first_seen_at DATETIME NULL DEFAULT NULL");
+        } catch (PDOException $e) {
+            // 이미 컬럼이 있으면(에러코드 1060) 무시
+        }
     }
 
     abstract public function crawl();
@@ -59,8 +71,10 @@ abstract class BaseJobCrawler {
     }
 
     protected function saveJobs(array $jobs) {
-        $sql = "INSERT INTO jobs (site_id, title, url, period, status, budget, experience, deadline, location, category, agency, client)
-                VALUES (:site_id, :title, :url, :period, :status, :budget, :experience, :deadline, :location, :category, :agency, :client)
+        // first_seen_at은 INSERT 시에만 NOW()로 채우고 ON DUPLICATE KEY UPDATE에서는
+        // 건드리지 않는다 -> 그 공고가 최초로 발견된 시각이 이후 크롤링에도 그대로 유지됨
+        $sql = "INSERT INTO jobs (site_id, title, url, period, status, budget, experience, deadline, location, category, agency, client, first_seen_at)
+                VALUES (:site_id, :title, :url, :period, :status, :budget, :experience, :deadline, :location, :category, :agency, :client, NOW())
                 ON DUPLICATE KEY UPDATE
                     title      = VALUES(title),
                     period     = VALUES(period),
