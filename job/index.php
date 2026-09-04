@@ -297,7 +297,8 @@
 
   function p2(n) { return n < 10 ? '0' + n : '' + n; }
 
-  // 상태 정규화: 접수완료/마감임박 → 마감, 디자인그룹나인 기간 만료 체크
+  // 상태 정규화: 접수완료/마감임박 → 마감, 디자인그룹나인 기간 만료 체크,
+  // 마감일(deadline)이 이미 지난 경우 → 마감 (크롤링 갱신 전이라도 화면에서 즉시 반영)
   function normalizeStatus(job, siteCode) {
     var status = job.status || '';
     if (status === '접수완료' || status === '마감임박') return '마감';
@@ -310,7 +311,24 @@
         if (endYM < curYM) return '마감';
       }
     }
+
+    if (job.deadline && isDeadlinePassed(job.deadline)) return '마감';
+
     return status;
+  }
+
+  // "MM/DD" 형식의 마감일이 오늘보다 과거인지 확인 (당일 마감은 아직 접수중으로 간주)
+  function isDeadlinePassed(deadline) {
+    var m = (deadline || '').trim().match(/^(\d{2})\/(\d{2})$/);
+    if (!m) return false;
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var dlMonth = parseInt(m[1], 10);
+    var dlYear = now.getFullYear();
+    // 12월에 1월 마감일을 보면 올해가 아니라 내년 1월로 간주 (연도 넘어가는 경우 예외 처리)
+    if (now.getMonth() === 11 && dlMonth === 1) dlYear += 1;
+    var dl = new Date(dlYear, dlMonth - 1, parseInt(m[2], 10));
+    return dl.getTime() < today.getTime();
   }
 
   // period 문자열에서 종료 년월을 YYYYMM 숫자로 추출
