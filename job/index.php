@@ -66,6 +66,8 @@
   .badge-closed { background: rgba(136,136,136,.15); color: var(--text3); border: 1px solid var(--border); }
   .badge-cat { background: rgba(79,156,249,.12); color: var(--accent); border: 1px solid rgba(79,156,249,.25); }
   .card-title { font-size: 14px; font-weight: 600; line-height: 1.45; color: var(--text); }
+  .card-newtab { display: inline-flex; align-items: center; justify-content: center; vertical-align: -2px; margin-left: 5px; color: var(--text3); transition: color .15s; }
+  .card-newtab:hover { color: var(--accent); }
   .card-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text2); margin-top: 8px; }
   .meta-item { display: flex; align-items: center; gap: 3px; }
   .meta-icon { font-size: 11px; }
@@ -115,6 +117,7 @@
   var currentStatus = '접수중';
   var favOnly = false;
   var favorites = JSON.parse(localStorage.getItem('jobFavorites') || '[]');
+  var NEWTAB_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
 
   function fetchJobs() {
     fetch('/api/jobs.php')
@@ -171,13 +174,15 @@
     var fav = isFav(job.url);
     var h = '';
     h += '<div class="card-wrap">';
-    h += '<a class="card" href="' + esc(job.url) + '">';
+    h += '<div class="card" data-url="' + esc(job.url) + '">';
     h += '<div class="card-badges">';
     h += '<span class="badge ' + (isActive ? 'badge-active' : 'badge-closed') + '">' + esc(displayStatus || '-') + '</span>';
     var siteName = allData[code] && allData[code].site_name;
     if (siteName) h += '<span class="badge badge-cat">' + esc(siteName) + '</span>';
     h += '</div>';
-    h += '<div class="card-title">' + esc(job.title) + '</div>';
+    h += '<div class="card-title">' + esc(job.title);
+    h += '<a class="card-newtab" href="' + esc(job.url) + '" target="_blank" rel="noopener" title="새 창으로 열기" aria-label="새 창으로 열기">' + NEWTAB_ICON + '</a>';
+    h += '</div>';
     var metas = [];
     if (job.period)     metas.push({ icon: '📅', text: formatPeriod(job.period) });
     if (job.deadline)   metas.push({ icon: '⏰', text: job.deadline });
@@ -191,7 +196,7 @@
       });
       h += '</div>';
     }
-    h += '</a>';
+    h += '</div>';
     h += '<button class="fav-btn' + (fav ? ' active' : '') + '" data-url="' + esc(job.url) + '" title="즐겨찾기">' + (fav ? '★' : '☆') + '</button>';
     h += '</div>';
     return h;
@@ -348,6 +353,14 @@
     else { favorites.splice(idx, 1); }
     localStorage.setItem('jobFavorites', JSON.stringify(favorites));
     render();
+  });
+
+  // 카드 클릭: 현재 창으로 이동 (새 창 아이콘 클릭 시는 제외 - 새 창 아이콘 자체가 처리)
+  document.getElementById('contentEl').addEventListener('click', function (e) {
+    if (e.target.closest('.card-newtab') || e.target.closest('.fav-btn')) return;
+    var card = e.target.closest('.card');
+    if (!card) return;
+    window.location.href = card.dataset.url;
   });
 
   fetchJobs();
