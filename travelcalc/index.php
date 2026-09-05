@@ -19,8 +19,10 @@
 
   <div class="card rate-card">
     <div class="rate-info">
-      <span id="rateInfoText">환율 불러오는 중...</span>
+      <span id="rateInfoText" class="rate-info-main">환율 불러오는 중...</span>
+      <button type="button" class="rate-info-toggle" id="rateInfoToggle" aria-expanded="false" aria-label="환율 상세 정보 펼치기" style="display:none;">⌄</button>
     </div>
+    <div class="rate-info-detail" id="rateInfoDetail"></div>
 
     <div class="fixed-toggle-row">
       <label>

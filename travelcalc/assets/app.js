@@ -75,6 +75,8 @@
   var resultValue = document.getElementById('resultValue');
   var resultSub = document.getElementById('resultSub');
   var rateInfoText = document.getElementById('rateInfoText');
+  var rateInfoToggle = document.getElementById('rateInfoToggle');
+  var rateInfoDetail = document.getElementById('rateInfoDetail');
   var fixedToggle = document.getElementById('fixedToggle');
   var fixedRateWrap = document.getElementById('fixedRateWrap');
   var fixedRateInput = document.getElementById('fixedRateInput');
@@ -116,10 +118,6 @@
 
   function saveRecent(list) {
     try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) {}
-  }
-
-  function formatNumber(n) {
-    return Math.round(n).toLocaleString('ko-KR');
   }
 
   // 환산 결과(원)는 소수점 둘째 자리까지 보여주되, 소수 부분만 작은 글자로 표시
@@ -173,21 +171,49 @@
     return liveRatePer1;
   }
 
+  // 환율 상세(기준일/갱신 실패 여부)는 기본적으로 접어두고, v 버튼으로 펼치고 접을 수 있게 함
+  function closeRateDetail() {
+    rateInfoDetail.classList.remove('show');
+    rateInfoToggle.classList.remove('expanded');
+    rateInfoToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  function setRateDetail(html) {
+    if (!html) {
+      rateInfoDetail.innerHTML = '';
+      rateInfoToggle.style.display = 'none';
+      closeRateDetail();
+      return;
+    }
+    rateInfoDetail.innerHTML = html;
+    rateInfoToggle.style.display = 'inline-block';
+  }
+
+  rateInfoToggle.addEventListener('click', function () {
+    var willShow = !rateInfoDetail.classList.contains('show');
+    rateInfoDetail.classList.toggle('show', willShow);
+    rateInfoToggle.classList.toggle('expanded', willShow);
+    rateInfoToggle.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+  });
+
   function renderRateInfo() {
     if (settings.useFixed && settings.fixedRate) {
       rateInfoText.innerHTML = '고정환율 사용 중: <b>' + RATE_BASE.toLocaleString('ko-KR') + CUR_UNIT + ' = ' + formatRate(settings.fixedRate) + '원</b>';
+      setRateDetail('');
       return;
     }
     if (liveRatePer1 === null) {
       rateInfoText.textContent = '환율 불러오는 중...';
+      setRateDetail('');
       return;
     }
     var perBase = liveRatePer1 * RATE_BASE;
+    rateInfoText.innerHTML = '오늘의 환율: <b>' + RATE_BASE.toLocaleString('ko-KR') + CUR_UNIT + ' = ' + formatRate(perBase) + '원</b>';
     var dateStr = '';
     try { dateStr = new Date(liveUpdatedAt).toLocaleDateString('ko-KR'); } catch (e) {}
-    var html = '오늘의 환율: <b>' + RATE_BASE.toLocaleString('ko-KR') + CUR_UNIT + ' = ' + formatRate(perBase) + '원</b>' + (dateStr ? ' (' + dateStr + ' 기준)' : '');
-    if (liveStale) html += ' <span class="badge-stale">· 최신 갱신 실패, 이전 환율 표시 중</span>';
-    rateInfoText.innerHTML = html;
+    var detailHtml = dateStr ? (dateStr + ' 기준') : '';
+    if (liveStale) detailHtml += (detailHtml ? ' ' : '') + '<span class="badge-stale">· 최신 갱신 실패, 이전 환율 표시 중</span>';
+    setRateDetail(detailHtml);
   }
 
   function calcAndRender() {
@@ -222,7 +248,7 @@
       } catch (e) {}
       return '<div class="recent-item" data-idx="' + idx + '">' +
         '<div><div class="from">' + item.amount.toLocaleString('ko-KR', { maximumFractionDigits: 2 }) + CUR_UNIT + '</div><div class="time">' + timeStr + '</div></div>' +
-        '<div class="to">' + formatNumber(item.krw) + '원</div>' +
+        '<div class="to">' + formatResultKRW(item.krw) + '원</div>' +
         '</div>';
     }).join('');
   }
@@ -232,7 +258,7 @@
     var list = loadRecent();
     // 바로 직전 값과 동일하면 중복 기록하지 않음
     if (list.length && list[0].amount === amount) return;
-    list.unshift({ amount: amount, krw: Math.round(krw), time: Date.now() });
+    list.unshift({ amount: amount, krw: Math.round(krw * 100) / 100, time: Date.now() });
     if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
     saveRecent(list);
     renderRecent();
