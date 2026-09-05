@@ -297,14 +297,19 @@ header h1 {
 
 .rate-info-toggle.expanded { transform: rotate(180deg); }
 
-.rate-info-detail {
+.rate-card-collapsible {
   display: none;
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
-.rate-info-detail.show { display: block; }
+.rate-card-collapsible.show { display: block; }
+
+.rate-info-detail {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rate-info-detail:empty { display: none; }
 
 .badge-stale {
   color: #b45309;

@@ -77,6 +77,7 @@
   var rateInfoText = document.getElementById('rateInfoText');
   var rateInfoToggle = document.getElementById('rateInfoToggle');
   var rateInfoDetail = document.getElementById('rateInfoDetail');
+  var rateCardCollapsible = document.getElementById('rateCardCollapsible');
   var fixedToggle = document.getElementById('fixedToggle');
   var fixedRateWrap = document.getElementById('fixedRateWrap');
   var fixedRateInput = document.getElementById('fixedRateInput');
@@ -171,27 +172,15 @@
     return liveRatePer1;
   }
 
-  // 환율 상세(기준일/갱신 실패 여부)는 기본적으로 접어두고, v 버튼으로 펼치고 접을 수 있게 함
-  function closeRateDetail() {
-    rateInfoDetail.classList.remove('show');
-    rateInfoToggle.classList.remove('expanded');
-    rateInfoToggle.setAttribute('aria-expanded', 'false');
-  }
-
+  // 환율 상세(기준일/갱신 실패 여부)와 고정환율 사용 항목은 기본적으로 접어두고,
+  // v 버튼으로 한번에 펼치고 접을 수 있게 함
   function setRateDetail(html) {
-    if (!html) {
-      rateInfoDetail.innerHTML = '';
-      rateInfoToggle.style.display = 'none';
-      closeRateDetail();
-      return;
-    }
-    rateInfoDetail.innerHTML = html;
-    rateInfoToggle.style.display = 'inline-block';
+    rateInfoDetail.innerHTML = html || '';
   }
 
   rateInfoToggle.addEventListener('click', function () {
-    var willShow = !rateInfoDetail.classList.contains('show');
-    rateInfoDetail.classList.toggle('show', willShow);
+    var willShow = !rateCardCollapsible.classList.contains('show');
+    rateCardCollapsible.classList.toggle('show', willShow);
     rateInfoToggle.classList.toggle('expanded', willShow);
     rateInfoToggle.setAttribute('aria-expanded', willShow ? 'true' : 'false');
   });

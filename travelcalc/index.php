@@ -20,24 +20,27 @@
   <div class="card rate-card">
     <div class="rate-info">
       <span id="rateInfoText" class="rate-info-main">환율 불러오는 중...</span>
-      <button type="button" class="rate-info-toggle" id="rateInfoToggle" aria-expanded="false" aria-label="환율 상세 정보 펼치기" style="display:none;">⌄</button>
-    </div>
-    <div class="rate-info-detail" id="rateInfoDetail"></div>
-
-    <div class="fixed-toggle-row">
-      <label>
-        <div class="switch">
-          <input type="checkbox" id="fixedToggle">
-          <span class="slider"></span>
-        </div>
-        고정환율 사용
-      </label>
+      <button type="button" class="rate-info-toggle" id="rateInfoToggle" aria-expanded="false" aria-label="환율 상세 정보 펼치기">⌄</button>
     </div>
 
-    <div class="fixed-rate-input-wrap" id="fixedRateWrap">
-      <span id="fixedRateUnitLabel">100동 =</span>
-      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 5.2">
-      <span>원</span>
+    <div class="rate-card-collapsible" id="rateCardCollapsible">
+      <div class="rate-info-detail" id="rateInfoDetail"></div>
+
+      <div class="fixed-toggle-row">
+        <label>
+          <div class="switch">
+            <input type="checkbox" id="fixedToggle">
+            <span class="slider"></span>
+          </div>
+          고정환율 사용
+        </label>
+      </div>
+
+      <div class="fixed-rate-input-wrap" id="fixedRateWrap">
+        <span id="fixedRateUnitLabel">100동 =</span>
+        <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 5.2">
+        <span>원</span>
+      </div>
     </div>
   </div>
 
