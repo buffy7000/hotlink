@@ -219,6 +219,11 @@
     word-break: break-all;
   }
 
+  .cur-right .result-main .decimal {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
   .cur-right .cur-sub {
     font-size: 12px;
     color: var(--muted);
@@ -575,6 +580,15 @@
     return Math.round(n).toLocaleString('ko-KR');
   }
 
+  // 환산 결과(원)는 소수점 둘째 자리까지 보여주되, 소수 부분만 작은 글자로 표시
+  function formatResultKRW(n) {
+    var fixed = n.toFixed(2);
+    var dotIdx = fixed.indexOf('.');
+    var intPart = parseInt(fixed.slice(0, dotIdx), 10).toLocaleString('ko-KR');
+    var decPart = fixed.slice(dotIdx);
+    return intPart + '<span class="decimal">' + decPart + '</span>';
+  }
+
   // 환율 표시용: 결과 금액과 달리 반올림하면 값이 달라 보이므로 소수점을 살려서 표시
   function formatRate(n) {
     return n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
@@ -635,7 +649,7 @@
       return;
     }
     var result = amount * rate;
-    resultValue.textContent = formatNumber(result);
+    resultValue.innerHTML = formatResultKRW(result);
     resultSub.textContent = toKoreanUnit(result) + ' 원';
   }
 

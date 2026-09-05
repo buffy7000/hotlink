@@ -219,6 +219,11 @@
     word-break: break-all;
   }
 
+  .cur-right .result-main .decimal {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
   .cur-right .cur-sub {
     font-size: 12px;
     color: var(--muted);
@@ -429,7 +434,7 @@
         </button>
         <div class="cur-right">
           <div class="amount-input-line">
-            <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
+            <input type="text" inputmode="decimal" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
             <button type="button" class="clear-icon-btn" id="clearBtn" aria-label="입력 지우기">✕</button>
           </div>
           <div class="cur-sub" id="amountSub">0 바트</div>
@@ -575,6 +580,21 @@
     return Math.round(n).toLocaleString('ko-KR');
   }
 
+  // 환산 결과(원)는 소수점 둘째 자리까지 보여주되, 소수 부분만 작은 글자로 표시
+  function formatResultKRW(n) {
+    var fixed = n.toFixed(2);
+    var dotIdx = fixed.indexOf('.');
+    var intPart = parseInt(fixed.slice(0, dotIdx), 10).toLocaleString('ko-KR');
+    var decPart = fixed.slice(dotIdx);
+    return intPart + '<span class="decimal">' + decPart + '</span>';
+  }
+
+  // 입력값(바트)에 소수점이 있으면 반올림 없이 그대로, 정수면 기존 한글 단위 표시 사용
+  function formatAmountSub(n) {
+    if (n % 1 !== 0) return n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
+    return toKoreanUnit(n);
+  }
+
   // 환율 표시용: 결과 금액과 달리 반올림하면 값이 달라 보이므로 소수점을 살려서 표시
   function formatRate(n) {
     return n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
@@ -595,8 +615,9 @@
   }
 
   function parseAmount() {
-    var raw = amountInput.value.replace(/[^0-9]/g, '');
-    return raw ? parseInt(raw, 10) : 0;
+    var raw = amountInput.value.replace(/[^0-9.]/g, '');
+    var num = parseFloat(raw);
+    return isNaN(num) ? 0 : num;
   }
 
   function activeRatePer1() {
@@ -624,7 +645,7 @@
 
   function calcAndRender() {
     var amount = parseAmount();
-    amountSub.textContent = toKoreanUnit(amount) + ' ' + CUR_UNIT;
+    amountSub.textContent = formatAmountSub(amount) + ' ' + CUR_UNIT;
     clearBtn.style.visibility = amount > 0 ? 'visible' : 'hidden';
 
     var rate = activeRatePer1();
@@ -634,7 +655,7 @@
       return;
     }
     var result = amount * rate;
-    resultValue.textContent = formatNumber(result);
+    resultValue.innerHTML = formatResultKRW(result);
     resultSub.textContent = toKoreanUnit(result) + ' 원';
   }
 
@@ -697,8 +718,15 @@
 
   // 입력 이벤트
   amountInput.addEventListener('input', function () {
-    var digits = amountInput.value.replace(/[^0-9]/g, '');
-    amountInput.value = digits ? parseInt(digits, 10).toLocaleString('ko-KR') : '';
+    var raw = amountInput.value.replace(/[^0-9.]/g, '');
+    // 소수점은 하나만 허용
+    var dotIdx = raw.indexOf('.');
+    if (dotIdx !== -1) {
+      raw = raw.slice(0, dotIdx + 1) + raw.slice(dotIdx + 1).replace(/\./g, '');
+    }
+    var parts = raw.split('.');
+    var intPart = parts[0] ? parseInt(parts[0], 10).toLocaleString('ko-KR') : '';
+    amountInput.value = parts.length > 1 ? (intPart + '.' + parts[1]) : intPart;
     calcAndRender();
     markDirty();
   });
