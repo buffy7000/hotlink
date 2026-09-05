@@ -6,7 +6,17 @@
   // rateBase: 환율을 몇 단위 기준으로 보여줄지(동은 100단위, 바트는 1단위) / allowDecimal: 금액 입력에 소수점 허용 여부
   var CURRENCY_DIRECTORY = {
     VND: { name: '베트남', flag: '🇻🇳', href: '/travelcalc/', unit: '동', defaultAmount: 100, rateBase: 100, allowDecimal: false },
-    THB: { name: '태국', flag: '🇹🇭', href: '/travelcalc/thb.php', unit: '바트', defaultAmount: 1, rateBase: 1, allowDecimal: true }
+    THB: { name: '태국', flag: '🇹🇭', href: '/travelcalc/thb.php', unit: '바트', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    USD: { name: '미국', flag: '🇺🇸', href: '/travelcalc/usd.php', unit: '달러', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    JPY: { name: '일본', flag: '🇯🇵', href: '/travelcalc/jpy.php', unit: '엔', defaultAmount: 100, rateBase: 100, allowDecimal: false },
+    EUR: { name: '유럽', flag: '🇪🇺', href: '/travelcalc/eur.php', unit: '유로', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    CNY: { name: '중국', flag: '🇨🇳', href: '/travelcalc/cny.php', unit: '위안', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    GBP: { name: '영국', flag: '🇬🇧', href: '/travelcalc/gbp.php', unit: '파운드', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    AUD: { name: '호주', flag: '🇦🇺', href: '/travelcalc/aud.php', unit: '달러', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    CAD: { name: '캐나다', flag: '🇨🇦', href: '/travelcalc/cad.php', unit: '달러', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    NZD: { name: '뉴질랜드', flag: '🇳🇿', href: '/travelcalc/nzd.php', unit: '달러', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    HKD: { name: '홍콩', flag: '🇭🇰', href: '/travelcalc/hkd.php', unit: '달러', defaultAmount: 1, rateBase: 1, allowDecimal: true },
+    TWD: { name: '대만', flag: '🇹🇼', href: '/travelcalc/twd.php', unit: '달러', defaultAmount: 1, rateBase: 1, allowDecimal: true }
   };
 
   var CURRENCY = window.TRAVELCALC_CURRENCY;

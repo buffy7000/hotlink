@@ -119,6 +119,8 @@ header h1 {
   top: calc(100% + 6px);
   left: 0;
   min-width: 190px;
+  max-height: 320px;
+  overflow-y: auto;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 12px;

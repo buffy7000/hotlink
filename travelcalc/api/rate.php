@@ -2,7 +2,7 @@
 header('Content-Type: application/json; charset=utf-8');
 
 // 지원 통화 화이트리스트 (추후 국가 추가시 여기에 추가)
-$supported = ['VND', 'THB'];
+$supported = ['VND', 'THB', 'USD', 'JPY', 'EUR', 'CNY', 'GBP', 'AUD', 'CAD', 'NZD', 'HKD', 'TWD'];
 $from = strtoupper($_GET['from'] ?? 'VND');
 $to = 'KRW';
 
