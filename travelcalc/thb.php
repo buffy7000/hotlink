@@ -63,11 +63,16 @@
   .converter-card { padding: 10px; }
 
   .exchange-row {
+    position: relative;
+  }
+
+  .cur-box {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
-    gap: 8px;
-    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
   }
 
   .cur-left {
@@ -76,7 +81,6 @@
     gap: 8px;
     flex-shrink: 0;
     background: #eef1f6;
-    border-radius: 14px;
     padding: 10px 14px;
   }
 
@@ -153,8 +157,6 @@
     min-width: 0;
     flex: 1;
     background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 14px;
     padding: 10px 14px;
     display: flex;
     flex-direction: column;
@@ -405,21 +407,23 @@
 
   <div class="card converter-card">
     <div class="exchange-row">
-      <button type="button" class="cur-left cur-left-btn" id="curSelectBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="flag">🇹🇭</span>
-        <div class="cur-text">
-          <div class="cur-name">태국 <span class="chevron">⌄</span></div>
-          <div class="cur-code">THB</div>
+      <div class="cur-box">
+        <button type="button" class="cur-left cur-left-btn" id="curSelectBtn" aria-haspopup="true" aria-expanded="false">
+          <span class="flag">🇹🇭</span>
+          <div class="cur-text">
+            <div class="cur-name">태국 <span class="chevron">⌄</span></div>
+            <div class="cur-code">THB</div>
+          </div>
+        </button>
+        <div class="cur-right">
+          <div class="amount-input-line">
+            <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
+            <button type="button" class="clear-icon-btn" id="clearBtn" aria-label="입력 지우기">✕</button>
+          </div>
+          <div class="cur-sub" id="amountSub">0 바트</div>
         </div>
-      </button>
-      <div class="currency-popover" id="currencyPopover"></div>
-      <div class="cur-right">
-        <div class="amount-input-line">
-          <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
-          <button type="button" class="clear-icon-btn" id="clearBtn" aria-label="입력 지우기">✕</button>
-        </div>
-        <div class="cur-sub" id="amountSub">0 바트</div>
       </div>
+      <div class="currency-popover" id="currencyPopover"></div>
     </div>
 
     <div class="quick-add-row">
@@ -433,16 +437,18 @@
     <div class="equals-divider">=</div>
 
     <div class="exchange-row">
-      <div class="cur-left">
-        <span class="flag">🇰🇷</span>
-        <div class="cur-text">
-          <div class="cur-name">대한민국</div>
-          <div class="cur-code">KRW</div>
+      <div class="cur-box">
+        <div class="cur-left">
+          <span class="flag">🇰🇷</span>
+          <div class="cur-text">
+            <div class="cur-name">대한민국</div>
+            <div class="cur-code">KRW</div>
+          </div>
         </div>
-      </div>
-      <div class="cur-right">
-        <div class="result-main" id="resultValue">0</div>
-        <div class="cur-sub" id="resultSub">0 원</div>
+        <div class="cur-right">
+          <div class="result-main" id="resultValue">0</div>
+          <div class="cur-sub" id="resultSub">0 원</div>
+        </div>
       </div>
     </div>
   </div>
