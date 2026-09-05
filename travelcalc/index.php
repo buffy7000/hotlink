@@ -64,12 +64,9 @@
 
   .exchange-row {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
-    background: #f6f7fb;
-    border-radius: 14px;
-    padding: 10px 14px;
-    gap: 10px;
+    gap: 8px;
     position: relative;
   }
 
@@ -78,12 +75,13 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    background: #eef1f6;
+    border-radius: 14px;
+    padding: 10px 14px;
   }
 
   .cur-left-btn {
-    background: none;
     border: none;
-    padding: 0;
     font: inherit;
     text-align: left;
     cursor: pointer;
@@ -154,6 +152,13 @@
     text-align: right;
     min-width: 0;
     flex: 1;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .amount-input-line {
@@ -457,6 +462,7 @@
 
   var CURRENCY = 'VND';
   var CUR_UNIT = '동';
+  var DEFAULT_AMOUNT = 100; // 베트남 동은 화폐 기본단위가 100 단위라 100을 기본 입력값으로 사용
   var SETTINGS_KEY = 'travelcalc_settings_' + CURRENCY;
   var RECENT_KEY = 'travelcalc_recent_' + CURRENCY;
   var LAST_CURRENCY_KEY = 'travelcalc_last_currency';
@@ -505,6 +511,7 @@
   });
 
   var amountInput = document.getElementById('amountInput');
+  amountInput.value = DEFAULT_AMOUNT.toLocaleString('ko-KR');
   var amountSub = document.getElementById('amountSub');
   var clearBtn = document.getElementById('clearBtn');
   var resultValue = document.getElementById('resultValue');
