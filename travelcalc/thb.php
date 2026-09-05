@@ -80,6 +80,7 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    width: 130px;
     background: #eef1f6;
     padding: 10px 14px;
   }
@@ -104,8 +105,10 @@
   }
 
   .cur-text .cur-name .chevron {
-    font-size: 11px;
-    color: var(--muted);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
   }
 
   .cur-text .cur-code {
