@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>여행 환율 계산기 - 베트남 동(VND) → 원화</title>
-<meta name="description" content="베트남 동(VND)을 원화로 환산하는 여행 환율 계산기. 실시간 환율 또는 고정환율을 선택할 수 있습니다.">
+<title>여행 환율 계산기 - 태국 바트(THB) → 원화</title>
+<meta name="description" content="태국 바트(THB)를 원화로 환산하는 여행 환율 계산기. 실시간 환율 또는 고정환율을 선택할 수 있습니다.">
 <link rel="icon" href="/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -392,8 +392,8 @@
     </div>
 
     <div class="fixed-rate-input-wrap" id="fixedRateWrap">
-      <span>100동 =</span>
-      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 5.2">
+      <span>1바트 =</span>
+      <input type="text" inputmode="decimal" id="fixedRateInput" placeholder="예: 38.5">
       <span>원</span>
     </div>
   </div>
@@ -401,10 +401,10 @@
   <div class="card converter-card">
     <div class="exchange-row">
       <button type="button" class="cur-left cur-left-btn" id="curSelectBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="flag">🇻🇳</span>
+        <span class="flag">🇹🇭</span>
         <div class="cur-text">
-          <div class="cur-name">베트남 <span class="chevron">⌄</span></div>
-          <div class="cur-code">VND</div>
+          <div class="cur-name">태국 <span class="chevron">⌄</span></div>
+          <div class="cur-code">THB</div>
         </div>
       </button>
       <div class="currency-popover" id="currencyPopover"></div>
@@ -413,16 +413,16 @@
           <input type="text" inputmode="numeric" id="amountInput" class="amount-input" placeholder="0" autocomplete="off">
           <button type="button" class="clear-icon-btn" id="clearBtn" aria-label="입력 지우기">✕</button>
         </div>
-        <div class="cur-sub" id="amountSub">0 동</div>
+        <div class="cur-sub" id="amountSub">0 바트</div>
       </div>
     </div>
 
     <div class="quick-add-row">
+      <button class="quick-add-btn" data-add="100">+100</button>
+      <button class="quick-add-btn" data-add="500">+500</button>
       <button class="quick-add-btn" data-add="1000">+1,000</button>
       <button class="quick-add-btn" data-add="5000">+5,000</button>
       <button class="quick-add-btn" data-add="10000">+10,000</button>
-      <button class="quick-add-btn" data-add="50000">+50,000</button>
-      <button class="quick-add-btn" data-add="100000">+100,000</button>
     </div>
 
     <div class="equals-divider">=</div>
@@ -455,8 +455,8 @@
 (function () {
   'use strict';
 
-  var CURRENCY = 'VND';
-  var CUR_UNIT = '동';
+  var CURRENCY = 'THB';
+  var CUR_UNIT = '바트';
   var SETTINGS_KEY = 'travelcalc_settings_' + CURRENCY;
   var RECENT_KEY = 'travelcalc_recent_' + CURRENCY;
   var LAST_CURRENCY_KEY = 'travelcalc_last_currency';
@@ -470,7 +470,7 @@
 
   try { localStorage.setItem(LAST_CURRENCY_KEY, CURRENCY); } catch (e) {}
 
-  // 통화명("베트남" 등)을 눌러 다른 통화 페이지로 이동할 수 있는 팝업 목록
+  // 통화명("태국" 등)을 눌러 다른 통화 페이지로 이동할 수 있는 팝업 목록
   var curSelectBtn = document.getElementById('curSelectBtn');
   var currencyPopover = document.getElementById('currencyPopover');
 
@@ -516,7 +516,7 @@
   var recentList = document.getElementById('recentList');
   var recentClearBtn = document.getElementById('recentClearBtn');
 
-  var liveRatePer1 = null;      // 1 VND = ? KRW (실시간)
+  var liveRatePer1 = null;      // 1 THB = ? KRW (실시간)
   var liveUpdatedAt = null;
   var liveStale = false;
 
@@ -525,7 +525,7 @@
       var raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
-    return { useFixed: false, fixedRatePer100: null };
+    return { useFixed: false, fixedRate: null };
   }
 
   function saveSettings(settings) {
@@ -575,25 +575,24 @@
   }
 
   function activeRatePer1() {
-    if (settings.useFixed && settings.fixedRatePer100) {
-      return settings.fixedRatePer100 / 100;
+    if (settings.useFixed && settings.fixedRate) {
+      return settings.fixedRate;
     }
     return liveRatePer1;
   }
 
   function renderRateInfo() {
-    if (settings.useFixed && settings.fixedRatePer100) {
-      rateInfoText.innerHTML = '고정환율 사용 중: <b>100동 = ' + formatRate(settings.fixedRatePer100) + '원</b>';
+    if (settings.useFixed && settings.fixedRate) {
+      rateInfoText.innerHTML = '고정환율 사용 중: <b>1바트 = ' + formatRate(settings.fixedRate) + '원</b>';
       return;
     }
     if (liveRatePer1 === null) {
       rateInfoText.textContent = '환율 불러오는 중...';
       return;
     }
-    var per100 = liveRatePer1 * 100;
     var dateStr = '';
     try { dateStr = new Date(liveUpdatedAt).toLocaleDateString('ko-KR'); } catch (e) {}
-    var html = '오늘의 환율: <b>100동 = ' + formatRate(per100) + '원</b>' + (dateStr ? ' (' + dateStr + ' 기준)' : '');
+    var html = '오늘의 환율: <b>1바트 = ' + formatRate(liveRatePer1) + '원</b>' + (dateStr ? ' (' + dateStr + ' 기준)' : '');
     if (liveStale) html += ' <span class="badge-stale">· 최신 갱신 실패, 이전 환율 표시 중</span>';
     rateInfoText.innerHTML = html;
   }
@@ -719,16 +718,16 @@
   // 고정환율 토글
   fixedToggle.checked = !!settings.useFixed;
   fixedRateWrap.classList.toggle('show', !!settings.useFixed);
-  if (settings.fixedRatePer100) {
-    fixedRateInput.value = settings.fixedRatePer100;
+  if (settings.fixedRate) {
+    fixedRateInput.value = settings.fixedRate;
   }
 
   fixedToggle.addEventListener('change', function () {
     settings.useFixed = fixedToggle.checked;
-    if (settings.useFixed && !settings.fixedRatePer100 && liveRatePer1 !== null) {
+    if (settings.useFixed && !settings.fixedRate && liveRatePer1 !== null) {
       // 처음 켤 때 현재 실시간 환율값을 기본값으로 채워줌
-      settings.fixedRatePer100 = Math.round(liveRatePer1 * 100 * 100) / 100;
-      fixedRateInput.value = settings.fixedRatePer100;
+      settings.fixedRate = Math.round(liveRatePer1 * 100) / 100;
+      fixedRateInput.value = settings.fixedRate;
     }
     saveSettings(settings);
     fixedRateWrap.classList.toggle('show', settings.useFixed);
@@ -738,7 +737,7 @@
 
   fixedRateInput.addEventListener('input', function () {
     var val = parseFloat(fixedRateInput.value.replace(/,/g, ''));
-    settings.fixedRatePer100 = isNaN(val) ? null : val;
+    settings.fixedRate = isNaN(val) ? null : val;
     saveSettings(settings);
     renderRateInfo();
     calcAndRender();
