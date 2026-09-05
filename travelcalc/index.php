@@ -90,6 +90,22 @@
     font: inherit;
     text-align: left;
     cursor: pointer;
+    justify-content: space-between;
+  }
+
+  .cur-left-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .cur-left-btn .chevron {
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
   }
 
   .cur-left .flag { font-size: 24px; line-height: 1; }
@@ -99,16 +115,6 @@
     font-weight: 700;
     color: var(--text);
     line-height: 1.25;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-
-  .cur-text .cur-name .chevron {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
   }
 
   .cur-text .cur-code {
@@ -412,11 +418,14 @@
     <div class="exchange-row">
       <div class="cur-box">
         <button type="button" class="cur-left cur-left-btn" id="curSelectBtn" aria-haspopup="true" aria-expanded="false">
-          <span class="flag">🇻🇳</span>
-          <div class="cur-text">
-            <div class="cur-name">베트남 <span class="chevron">⌄</span></div>
-            <div class="cur-code">VND</div>
+          <div class="cur-left-info">
+            <span class="flag">🇻🇳</span>
+            <div class="cur-text">
+              <div class="cur-name">베트남</div>
+              <div class="cur-code">VND</div>
+            </div>
           </div>
+          <span class="chevron">⌄</span>
         </button>
         <div class="cur-right">
           <div class="amount-input-line">
