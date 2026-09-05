@@ -1,0 +1,379 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --muted: #64748b;
+  --accent: #059669;
+}
+
+body {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+header {
+  padding: 20px 0 12px;
+}
+
+header a.home-link {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+header h1 {
+  font-size: 21px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.converter-card { padding: 10px; }
+
+.exchange-row {
+  position: relative;
+}
+
+.cur-box {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.cur-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 130px;
+  background: #eef1f6;
+  padding: 10px 14px;
+}
+
+.cur-left-btn {
+  border: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.cur-left-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cur-left-btn .chevron {
+  flex-shrink: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.cur-left .flag { font-size: 24px; line-height: 1; }
+
+.cur-text .cur-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.cur-text .cur-code {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.currency-popover {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 190px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+  padding: 6px;
+  z-index: 30;
+}
+
+.currency-popover.show { display: block; }
+
+.currency-popover .cp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.currency-popover .cp-item:active { background: #f1f5f9; }
+.currency-popover .cp-item.active { color: var(--primary); }
+.currency-popover .cp-item .flag { font-size: 18px; }
+.currency-popover .cp-item .cp-code {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.cur-right {
+  text-align: right;
+  min-width: 0;
+  flex: 1;
+  background: #ffffff;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.amount-input-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.cur-right .amount-input {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  text-align: right;
+  font-size: 24px;
+  font-weight: 800;
+  font-family: inherit;
+  color: var(--text);
+  padding: 0;
+}
+
+.clear-icon-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: #e2e6ee;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.clear-icon-btn:active { background: #cbd2e0; }
+
+.cur-right .result-main {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  word-break: break-all;
+}
+
+.cur-right .result-main .decimal {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cur-right .cur-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* X 아이콘(22px)+간격(6px)만큼 오른쪽을 비워서 숫자 입력란의 우측 끝과 세로로 맞춤 */
+#amountSub {
+  padding-right: 28px;
+}
+
+.equals-divider {
+  text-align: center;
+  color: #b0b6c2;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 0;
+}
+
+.quick-add-row {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.quick-add-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 0;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.quick-add-btn:active { background: #eff6ff; }
+
+/* 소형 화면(~380px 이하)에서도 5개 버튼 텍스트가 안 잘리도록 축소 */
+@media (max-width: 380px) {
+  .quick-add-row { gap: 3px; }
+  .quick-add-btn { font-size: 9.5px; }
+}
+
+.rate-info {
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rate-info b { color: var(--text); }
+
+.badge-stale {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.fixed-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.fixed-toggle-row label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #cbd5e1; border-radius: 22px; transition: 0.2s;
+}
+.slider::before {
+  content: ""; position: absolute; height: 16px; width: 16px;
+  left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s;
+}
+input:checked + .slider { background: var(--primary); }
+input:checked + .slider::before { transform: translateX(18px); }
+
+.fixed-rate-input-wrap {
+  display: none;
+  margin-top: 10px;
+  align-items: center;
+  gap: 8px;
+}
+.fixed-rate-input-wrap.show { display: flex; }
+.fixed-rate-input-wrap span { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.fixed-rate-input-wrap input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.recent-item:last-child { border-bottom: none; }
+.recent-item:active { background: #f8fafc; }
+
+.recent-item .from { font-size: 14px; font-weight: 600; }
+.recent-item .to { font-size: 14px; font-weight: 700; color: var(--primary-dark); }
+.recent-item .time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.empty-recent {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  padding: 12px 0;
+}
+
+.recent-clear {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+}
