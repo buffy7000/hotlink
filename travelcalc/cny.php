@@ -69,11 +69,11 @@
     </div>
 
     <div class="quick-add-row">
+      <button class="quick-add-btn" data-add="10">+10</button>
       <button class="quick-add-btn" data-add="50">+50</button>
       <button class="quick-add-btn" data-add="100">+100</button>
+      <button class="quick-add-btn" data-add="200">+200</button>
       <button class="quick-add-btn" data-add="500">+500</button>
-      <button class="quick-add-btn" data-add="1000">+1,000</button>
-      <button class="quick-add-btn" data-add="5000">+5,000</button>
     </div>
 
     <div class="equals-divider">=</div>
