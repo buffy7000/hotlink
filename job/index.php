@@ -193,6 +193,14 @@
     return (Date.now() - t) < 24 * 60 * 60 * 1000;
   }
 
+  // NEW(24시간 이내) 공고를 우선 정렬, 그다음 최근 크롤링순
+  function compareJobs(a, b) {
+    var aNew = isWithin24h(a.firstSeenAt);
+    var bNew = isWithin24h(b.firstSeenAt);
+    if (aNew !== bNew) return aNew ? -1 : 1;
+    return (b.crawledAt || '').localeCompare(a.crawledAt || '');
+  }
+
   function markVisited(url) {
     if (!url || isVisited(url)) return;
     visited.push(url);
@@ -249,9 +257,7 @@
           flatJobs.push({ job: j, code: code });
         });
       });
-      flatJobs.sort(function (a, b) {
-        return (b.job.crawledAt || '').localeCompare(a.job.crawledAt || '');
-      });
+      flatJobs.sort(function (a, b) { return compareJobs(a.job, b.job); });
       flatJobs.forEach(function (item) { html += buildCard(item.job, item.code); });
 
     } else {
@@ -262,6 +268,7 @@
           if (currentStatus === 'all') return true;
           return normalizeStatus(j, currentSite).indexOf(currentStatus) !== -1;
         });
+        jobs.sort(compareJobs);
         if (jobs.length > 0) {
           html += '<div class="section">';
           html += '<div class="section-header">';
