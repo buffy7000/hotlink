@@ -1144,10 +1144,29 @@ function escapeOgContent($content) {
   }
 }
 
+/* PC에서도 모바일과 동일한 폭으로 중앙 정렬 (헤더/내비/리스트가 서로 다른 폭으로 어긋나 보이는 문제 해결) */
+.page-shell {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--card-bg-color);
+  min-height: 100vh;
+}
+
+@media (min-width: 801px) {
+  body {
+    background: #e9edf2;
+  }
+  .page-shell {
+    box-shadow: 0 0 0 1px var(--border-color), 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+}
+
   </style>
 
 </head>
 <body>
+
+<div class="page-shell">
 
 <div class="header">
   <div class="header-nav">
@@ -1429,6 +1448,7 @@ function escapeOgContent($content) {
     </div>
   </div>
 
+</div><!-- /.page-shell -->
 
 <script>
     (function() {
