@@ -28,3 +28,8 @@ jobs:
             README.md
             .git/**
             stocks/**
+            config/db_credentials.php
+            coupang/coupang_credentials.php
+            crawler/config/crawler_api_key.php
+            crawler/config/slack_webhook.php
+            job/config/job_api_key.php
