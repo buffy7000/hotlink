@@ -129,8 +129,9 @@ function debug_hmac($method, $path, $query, $access_key, $secret_key) {
 
 // 골드박스 API 테스트 함수
 function test_goldbox_api() {
-    $access_key = '***REMOVED***';
-    $secret_key = '***REMOVED***';
+    require_once __DIR__ . '/coupang_credentials.php';
+    $access_key = COUPANG_ACCESS_KEY;
+    $secret_key = COUPANG_SECRET_KEY;
     
     $method = 'GET';
     $url = 'https://api-gateway.coupang.com/v2/providers/affiliate_open_api/apis/openapi/products/goldbox';

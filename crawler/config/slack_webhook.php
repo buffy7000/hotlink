@@ -1,2 +1,0 @@
-<?php
-define('SLACK_WEBHOOK_URL', 'https://hooks.slack.com/services/***REMOVED***');

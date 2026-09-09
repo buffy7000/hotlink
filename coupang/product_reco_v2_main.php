@@ -7,6 +7,7 @@
 
 // Include HMAC client
 require_once 'hmac_client.php';
+require_once __DIR__ . '/coupang_credentials.php';
 
 // Define the request body
 $request = [
@@ -34,9 +35,9 @@ $request = [
     ]
 ];
 
-// API credentials - replace with your actual keys
-$access_key = '***REMOVED***';
-$secret_key = '***REMOVED***';
+// API credentials
+$access_key = COUPANG_ACCESS_KEY;
+$secret_key = COUPANG_SECRET_KEY;
 
 try {
     // Send request to Coupang API

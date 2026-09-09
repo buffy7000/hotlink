@@ -9,9 +9,10 @@ ini_set('display_errors', 'stderr');
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/hmac_client.php';
+require_once __DIR__ . '/coupang_credentials.php';
 
-$accessKey = '***REMOVED***';
-$secretKey = '***REMOVED***';
+$accessKey = COUPANG_ACCESS_KEY;
+$secretKey = COUPANG_SECRET_KEY;
 $method = 'GET';
 $url = 'https://api-gateway.coupang.com/v2/providers/affiliate_open_api/apis/openapi/products/goldbox';
 $query = 'subId=hotlink1&imageSize=200x200';

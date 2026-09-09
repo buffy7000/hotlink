@@ -7,12 +7,13 @@
 // 기존 DB 클래스와 HMAC 클라이언트 로드
 require_once(__DIR__ . '/../deal/SimpleHotdealDB.php');
 require_once(__DIR__ . '/hmac_client.php');
+require_once(__DIR__ . '/coupang_credentials.php');
 
 class CoupangGoldboxCrawler {
     private $db;
     private $sourceId = 99; // 쿠팡 골드박스용 source_id
-    private $accessKey = '***REMOVED***';
-    private $secretKey = '***REMOVED***';
+    private $accessKey = COUPANG_ACCESS_KEY;
+    private $secretKey = COUPANG_SECRET_KEY;
     
     public function __construct() {
         $this->db = new SimpleHotdealDB();

@@ -8,9 +8,10 @@ ini_set('display_errors', 'stderr');
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/hmac_client.php';
+require_once __DIR__ . '/coupang_credentials.php';
 
-$accessKey = '***REMOVED***';
-$secretKey = '***REMOVED***';
+$accessKey = COUPANG_ACCESS_KEY;
+$secretKey = COUPANG_SECRET_KEY;
 $method = 'GET';
 
 // categoryId는 실제 API 호출로 검증된 값 (1012=로켓프레시/식품, 1015=생활용품, 1016=가전디지털)

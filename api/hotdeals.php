@@ -8,6 +8,8 @@ header('Access-Control-Allow-Headers: Content-Type');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+require_once __DIR__ . '/../config/db_credentials.php';
+
 try {
     // 파라미터 받기
     $source = $_GET['source'] ?? 'all';
@@ -15,12 +17,12 @@ try {
     $sort = $_GET['sort'] ?? 'latest';
     $time = $_GET['time'] ?? '24h';
     $id = $_GET['id'] ?? null;
-    
+
     // DB 연결
     $pdo = new PDO(
-        'mysql:host=localhost;port=3306;dbname=pricetag_hotdeal;charset=utf8mb4',
-        'pricetag_pricetag',
-        '***REMOVED***',
+        'mysql:host=' . DB_HOST . ';port=3306;dbname=pricetag_hotdeal;charset=utf8mb4',
+        DB_USER,
+        DB_PASS,
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC

@@ -16,8 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 date_default_timezone_set("GMT+0");
 
 // API 설정
-$ACCESS_KEY = "***REMOVED***";
-$SECRET_KEY = "***REMOVED***";
+require_once __DIR__ . '/coupang_credentials.php';
+$ACCESS_KEY = COUPANG_ACCESS_KEY;
+$SECRET_KEY = COUPANG_SECRET_KEY;
 $SUB_ID = "hotlink1";
 $IMAGE_SIZE = "80x80";
 

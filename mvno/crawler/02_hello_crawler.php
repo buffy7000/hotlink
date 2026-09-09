@@ -13,10 +13,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // DB 설정
-$DB_HOST = 'localhost';
+require_once __DIR__ . '/../../config/db_credentials.php';
+$DB_HOST = DB_HOST;
 $DB_NAME = 'pricetag_mvno';
-$DB_USER = 'pricetag_pricetag';
-$DB_PASS = '***REMOVED***';
+$DB_USER = DB_USER;
+$DB_PASS = DB_PASS;
 
 // 크롤링 설정
 $API_URL = 'https://direct.lghellovision.net/event/ajaxEventList.do';

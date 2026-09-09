@@ -9,6 +9,7 @@ if (!file_exists($secretFile)) {
     exit;
 }
 require $secretFile; // defines JOB_API_KEY constant
+require_once __DIR__ . '/../../config/db_credentials.php';
 
 $receivedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
 if (!hash_equals(JOB_API_KEY, $receivedKey)) {
@@ -33,9 +34,9 @@ if (!is_array($jobs) || empty($jobs)) {
 
 try {
     $pdo = new PDO(
-        'mysql:host=localhost;dbname=pricetag_job;charset=utf8mb4',
-        'pricetag_job',
-        '***REMOVED***',
+        'mysql:host=' . DB_HOST . ';dbname=pricetag_job;charset=utf8mb4',
+        DB_USER_JOB,
+        DB_PASS_JOB,
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 

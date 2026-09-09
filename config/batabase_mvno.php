@@ -1,13 +1,15 @@
 <?php
+require_once __DIR__ . '/db_credentials.php';
+
 class SimpleEventDB {
     private $pdo;
-    
+
     public function __construct() {
         try {
-            $host = 'localhost';
+            $host = DB_HOST;
             $dbname = 'pricetag_mvno';  // DB명 확인
-            $username = 'pricetag_pricetag';  // 사용자명 확인
-            $password = '***REMOVED***';  // 비밀번호 입력
+            $username = DB_USER;
+            $password = DB_PASS;
             
             $this->pdo = new PDO(
                 "mysql:host=$host;dbname=$dbname;charset=utf8mb4",

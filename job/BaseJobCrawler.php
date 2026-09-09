@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../config/db_credentials.php';
+
 abstract class BaseJobCrawler {
     protected $pdo;
     protected $siteId;
@@ -16,9 +18,9 @@ abstract class BaseJobCrawler {
 
         try {
             $this->pdo = new PDO(
-                'mysql:host=localhost;dbname=pricetag_job;charset=utf8mb4',
-                'pricetag_job',
-                '***REMOVED***',
+                'mysql:host=' . DB_HOST . ';dbname=pricetag_job;charset=utf8mb4',
+                DB_USER_JOB,
+                DB_PASS_JOB,
                 [
                     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

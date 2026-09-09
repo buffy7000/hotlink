@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/db_credentials.php';
+
 class Database {
-    private $host = 'localhost';
+    private $host = DB_HOST;
     private $dbname = 'pricetag_hotpdeal';  // 당신의 DB명
-    private $username = 'pricetag_pricetag'; // 패스트코멧 DB 사용자명으로 변경
-    private $password = '***REMOVED***'; // 패스트코멧 DB 비밀번호로 변경
+    private $username = DB_USER;
+    private $password = DB_PASS;
     private $pdo;
     
     public function __construct() {

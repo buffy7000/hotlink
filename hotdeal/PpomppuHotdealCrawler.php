@@ -3,16 +3,18 @@
  * 수정된 핫딜 크롤러 기본 클래스 (DB 연결 수정)
  */
 
+require_once __DIR__ . '/../config/db_credentials.php';
+
 // 직접 DB 연결 (기존 config 파일 문제 회피)
 class HotdealDatabase {
     private $pdo;
-    
+
     public function __construct() {
         try {
             $this->pdo = new PDO(
-                'mysql:host=localhost:3306;dbname=pricetag_hotdeal;charset=utf8mb4',
-                'pricetag_pricetag',
-                '***REMOVED***',
+                'mysql:host=' . DB_HOST . ':3306;dbname=pricetag_hotdeal;charset=utf8mb4',
+                DB_USER,
+                DB_PASS,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

@@ -6,10 +6,11 @@
 
 // hmac_client.php 파일을 포함
 require_once 'hmac_client.php';
+require_once __DIR__ . '/coupang_credentials.php';
 
 // API 인증 정보
-$access_key = '***REMOVED***';
-$secret_key = '***REMOVED***';
+$access_key = COUPANG_ACCESS_KEY;
+$secret_key = COUPANG_SECRET_KEY;
 
 // 골드박스 API 정보
 $method = 'GET';

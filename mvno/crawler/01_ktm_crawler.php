@@ -8,11 +8,9 @@
  * 또는 웹 브라우저에서: https://hotlink.kr/mvno/crawler/01_ktm_crawler.php
  */
 
-// DB 설정 (실제 값으로 변경 필요)
-define('DB_HOST', 'localhost');
+// DB 설정
+require_once __DIR__ . '/../../config/db_credentials.php';
 define('DB_NAME', 'pricetag_mvno');
-define('DB_USER', 'pricetag_pricetag');
-define('DB_PASS', '***REMOVED***');
 
 // 크롤링 설정
 define('API_URL', 'https://www.ktmmobile.com/event/eventListAjax.do');

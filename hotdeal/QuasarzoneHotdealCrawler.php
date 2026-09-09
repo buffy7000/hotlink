@@ -4,15 +4,17 @@
  * 파일명: QuasarzoneMultiPageCrawler.php
  */
 
+require_once __DIR__ . '/../config/db_credentials.php';
+
 // DB 연결 클래스
 class SimpleHotdealDB {
     private $pdo;
-    
+
     public function __construct() {
         $this->pdo = new PDO(
-            'mysql:host=localhost;port=3306;dbname=pricetag_hotdeal;charset=utf8mb4',
-            'pricetag_pricetag',
-            '***REMOVED***',
+            'mysql:host=' . DB_HOST . ';port=3306;dbname=pricetag_hotdeal;charset=utf8mb4',
+            DB_USER,
+            DB_PASS,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
         );
     }
