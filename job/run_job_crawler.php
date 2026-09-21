@@ -9,6 +9,7 @@ require_once JOB_CRAWLERS_DIR . '/crawler_designnine.php';
 require_once JOB_CRAWLERS_DIR . '/crawler_uneedjob.php';
 require_once JOB_CRAWLERS_DIR . '/crawler_okky.php';
 require_once JOB_CRAWLERS_DIR . '/crawler_jobkorea.php';
+require_once JOB_CRAWLERS_DIR . '/crawler_webcruit.php';
 
 function jobLog($message) {
     $logDir  = dirname(__DIR__) . '/logs';
@@ -28,6 +29,7 @@ $crawlers = [
     'UneedJobCrawler'   => '유니드잡',
     'OkkyCrawler'       => 'OKKY',
     'JobKoreaCrawler'   => '잡코리아',
+    'WebcruitCrawler'   => '웹크루트',
 ];
 
 $totalSaved = 0;

@@ -44,6 +44,24 @@ abstract class BaseJobCrawler {
         }
     }
 
+    // sites 테이블에 이 사이트 행이 없으면 추가 (신규 사이트 크롤러 추가 시 DB에 직접 접속하지 않아도 되도록)
+    protected function ensureSiteRow($name, $url) {
+        try {
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO sites (id, code, name, url) VALUES (:id, :code, :name, :url)
+                 ON DUPLICATE KEY UPDATE name = VALUES(name), url = VALUES(url)"
+            );
+            $stmt->execute([
+                ':id'   => $this->siteId,
+                ':code' => $this->siteCode,
+                ':name' => $name,
+                ':url'  => $url,
+            ]);
+        } catch (PDOException $e) {
+            // sites 테이블 구조 문제 등은 무시 (필요 시 수동으로 추가)
+        }
+    }
+
     abstract public function crawl();
 
     protected function makeRequest($url) {
