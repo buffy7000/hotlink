@@ -135,6 +135,27 @@
   // ---------- 카메라로 바코드 스캔 (설정에서 켰을 때만 노출) ----------
   let cameraReader = null;
   let cameraControls = null;
+  let cameraIdleTimer = null;
+  let scanCooldownUntil = 0;
+  const CAMERA_IDLE_MS = 60000; // 1분간 인식이 없으면 자동 종료
+  const SCAN_COOLDOWN_MS = 1200; // 같은 바코드를 연속으로 중복 인식하지 않도록 잠깐 쉬는 시간
+
+  function resetCameraIdleTimer() {
+    if (cameraIdleTimer) clearTimeout(cameraIdleTimer);
+    cameraIdleTimer = setTimeout(closeCameraScan, CAMERA_IDLE_MS);
+  }
+
+  function clearCameraIdleTimer() {
+    if (cameraIdleTimer) {
+      clearTimeout(cameraIdleTimer);
+      cameraIdleTimer = null;
+    }
+  }
+
+  function isCameraScanBlocked() {
+    // 상품 등록 팝업이나 결제 완료 화면이 떠 있을 때는 뒤에서 계속 도는 카메라 인식 결과를 무시한다
+    return !registerModal.classList.contains('hidden') || !checkoutOverlay.classList.contains('hidden');
+  }
 
   function applyCameraScanVisibility() {
     btnCameraScan.classList.toggle('hidden', !cameraScanEnabled);
@@ -183,14 +204,16 @@
         { video: { facingMode: { ideal: 'environment' } } },
         cameraVideo,
         (result) => {
-          if (result) {
-            const code = result.getText();
-            closeCameraScan();
-            handleScan(code);
-          }
+          if (!result || isCameraScanBlocked()) return;
+          const now = Date.now();
+          if (now < scanCooldownUntil) return;
+          scanCooldownUntil = now + SCAN_COOLDOWN_MS;
+          resetCameraIdleTimer();
+          handleScan(result.getText());
           // 바코드를 못 찾은 프레임에서는 계속 error가 들어오는 게 정상이라 무시한다
         }
       );
+      resetCameraIdleTimer();
     } catch (err) {
       if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
         showCameraError('카메라 권한이 필요해요. 브라우저 설정에서 카메라 접근을 허용해주세요.');
@@ -203,6 +226,7 @@
   }
 
   function closeCameraScan() {
+    clearCameraIdleTimer();
     if (cameraControls) {
       cameraControls.stop();
       cameraControls = null;
