@@ -382,6 +382,14 @@
 
   btnRegisterCancel.addEventListener('click', closeRegisterModal);
 
+  document.querySelectorAll('.price-add-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const amount = parseInt(btn.dataset.amount, 10);
+      const current = parseInt(registerPrice.value, 10) || 0;
+      registerPrice.value = String(current + amount);
+    });
+  });
+
   registerPhotoInput.addEventListener('change', () => {
     const file = registerPhotoInput.files[0];
     if (!file) return;

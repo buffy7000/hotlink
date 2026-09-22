@@ -35,8 +35,8 @@
         </div>
 
         <div class="scan-buttons">
-          <button id="btn-manual-toggle" class="ghost-btn">⌨️ 바코드 직접 입력</button>
-          <button id="btn-camera-scan" class="ghost-btn hidden">📷 카메라로 스캔</button>
+          <button id="btn-manual-toggle" class="ghost-btn">⌨️ 바코드 입력</button>
+          <button id="btn-camera-scan" class="ghost-btn hidden">📷 카메라</button>
         </div>
 
         <form id="manual-form" class="manual-form hidden">
@@ -107,6 +107,12 @@
 
       <label class="field-label">가격 (원)</label>
       <input type="text" id="register-price" class="field-input" inputmode="numeric" pattern="[0-9]*" placeholder="예: 1500">
+      <div class="price-quick-add">
+        <button type="button" class="price-add-btn" data-amount="500">+500</button>
+        <button type="button" class="price-add-btn" data-amount="1000">+1,000</button>
+        <button type="button" class="price-add-btn" data-amount="5000">+5,000</button>
+        <button type="button" class="price-add-btn" data-amount="10000">+10,000</button>
+      </div>
 
       <div class="modal-actions">
         <button id="btn-register-cancel" class="ghost-btn">취소</button>
