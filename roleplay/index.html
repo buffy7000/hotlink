@@ -33,16 +33,6 @@
           <div class="speech-bubble">바코드를 <strong>삑!</strong> 찍어주세요</div>
           <div id="mascot-big" class="mascot-big"></div>
         </div>
-
-        <div class="scan-buttons">
-          <button id="btn-manual-toggle" class="ghost-btn">⌨️ 바코드 입력</button>
-          <button id="btn-camera-scan" class="ghost-btn hidden">📷 카메라</button>
-        </div>
-
-        <form id="manual-form" class="manual-form hidden">
-          <input type="text" id="manual-input" placeholder="바코드 숫자 입력" inputmode="numeric" pattern="[0-9]*">
-          <button type="submit" class="primary-btn small">추가</button>
-        </form>
       </section>
 
       <section class="cart-panel">
@@ -80,6 +70,19 @@
           </label>
         </div>
         <p class="settings-hint">켜면 스캐너 없이도 태블릿/휴대폰 카메라로 바코드를 찍을 수 있어요.</p>
+      </div>
+
+      <div class="settings-card">
+        <p class="settings-card-title">🔎 바코드로 상품 추가</p>
+        <div class="scan-buttons">
+          <button id="btn-manual-toggle" class="ghost-btn">⌨️ 바코드 입력</button>
+          <button id="btn-camera-scan" class="ghost-btn hidden">📷 카메라</button>
+        </div>
+
+        <form id="manual-form" class="manual-form hidden">
+          <input type="text" id="manual-input" placeholder="바코드 숫자 입력" inputmode="numeric" pattern="[0-9]*">
+          <button type="submit" class="primary-btn small">추가</button>
+        </form>
       </div>
 
       <ul id="product-list" class="product-list"></ul>

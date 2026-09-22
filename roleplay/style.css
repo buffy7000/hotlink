@@ -468,6 +468,20 @@ body {
   color: #8a7a68;
 }
 
+.settings-card-title {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+
+.settings-card .scan-buttons {
+  justify-content: flex-start;
+}
+
+.settings-card .manual-form {
+  margin-top: 12px;
+  justify-content: flex-start;
+}
+
 .switch {
   position: relative;
   display: inline-block;
