@@ -252,6 +252,20 @@
       cart.push({ barcode, qty: 1 });
     }
     renderCart();
+    revealCart(barcode);
+  }
+
+  // 화면 크기/레이아웃과 상관없이 방금 담은 물건이 항상 눈에 보이도록 스크롤해서 보여준다
+  function revealCart(barcode) {
+    const row = cartListEl.querySelector(`.cart-item[data-barcode="${CSS.escape(barcode)}"]`);
+    const target = row || document.querySelector('.cart-panel');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    if (row) {
+      row.classList.add('cart-item-flash');
+      setTimeout(() => row.classList.remove('cart-item-flash'), 900);
+    }
   }
 
   function changeQty(barcode, delta) {
@@ -280,6 +294,7 @@
       if (!p) continue;
       const li = document.createElement('li');
       li.className = 'cart-item';
+      li.dataset.barcode = item.barcode;
       li.innerHTML = `
         <div class="cart-item-photo">${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">` : '📦'}</div>
         <div class="cart-item-info">
