@@ -609,10 +609,20 @@ body {
   width: 110px;
   height: 110px;
   border-radius: 16px;
-  object-fit: cover;
   background: #eee2cf;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
   margin: 0 auto 10px;
+  overflow: hidden;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .photo-btn {
@@ -643,6 +653,37 @@ body {
 
 .field-input[readonly] {
   color: #8a7a68;
+}
+
+.price-input-wrap {
+  position: relative;
+}
+
+.price-input-wrap .field-input {
+  padding-right: 46px;
+}
+
+.price-clear-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #ddd0bd;
+  color: white;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.price-clear-btn:active {
+  transform: translateY(-50%) scale(0.92);
 }
 
 .price-quick-add {

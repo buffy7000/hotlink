@@ -27,6 +27,7 @@
   const manualInput = document.getElementById('manual-input');
 
   const btnCameraScan = document.getElementById('btn-camera-scan');
+  const btnCameraScanSettings = document.getElementById('btn-camera-scan-settings');
   const cameraInline = document.getElementById('camera-inline');
   const scanHint = document.getElementById('scan-hint');
   const cameraVideo = document.getElementById('camera-video');
@@ -137,6 +138,7 @@
 
   function applyCameraScanVisibility() {
     btnCameraScan.classList.toggle('hidden', !cameraScanEnabled);
+    btnCameraScanSettings.classList.toggle('hidden', !cameraScanEnabled);
     toggleCameraScan.checked = cameraScanEnabled;
   }
 
@@ -148,6 +150,13 @@
 
   btnCameraScan.addEventListener('click', openCameraScan);
   btnCameraCancel.addEventListener('click', closeCameraScan);
+
+  // 설정 화면에서 카메라 버튼을 누르면 계산대 화면으로 돌아가 카메라를 바로 띄운다
+  btnCameraScanSettings.addEventListener('click', () => {
+    manageView.classList.add('hidden');
+    scanView.classList.remove('hidden');
+    openCameraScan();
+  });
 
   function showCameraError(msg) {
     cameraErrorEl.textContent = msg;
@@ -219,28 +228,23 @@
 
     if (navigator.onLine) {
       const info = await fetchProductInfo(barcode);
-      if (info && registerMode === 'new' && registerBarcode.value === barcode) {
-        if (info.name && !registerName.value) registerName.value = info.name;
-        if (info.image) {
-          registerPreview.src = info.image;
-          pendingPhotoDataUrl = info.image;
-        }
+      if (info && info.image && registerMode === 'new' && registerBarcode.value === barcode) {
+        setPhotoPreview(info.image);
+        pendingPhotoDataUrl = info.image;
       }
     }
   }
 
   async function fetchProductInfo(barcode) {
+    // 상품명은 해외 데이터베이스라 외국어/깨진 문자로 채워지는 경우가 많아 사진만 자동으로 채운다
     try {
       const res = await fetch(
-        `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json?fields=product_name,image_front_small_url`
+        `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json?fields=image_front_small_url`
       );
       if (!res.ok) return null;
       const data = await res.json();
       if (data.status === 1 && data.product) {
-        return {
-          name: data.product.product_name || '',
-          image: data.product.image_front_small_url || null,
-        };
+        return { image: data.product.image_front_small_url || null };
       }
     } catch {
       // 오프라인이거나 조회 실패 -> 수동 입력으로 진행
@@ -349,21 +353,24 @@
   });
 
   // ---------- 상품 등록/수정 모달 ----------
+  function setPhotoPreview(dataUrl) {
+    registerPreview.innerHTML = dataUrl ? `<img src="${dataUrl}" alt="상품 사진">` : '📦';
+  }
+
   function openRegisterModal(mode, barcode) {
     registerMode = mode;
     scannerCaptureEnabled = false;
     pendingPhotoDataUrl = null;
 
     registerBarcode.value = barcode;
-    registerPreview.src = '';
-    registerPreview.style.background = '#eee2cf';
+    setPhotoPreview(null);
 
     if (mode === 'edit' && products[barcode]) {
       registerTitle.textContent = '상품 수정';
       registerName.value = products[barcode].name;
       registerPrice.value = String(products[barcode].price);
       if (products[barcode].image) {
-        registerPreview.src = products[barcode].image;
+        setPhotoPreview(products[barcode].image);
         pendingPhotoDataUrl = products[barcode].image;
       }
       btnRegisterDelete.classList.remove('hidden');
@@ -387,6 +394,11 @@
 
   btnRegisterCancel.addEventListener('click', closeRegisterModal);
 
+  document.getElementById('btn-price-clear').addEventListener('click', () => {
+    registerPrice.value = '';
+    registerPrice.focus();
+  });
+
   document.querySelectorAll('.price-add-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const amount = parseInt(btn.dataset.amount, 10);
@@ -400,7 +412,7 @@
     if (!file) return;
     resizeImageToDataUrl(file, 320).then((dataUrl) => {
       pendingPhotoDataUrl = dataUrl;
-      registerPreview.src = dataUrl;
+      setPhotoPreview(dataUrl);
     });
   });
 
@@ -659,7 +671,7 @@
   }
 
   function playBeep() {
-    playTone(1200, 0.09);
+    playTone(1200, 0.09, 0, 0.7);
   }
 
   function playCheckoutSound() {
