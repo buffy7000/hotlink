@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>우리집 가게놀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 바코드 스캐너(키보드 입력형)가 항상 타이핑할 수 있도록 화면 밖에 숨겨둔 입력창 -->
+  <input type="text" id="scanner-input" autocomplete="off" autocapitalize="off" autocorrect="off" inputmode="none">
+
+  <div id="app">
+
+    <!-- ===== 상단바 ===== -->
+    <header class="topbar">
+      <h1>🛒 우리집 가게</h1>
+      <div class="topbar-right">
+        <button id="btn-mascot" class="mascot-avatar-btn" aria-label="마스코트 바꾸기"></button>
+        <button id="btn-manage" class="icon-btn" aria-label="상품 관리">⚙️</button>
+      </div>
+    </header>
+
+    <!-- ===== 계산대 화면 ===== -->
+    <main id="scan-view" class="view">
+
+      <section class="scan-panel">
+        <div class="scan-hint">
+          <div class="speech-bubble">바코드를 <strong>삑!</strong> 찍어주세요</div>
+          <div id="mascot-big" class="mascot-big"></div>
+        </div>
+
+        <button id="btn-manual-toggle" class="ghost-btn">⌨️ 바코드 직접 입력</button>
+
+        <form id="manual-form" class="manual-form hidden">
+          <input type="text" id="manual-input" placeholder="바코드 숫자 입력" inputmode="numeric" pattern="[0-9]*">
+          <button type="submit" class="primary-btn small">추가</button>
+        </form>
+      </section>
+
+      <section class="cart-panel">
+        <h2>장바구니</h2>
+        <ul id="cart-list" class="cart-list">
+          <li class="cart-empty" id="cart-empty">아직 담은 물건이 없어요</li>
+        </ul>
+
+        <div class="cart-footer">
+          <div class="cart-total">
+            합계 <span id="cart-total-amount">0</span>원
+          </div>
+          <div class="cart-actions">
+            <button id="btn-clear-cart" class="ghost-btn">비우기</button>
+            <button id="btn-checkout" class="primary-btn big" disabled>결제하기</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ===== 상품 관리 화면 ===== -->
+    <main id="manage-view" class="view hidden">
+      <div class="manage-header">
+        <button id="btn-back-from-manage" class="ghost-btn">← 뒤로</button>
+        <h2>상품 관리</h2>
+      </div>
+      <ul id="product-list" class="product-list"></ul>
+      <p id="product-empty" class="cart-empty hidden">등록된 상품이 없어요. 물건을 스캔하면 자동으로 등록돼요!</p>
+    </main>
+
+  </div>
+
+  <!-- ===== 새 상품 등록 / 수정 모달 ===== -->
+  <div id="register-modal" class="overlay hidden">
+    <div class="modal">
+      <h2 id="register-title">새 상품 등록</h2>
+
+      <div class="photo-field">
+        <img id="register-preview" class="photo-preview" alt="상품 사진">
+        <label for="register-photo-input" class="photo-btn">📸 사진 찍기</label>
+        <input type="file" id="register-photo-input" accept="image/*" capture="environment" class="hidden">
+      </div>
+
+      <label class="field-label">바코드</label>
+      <input type="text" id="register-barcode" class="field-input" readonly>
+
+      <label class="field-label">상품 이름</label>
+      <input type="text" id="register-name" class="field-input" placeholder="예: 딸기 우유">
+
+      <label class="field-label">가격 (원)</label>
+      <input type="text" id="register-price" class="field-input" inputmode="numeric" pattern="[0-9]*" placeholder="예: 1500">
+
+      <div class="modal-actions">
+        <button id="btn-register-cancel" class="ghost-btn">취소</button>
+        <button id="btn-register-delete" class="danger-btn hidden">삭제</button>
+        <button id="btn-register-save" class="primary-btn">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 결제 완료 오버레이 ===== -->
+  <div id="checkout-overlay" class="overlay hidden">
+    <div class="checkout-card">
+      <div class="confetti" aria-hidden="true"></div>
+      <div id="mascot-checkout" class="mascot-checkout"></div>
+      <p class="checkout-title">결제 완료!</p>
+      <p class="checkout-total"><span id="checkout-total-amount">0</span>원</p>
+      <p class="checkout-thanks">감사합니다, 또 오세요~ 🛍️</p>
+      <button id="btn-checkout-close" class="primary-btn big">확인</button>
+    </div>
+  </div>
+
+  <!-- ===== 마스코트 선택 오버레이 ===== -->
+  <div id="mascot-picker-overlay" class="overlay hidden">
+    <div class="modal mascot-picker">
+      <h2>어떤 친구랑<br>가게를 운영할까요?</h2>
+      <div id="mascot-card-list" class="mascot-card-list"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
