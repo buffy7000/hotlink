@@ -3,6 +3,7 @@
 
   const STORAGE_KEY = 'store_products_v1';
   const MASCOT_STORAGE_KEY = 'store_mascot_v1';
+  const CAMERA_SCAN_STORAGE_KEY = 'store_camera_scan_v1';
 
   const MASCOT_TYPES = ['bear', 'cat', 'rabbit'];
   const MASCOT_NAMES = { bear: '곰돌이', cat: '고양이', rabbit: '토끼' };
@@ -11,6 +12,7 @@
   let products = loadProducts();
 
   let mascot = localStorage.getItem(MASCOT_STORAGE_KEY) || null;
+  let cameraScanEnabled = localStorage.getItem(CAMERA_SCAN_STORAGE_KEY) === 'true';
 
   /** @type {Array<{barcode: string, qty: number}>} 결제 전까지만 유지되는 임시 장바구니 */
   let cart = [];
@@ -23,6 +25,13 @@
   const manualToggleBtn = document.getElementById('btn-manual-toggle');
   const manualForm = document.getElementById('manual-form');
   const manualInput = document.getElementById('manual-input');
+
+  const btnCameraScan = document.getElementById('btn-camera-scan');
+  const cameraScanOverlay = document.getElementById('camera-scan-overlay');
+  const cameraVideo = document.getElementById('camera-video');
+  const cameraErrorEl = document.getElementById('camera-error');
+  const btnCameraCancel = document.getElementById('btn-camera-cancel');
+  const toggleCameraScan = document.getElementById('toggle-camera-scan');
 
   const cartListEl = document.getElementById('cart-list');
   const cartEmptyEl = document.getElementById('cart-empty');
@@ -120,6 +129,78 @@
     manualInput.value = '';
     if (code) handleScan(code);
   });
+
+  // ---------- 카메라로 바코드 스캔 (설정에서 켰을 때만 노출) ----------
+  let cameraReader = null;
+  let cameraControls = null;
+
+  function applyCameraScanVisibility() {
+    btnCameraScan.classList.toggle('hidden', !cameraScanEnabled);
+    toggleCameraScan.checked = cameraScanEnabled;
+  }
+
+  toggleCameraScan.addEventListener('change', () => {
+    cameraScanEnabled = toggleCameraScan.checked;
+    localStorage.setItem(CAMERA_SCAN_STORAGE_KEY, String(cameraScanEnabled));
+    applyCameraScanVisibility();
+  });
+
+  btnCameraScan.addEventListener('click', openCameraScan);
+  btnCameraCancel.addEventListener('click', closeCameraScan);
+
+  function showCameraError(msg) {
+    cameraErrorEl.textContent = msg;
+    cameraErrorEl.classList.remove('hidden');
+  }
+
+  async function openCameraScan() {
+    scannerCaptureEnabled = false;
+    cameraErrorEl.classList.add('hidden');
+    cameraScanOverlay.classList.remove('hidden');
+
+    if (typeof ZXingBrowser === 'undefined') {
+      showCameraError('카메라 스캔 기능을 불러오지 못했어요. 인터넷 연결을 확인해주세요.');
+      return;
+    }
+
+    try {
+      if (!cameraReader) {
+        cameraReader = new ZXingBrowser.BrowserMultiFormatReader();
+      }
+      cameraControls = await cameraReader.decodeFromConstraints(
+        { video: { facingMode: { ideal: 'environment' } } },
+        cameraVideo,
+        (result) => {
+          if (result) {
+            const code = result.getText();
+            closeCameraScan();
+            handleScan(code);
+          }
+          // 바코드를 못 찾은 프레임에서는 계속 error가 들어오는 게 정상이라 무시한다
+        }
+      );
+    } catch (err) {
+      if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+        showCameraError('카메라 권한이 필요해요. 브라우저 설정에서 카메라 접근을 허용해주세요.');
+      } else if (err && err.name === 'NotFoundError') {
+        showCameraError('사용할 수 있는 카메라를 찾지 못했어요.');
+      } else {
+        showCameraError('카메라를 사용할 수 없어요. 잠시 후 다시 시도해주세요.');
+      }
+    }
+  }
+
+  function closeCameraScan() {
+    if (cameraControls) {
+      cameraControls.stop();
+      cameraControls = null;
+    }
+    cameraScanOverlay.classList.add('hidden');
+    scannerCaptureEnabled = true;
+    refocusScanner();
+  }
+
+  applyCameraScanVisibility();
 
   // ---------- 스캔 처리 ----------
   async function handleScan(barcode) {

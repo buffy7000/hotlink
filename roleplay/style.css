@@ -229,6 +229,13 @@ body {
   95% { transform: scaleY(0.1); }
 }
 
+.scan-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .manual-form {
   display: flex;
   gap: 10px;
@@ -423,6 +430,71 @@ body {
 .manage-header h2 {
   margin: 0;
   font-size: 22px;
+}
+
+.settings-card {
+  background: var(--color-card);
+  border-radius: 20px;
+  padding: 16px 18px;
+  border: 2px solid var(--color-border);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 19px;
+  gap: 12px;
+}
+
+.settings-hint {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: #8a7a68;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 54px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #ddd0bd;
+  border-radius: 30px;
+  transition: background 0.2s;
+}
+
+.switch-slider::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.switch input:checked + .switch-slider {
+  background: var(--color-accent);
+}
+
+.switch input:checked + .switch-slider::before {
+  transform: translateX(24px);
 }
 
 .product-list {
@@ -637,6 +709,55 @@ body {
   margin-bottom: 20px;
   position: relative;
   z-index: 1;
+}
+
+/* ===== 카메라 바코드 스캔 ===== */
+.camera-modal {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 22px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.camera-hint {
+  font-size: 19px;
+  margin: 0 0 14px;
+}
+
+.camera-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #1c1c1c;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+#camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.camera-frame {
+  position: absolute;
+  inset: 14% 10%;
+  border: 3px dashed rgba(255,255,255,0.85);
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.camera-error {
+  color: #d1483a;
+  font-size: 16px;
+  margin: 14px 0 0;
+}
+
+.camera-modal .ghost-btn {
+  margin-top: 16px;
 }
 
 /* ===== 마스코트 선택 ===== */
