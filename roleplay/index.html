@@ -29,10 +29,21 @@
     <main id="scan-view" class="view">
 
       <section class="scan-panel">
-        <div class="scan-hint">
+        <div id="scan-hint" class="scan-hint">
           <div class="speech-bubble">바코드를 <strong>삑!</strong> 찍어주세요</div>
           <div id="mascot-big" class="mascot-big"></div>
         </div>
+
+        <div id="camera-inline" class="camera-inline hidden">
+          <p class="camera-hint">바코드를 네모 칸에 맞춰주세요</p>
+          <div class="camera-video-wrap">
+            <video id="camera-video" playsinline autoplay muted></video>
+            <div class="camera-frame"></div>
+            <button id="btn-camera-cancel" class="camera-close-btn" aria-label="카메라 스캔 닫기">✕</button>
+          </div>
+          <p id="camera-error" class="camera-error hidden"></p>
+        </div>
+
         <button id="btn-camera-scan" class="ghost-btn hidden">📷 카메라</button>
       </section>
 
@@ -134,19 +145,6 @@
       <p class="checkout-total"><span id="checkout-total-amount">0</span>원</p>
       <p class="checkout-thanks">감사합니다, 또 오세요~ 🛍️</p>
       <button id="btn-checkout-close" class="primary-btn big">확인</button>
-    </div>
-  </div>
-
-  <!-- ===== 카메라 바코드 스캔 오버레이 ===== -->
-  <div id="camera-scan-overlay" class="overlay hidden">
-    <div class="camera-modal">
-      <p class="camera-hint">바코드를 네모 칸에 맞춰주세요</p>
-      <div class="camera-video-wrap">
-        <video id="camera-video" playsinline autoplay muted></video>
-        <div class="camera-frame"></div>
-        <button id="btn-camera-cancel" class="camera-close-btn" aria-label="카메라 스캔 닫기">✕</button>
-      </div>
-      <p id="camera-error" class="camera-error hidden"></p>
     </div>
   </div>
 

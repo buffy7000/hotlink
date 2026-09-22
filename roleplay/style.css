@@ -763,13 +763,13 @@ body {
   z-index: 1;
 }
 
-/* ===== 카메라 바코드 스캔 ===== */
-.camera-modal {
-  background: var(--color-card);
-  border-radius: var(--radius);
-  padding: 22px;
+/* ===== 카메라 바코드 스캔 (현재 화면 안에 바로 보여줌) ===== */
+.camera-inline {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 360px;
+  margin: 0 auto 20px;
   text-align: center;
 }
 

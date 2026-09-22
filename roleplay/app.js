@@ -27,7 +27,8 @@
   const manualInput = document.getElementById('manual-input');
 
   const btnCameraScan = document.getElementById('btn-camera-scan');
-  const cameraScanOverlay = document.getElementById('camera-scan-overlay');
+  const cameraInline = document.getElementById('camera-inline');
+  const scanHint = document.getElementById('scan-hint');
   const cameraVideo = document.getElementById('camera-video');
   const cameraErrorEl = document.getElementById('camera-error');
   const btnCameraCancel = document.getElementById('btn-camera-cancel');
@@ -156,7 +157,9 @@
   async function openCameraScan() {
     scannerCaptureEnabled = false;
     cameraErrorEl.classList.add('hidden');
-    cameraScanOverlay.classList.remove('hidden');
+    scanHint.classList.add('hidden');
+    btnCameraScan.classList.add('hidden');
+    cameraInline.classList.remove('hidden');
 
     if (typeof ZXingBrowser === 'undefined') {
       showCameraError('카메라 스캔 기능을 불러오지 못했어요. 인터넷 연결을 확인해주세요.');
@@ -195,7 +198,9 @@
       cameraControls.stop();
       cameraControls = null;
     }
-    cameraScanOverlay.classList.add('hidden');
+    cameraInline.classList.add('hidden');
+    scanHint.classList.remove('hidden');
+    applyCameraScanVisibility();
     scannerCaptureEnabled = true;
     refocusScanner();
   }
