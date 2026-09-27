@@ -22,13 +22,6 @@
       </div>
     </header>
 
-    <!-- 바코드 스캐너(키보드 입력형)가 타이핑하는 자리. 실제로 입력이 들어오는지 눈으로 확인할 수 있게 보이게 둔다 -->
-    <form id="scanner-form" class="scanner-status">
-      <span id="scanner-status-dot" class="scanner-status-dot"></span>
-      <span id="scanner-status-text" class="scanner-status-text">대기 중</span>
-      <input type="text" id="scanner-input" class="scanner-status-input" autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="스캐너로 찍으면 여기에 숫자가 나타나요">
-    </form>
-
     <!-- ===== 계산대 화면 ===== -->
     <main id="scan-view" class="view">
 
@@ -38,17 +31,29 @@
           <div id="mascot-big" class="mascot-big"></div>
         </div>
 
+        <!-- "바코드" 버튼을 누른 순간(사용자 탭) 안에서 바로 input에 focus를 거는 방식.
+             iOS Safari는 타이머 등 사용자 동작과 무관한 코드의 focus() 호출은 무시하므로,
+             반드시 버튼 클릭 핸들러 안에서 직접 focus를 호출해야 한다. -->
+        <form id="barcode-inline" class="barcode-inline hidden">
+          <button type="button" id="btn-barcode-close" class="mode-close-btn" aria-label="바코드 모드 닫기">✕</button>
+          <p class="barcode-hint">📡 바코드 스캐너 준비 완료!<br>스캐너로 찍어주세요</p>
+          <input type="text" id="scanner-input" class="barcode-input" autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="여기에 숫자가 나타나요">
+        </form>
+
         <div id="camera-inline" class="camera-inline hidden">
           <p class="camera-hint">바코드를 네모 칸에 맞춰주세요</p>
           <div class="camera-video-wrap">
             <video id="camera-video" playsinline autoplay muted></video>
             <div class="camera-frame"></div>
-            <button id="btn-camera-cancel" class="camera-close-btn" aria-label="카메라 스캔 닫기">✕</button>
+            <button id="btn-camera-cancel" class="mode-close-btn" aria-label="카메라 스캔 닫기">✕</button>
           </div>
           <p id="camera-error" class="camera-error hidden"></p>
         </div>
 
-        <button id="btn-camera-scan" class="ghost-btn hidden">📷 카메라</button>
+        <div class="scan-mode-toggle">
+          <button id="btn-mode-barcode" class="ghost-btn">⌨️ 바코드</button>
+          <button id="btn-mode-camera" class="ghost-btn hidden">📷 카메라</button>
+        </div>
       </section>
 
       <section class="cart-panel">

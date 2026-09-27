@@ -39,63 +39,39 @@ body {
   user-select: none;
 }
 
-/* 스캐너가 입력을 보낼 자리를 눈에 보이게 둬서, 실제로 입력이 들어오는지 확인할 수 있게 한다 */
-.scanner-status {
+/* ===== 바코드 모드: 버튼을 눌러야 켜지는 명시적인 스캐너 입력 화면 ===== */
+.scan-mode-toggle {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #fff8ec;
-  border-bottom: 1px solid var(--color-border);
-  cursor: pointer;
+  gap: 10px;
+  justify-content: center;
 }
 
-.scanner-status:not(.ready) {
-  background: #fff0d6;
-  animation: scanner-status-pulse 1.6s ease-in-out infinite;
+.barcode-inline {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 20px;
+  background: var(--color-card);
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  text-align: center;
 }
 
-@keyframes scanner-status-pulse {
-  0%, 100% { background: #fff0d6; }
-  50% { background: #ffe2ae; }
+.barcode-hint {
+  font-size: 19px;
+  margin: 0 0 16px;
+  line-height: 1.5;
 }
 
-.scanner-status-dot {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #b0a08a;
-  border: 1px solid #8a7a68;
-  flex-shrink: 0;
-  transition: background 0.2s;
-}
-
-.scanner-status-dot.ready {
-  background: #2ecc71;
-  border-color: #27ae60;
-  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3);
-}
-
-.scanner-status-text {
-  font-size: 13px;
-  color: #8a7a68;
-  flex-shrink: 0;
-}
-
-.scanner-status:not(.ready) .scanner-status-text {
-  font-weight: bold;
-  color: #b5762a;
-}
-
-.scanner-status-input {
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  padding: 4px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  background: white;
+.barcode-input {
+  width: 100%;
+  font-size: 22px;
+  text-align: center;
+  padding: 14px 16px;
+  border: 2px solid var(--color-accent);
+  border-radius: 16px;
+  background: #f3fffa;
   color: var(--color-text);
 }
 
@@ -896,7 +872,7 @@ body {
   margin: 14px 0 0;
 }
 
-.camera-close-btn {
+.mode-close-btn {
   position: absolute;
   top: 10px;
   right: 10px;

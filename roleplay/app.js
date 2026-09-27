@@ -18,18 +18,19 @@
   let cart = [];
 
   let registerMode = null; // 'new' | 'edit'
-  let scannerCaptureEnabled = true;
+  let scannerCaptureEnabled = false; // "바코드" 버튼을 눌러야 켜진다
 
   // ---------- DOM ----------
-  const scannerForm = document.getElementById('scanner-form');
+  const barcodeInline = document.getElementById('barcode-inline');
   const scannerInput = document.getElementById('scanner-input');
-  const scannerStatusDot = document.getElementById('scanner-status-dot');
-  const scannerStatusText = document.getElementById('scanner-status-text');
+  const btnModeBarcode = document.getElementById('btn-mode-barcode');
+  const btnBarcodeClose = document.getElementById('btn-barcode-close');
+  const scanModeToggle = document.querySelector('.scan-mode-toggle');
   const manualToggleBtn = document.getElementById('btn-manual-toggle');
   const manualForm = document.getElementById('manual-form');
   const manualInput = document.getElementById('manual-input');
 
-  const btnCameraScan = document.getElementById('btn-camera-scan');
+  const btnModeCamera = document.getElementById('btn-mode-camera');
   const btnCameraScanSettings = document.getElementById('btn-camera-scan-settings');
   const cameraInline = document.getElementById('camera-inline');
   const scanHint = document.getElementById('scan-hint');
@@ -103,10 +104,16 @@
     if (scannerCaptureEnabled && document.activeElement !== scannerInput && !isTextInputFocused()) {
       scannerInput.focus({ preventScroll: true });
     }
-    const ready = document.activeElement === scannerInput;
-    scannerStatusDot.classList.toggle('ready', ready);
-    scannerStatusText.textContent = ready ? '준비됨' : '👆 여기를 눌러 스캐너 켜기';
-    scannerForm.classList.toggle('ready', ready);
+  }
+
+  // 바코드 모드가 켜져 있던 상태에서만(등록 팝업 등으로) 잃어버린 포커스를 되살린다.
+  // iOS Safari는 사용자 동작과 무관한 코드의 focus()는 무시하지만, 여기서는 항상
+  // 클릭/터치 이벤트 핸들러 안에서만 호출되므로 정상 동작한다.
+  function resumeScannerIfActive() {
+    if (!barcodeInline.classList.contains('hidden')) {
+      scannerCaptureEnabled = true;
+      refocusScanner();
+    }
   }
 
   function submitScannerInput() {
@@ -124,20 +131,39 @@
 
   // 일부 아이패드 환경에서 외장 블루투스 스캐너의 Enter가 input의 keydown으로 잡히지 않는
   // 경우가 있어, input을 form으로 감싸 submit 이벤트로도 동일하게 처리한다
-  scannerForm.addEventListener('submit', (e) => {
+  barcodeInline.addEventListener('submit', (e) => {
     e.preventDefault();
     submitScannerInput();
   });
-
-  // iOS Safari는 setInterval 등 사용자 동작과 무관한 코드에서의 focus()를 무시하므로,
-  // 상태 표시줄을 직접 탭했을 때는 그 탭 이벤트 안에서 곧바로 focus()를 호출해 확실히 잡는다
-  scannerForm.addEventListener('click', () => scannerInput.focus({ preventScroll: true }));
 
   document.addEventListener('click', refocusScanner);
   document.addEventListener('touchend', refocusScanner);
   window.addEventListener('focus', refocusScanner);
   setInterval(refocusScanner, 1000);
-  refocusScanner();
+
+  // ---------- 바코드 모드 (버튼을 눌러야만 켜짐) ----------
+  function showIdleView() {
+    scanHint.classList.remove('hidden');
+    barcodeInline.classList.add('hidden');
+    cameraInline.classList.add('hidden');
+    scanModeToggle.classList.remove('hidden');
+    applyCameraScanVisibility();
+    scannerCaptureEnabled = false;
+  }
+
+  function activateBarcodeMode() {
+    scanHint.classList.add('hidden');
+    cameraInline.classList.add('hidden');
+    scanModeToggle.classList.add('hidden');
+    barcodeInline.classList.remove('hidden');
+    scannerCaptureEnabled = true;
+    scannerInput.value = '';
+    // 버튼 클릭이라는 사용자 제스처 안에서 곧바로 호출하므로 iOS Safari에서도 확실히 포커스가 걸린다
+    scannerInput.focus({ preventScroll: true });
+  }
+
+  btnModeBarcode.addEventListener('click', activateBarcodeMode);
+  btnBarcodeClose.addEventListener('click', showIdleView);
 
   // ---------- 수동 입력 ----------
   manualToggleBtn.addEventListener('click', () => {
@@ -180,7 +206,7 @@
   }
 
   function applyCameraScanVisibility() {
-    btnCameraScan.classList.toggle('hidden', !cameraScanEnabled);
+    btnModeCamera.classList.toggle('hidden', !cameraScanEnabled);
     btnCameraScanSettings.classList.toggle('hidden', !cameraScanEnabled);
     toggleCameraScan.checked = cameraScanEnabled;
   }
@@ -191,7 +217,7 @@
     applyCameraScanVisibility();
   });
 
-  btnCameraScan.addEventListener('click', openCameraScan);
+  btnModeCamera.addEventListener('click', openCameraScan);
   btnCameraCancel.addEventListener('click', closeCameraScan);
 
   // 설정 화면에서 카메라 버튼을 누르면 계산대 화면으로 돌아가 카메라를 바로 띄운다
@@ -210,13 +236,12 @@
     scannerCaptureEnabled = false;
     cameraErrorEl.classList.add('hidden');
     scanHint.classList.add('hidden');
-    btnCameraScan.classList.add('hidden');
+    barcodeInline.classList.add('hidden');
+    scanModeToggle.classList.add('hidden');
     cameraInline.classList.remove('hidden');
 
     if (typeof ZXingBrowser === 'undefined') {
       showCameraError('카메라 스캔 기능을 불러오지 못했어요. 인터넷 연결을 확인해주세요.');
-      scannerCaptureEnabled = true;
-      refocusScanner();
       return;
     }
 
@@ -246,9 +271,6 @@
       } else {
         showCameraError('카메라를 사용할 수 없어요. 잠시 후 다시 시도해주세요.');
       }
-      // 카메라가 실패해도 실물 바코드 스캐너는 계속 쓸 수 있어야 하므로 입력 캡처를 되살린다
-      scannerCaptureEnabled = true;
-      refocusScanner();
     }
   }
 
@@ -258,11 +280,7 @@
       cameraControls.stop();
       cameraControls = null;
     }
-    cameraInline.classList.add('hidden');
-    scanHint.classList.remove('hidden');
-    applyCameraScanVisibility();
-    scannerCaptureEnabled = true;
-    refocusScanner();
+    showIdleView();
   }
 
   applyCameraScanVisibility();
@@ -400,7 +418,7 @@
     checkoutOverlay.classList.add('hidden');
     cart = [];
     renderCart();
-    refocusScanner();
+    resumeScannerIfActive();
   });
 
   // ---------- 상품 등록/수정 모달 ----------
@@ -439,8 +457,7 @@
   function closeRegisterModal() {
     registerModal.classList.add('hidden');
     registerMode = null;
-    scannerCaptureEnabled = true;
-    refocusScanner();
+    resumeScannerIfActive();
   }
 
   btnRegisterCancel.addEventListener('click', closeRegisterModal);
@@ -536,8 +553,7 @@
   btnBackFromManage.addEventListener('click', () => {
     manageView.classList.add('hidden');
     scanView.classList.remove('hidden');
-    scannerCaptureEnabled = true;
-    refocusScanner();
+    resumeScannerIfActive();
   });
 
   function renderProductList() {
@@ -690,8 +706,7 @@
 
   function closeMascotPicker() {
     mascotPickerOverlay.classList.add('hidden');
-    scannerCaptureEnabled = true;
-    refocusScanner();
+    resumeScannerIfActive();
   }
 
   btnMascot.addEventListener('click', openMascotPicker);
