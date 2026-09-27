@@ -21,8 +21,10 @@
   let scannerCaptureEnabled = true;
 
   // ---------- DOM ----------
+  const scannerForm = document.getElementById('scanner-form');
   const scannerInput = document.getElementById('scanner-input');
   const scannerStatusDot = document.getElementById('scanner-status-dot');
+  const scannerStatusText = document.getElementById('scanner-status-text');
   const manualToggleBtn = document.getElementById('btn-manual-toggle');
   const manualForm = document.getElementById('manual-form');
   const manualInput = document.getElementById('manual-input');
@@ -101,16 +103,29 @@
     if (scannerCaptureEnabled && document.activeElement !== scannerInput && !isTextInputFocused()) {
       scannerInput.focus({ preventScroll: true });
     }
-    scannerStatusDot.classList.toggle('ready', document.activeElement === scannerInput);
+    const ready = document.activeElement === scannerInput;
+    scannerStatusDot.classList.toggle('ready', ready);
+    scannerStatusText.textContent = ready ? '준비됨' : '대기 중';
+  }
+
+  function submitScannerInput() {
+    const code = scannerInput.value.trim();
+    scannerInput.value = '';
+    if (code) handleScan(code);
   }
 
   scannerInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const code = scannerInput.value.trim();
-      scannerInput.value = '';
-      if (code) handleScan(code);
+      submitScannerInput();
     }
+  });
+
+  // 일부 아이패드 환경에서 외장 블루투스 스캐너의 Enter가 input의 keydown으로 잡히지 않는
+  // 경우가 있어, input을 form으로 감싸 submit 이벤트로도 동일하게 처리한다
+  scannerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitScannerInput();
   });
 
   document.addEventListener('click', refocusScanner);

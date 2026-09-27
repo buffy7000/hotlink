@@ -50,17 +50,26 @@ body {
 }
 
 .scanner-status-dot {
-  width: 10px;
-  height: 10px;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #c9bda8;
+  background: #b0a08a;
+  border: 1px solid #8a7a68;
   flex-shrink: 0;
   transition: background 0.2s;
 }
 
 .scanner-status-dot.ready {
-  background: #4cc98a;
-  box-shadow: 0 0 0 3px rgba(76, 201, 138, 0.25);
+  background: #2ecc71;
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3);
+}
+
+.scanner-status-text {
+  font-size: 13px;
+  color: #8a7a68;
+  flex-shrink: 0;
 }
 
 .scanner-status-input {
