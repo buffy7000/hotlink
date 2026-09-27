@@ -105,7 +105,8 @@
     }
     const ready = document.activeElement === scannerInput;
     scannerStatusDot.classList.toggle('ready', ready);
-    scannerStatusText.textContent = ready ? '준비됨' : '대기 중';
+    scannerStatusText.textContent = ready ? '준비됨' : '👆 여기를 눌러 스캐너 켜기';
+    scannerForm.classList.toggle('ready', ready);
   }
 
   function submitScannerInput() {
@@ -127,6 +128,10 @@
     e.preventDefault();
     submitScannerInput();
   });
+
+  // iOS Safari는 setInterval 등 사용자 동작과 무관한 코드에서의 focus()를 무시하므로,
+  // 상태 표시줄을 직접 탭했을 때는 그 탭 이벤트 안에서 곧바로 focus()를 호출해 확실히 잡는다
+  scannerForm.addEventListener('click', () => scannerInput.focus({ preventScroll: true }));
 
   document.addEventListener('click', refocusScanner);
   document.addEventListener('touchend', refocusScanner);

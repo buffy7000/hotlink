@@ -47,6 +47,17 @@ body {
   padding: 8px 16px;
   background: #fff8ec;
   border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.scanner-status:not(.ready) {
+  background: #fff0d6;
+  animation: scanner-status-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes scanner-status-pulse {
+  0%, 100% { background: #fff0d6; }
+  50% { background: #ffe2ae; }
 }
 
 .scanner-status-dot {
@@ -70,6 +81,11 @@ body {
   font-size: 13px;
   color: #8a7a68;
   flex-shrink: 0;
+}
+
+.scanner-status:not(.ready) .scanner-status-text {
+  font-weight: bold;
+  color: #b5762a;
 }
 
 .scanner-status-input {
