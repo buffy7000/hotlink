@@ -193,6 +193,8 @@
 
     if (typeof ZXingBrowser === 'undefined') {
       showCameraError('카메라 스캔 기능을 불러오지 못했어요. 인터넷 연결을 확인해주세요.');
+      scannerCaptureEnabled = true;
+      refocusScanner();
       return;
     }
 
@@ -222,6 +224,9 @@
       } else {
         showCameraError('카메라를 사용할 수 없어요. 잠시 후 다시 시도해주세요.');
       }
+      // 카메라가 실패해도 실물 바코드 스캐너는 계속 쓸 수 있어야 하므로 입력 캡처를 되살린다
+      scannerCaptureEnabled = true;
+      refocusScanner();
     }
   }
 
