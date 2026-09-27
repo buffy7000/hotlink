@@ -22,6 +22,7 @@
 
   // ---------- DOM ----------
   const scannerInput = document.getElementById('scanner-input');
+  const scannerStatusDot = document.getElementById('scanner-status-dot');
   const manualToggleBtn = document.getElementById('btn-manual-toggle');
   const manualForm = document.getElementById('manual-form');
   const manualInput = document.getElementById('manual-input');
@@ -100,6 +101,7 @@
     if (scannerCaptureEnabled && document.activeElement !== scannerInput && !isTextInputFocused()) {
       scannerInput.focus({ preventScroll: true });
     }
+    scannerStatusDot.classList.toggle('ready', document.activeElement === scannerInput);
   }
 
   scannerInput.addEventListener('keydown', (e) => {
