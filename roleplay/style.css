@@ -39,40 +39,17 @@ body {
   user-select: none;
 }
 
-/* ===== 바코드 모드: 버튼을 눌러야 켜지는 명시적인 스캐너 입력 화면 ===== */
-.scan-mode-toggle {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.barcode-inline {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto 20px;
-  background: var(--color-card);
-  border-radius: 20px;
-  padding: 28px 24px 24px;
-  text-align: center;
-}
-
-.barcode-hint {
-  font-size: 19px;
-  margin: 0 0 16px;
-  line-height: 1.5;
-}
-
-.barcode-input {
-  width: 100%;
-  font-size: 22px;
-  text-align: center;
-  padding: 14px 16px;
-  border: 2px solid var(--color-accent);
-  border-radius: 16px;
-  background: #f3fffa;
-  color: var(--color-text);
+/* 스캐너가 입력을 보낼 숨김 입력창: display:none 은 포커스가 안 되므로 화면 밖으로만 뺀다 */
+#scanner-input {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  border: none;
+  padding: 0;
+  pointer-events: none;
 }
 
 #app {
@@ -872,7 +849,7 @@ body {
   margin: 14px 0 0;
 }
 
-.mode-close-btn {
+.camera-close-btn {
   position: absolute;
   top: 10px;
   right: 10px;

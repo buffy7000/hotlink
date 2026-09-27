@@ -18,19 +18,15 @@
   let cart = [];
 
   let registerMode = null; // 'new' | 'edit'
-  let scannerCaptureEnabled = false; // "바코드" 버튼을 눌러야 켜진다
+  let scannerCaptureEnabled = true;
 
   // ---------- DOM ----------
-  const barcodeInline = document.getElementById('barcode-inline');
   const scannerInput = document.getElementById('scanner-input');
-  const btnModeBarcode = document.getElementById('btn-mode-barcode');
-  const btnBarcodeClose = document.getElementById('btn-barcode-close');
-  const scanModeToggle = document.querySelector('.scan-mode-toggle');
   const manualToggleBtn = document.getElementById('btn-manual-toggle');
   const manualForm = document.getElementById('manual-form');
   const manualInput = document.getElementById('manual-input');
 
-  const btnModeCamera = document.getElementById('btn-mode-camera');
+  const btnCameraScan = document.getElementById('btn-camera-scan');
   const btnCameraScanSettings = document.getElementById('btn-camera-scan-settings');
   const cameraInline = document.getElementById('camera-inline');
   const scanHint = document.getElementById('scan-hint');
@@ -106,64 +102,20 @@
     }
   }
 
-  // 바코드 모드가 켜져 있던 상태에서만(등록 팝업 등으로) 잃어버린 포커스를 되살린다.
-  // iOS Safari는 사용자 동작과 무관한 코드의 focus()는 무시하지만, 여기서는 항상
-  // 클릭/터치 이벤트 핸들러 안에서만 호출되므로 정상 동작한다.
-  function resumeScannerIfActive() {
-    if (!barcodeInline.classList.contains('hidden')) {
-      scannerCaptureEnabled = true;
-      refocusScanner();
-    }
-  }
-
-  function submitScannerInput() {
-    const code = scannerInput.value.trim();
-    scannerInput.value = '';
-    if (code) handleScan(code);
-  }
-
   scannerInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      submitScannerInput();
+      const code = scannerInput.value.trim();
+      scannerInput.value = '';
+      if (code) handleScan(code);
     }
-  });
-
-  // 일부 아이패드 환경에서 외장 블루투스 스캐너의 Enter가 input의 keydown으로 잡히지 않는
-  // 경우가 있어, input을 form으로 감싸 submit 이벤트로도 동일하게 처리한다
-  barcodeInline.addEventListener('submit', (e) => {
-    e.preventDefault();
-    submitScannerInput();
   });
 
   document.addEventListener('click', refocusScanner);
   document.addEventListener('touchend', refocusScanner);
   window.addEventListener('focus', refocusScanner);
   setInterval(refocusScanner, 1000);
-
-  // ---------- 바코드 모드 (버튼을 눌러야만 켜짐) ----------
-  function showIdleView() {
-    scanHint.classList.remove('hidden');
-    barcodeInline.classList.add('hidden');
-    cameraInline.classList.add('hidden');
-    scanModeToggle.classList.remove('hidden');
-    applyCameraScanVisibility();
-    scannerCaptureEnabled = false;
-  }
-
-  function activateBarcodeMode() {
-    scanHint.classList.add('hidden');
-    cameraInline.classList.add('hidden');
-    scanModeToggle.classList.add('hidden');
-    barcodeInline.classList.remove('hidden');
-    scannerCaptureEnabled = true;
-    scannerInput.value = '';
-    // 버튼 클릭이라는 사용자 제스처 안에서 곧바로 호출하므로 iOS Safari에서도 확실히 포커스가 걸린다
-    scannerInput.focus({ preventScroll: true });
-  }
-
-  btnModeBarcode.addEventListener('click', activateBarcodeMode);
-  btnBarcodeClose.addEventListener('click', showIdleView);
+  refocusScanner();
 
   // ---------- 수동 입력 ----------
   manualToggleBtn.addEventListener('click', () => {
@@ -206,7 +158,7 @@
   }
 
   function applyCameraScanVisibility() {
-    btnModeCamera.classList.toggle('hidden', !cameraScanEnabled);
+    btnCameraScan.classList.toggle('hidden', !cameraScanEnabled);
     btnCameraScanSettings.classList.toggle('hidden', !cameraScanEnabled);
     toggleCameraScan.checked = cameraScanEnabled;
   }
@@ -217,7 +169,7 @@
     applyCameraScanVisibility();
   });
 
-  btnModeCamera.addEventListener('click', openCameraScan);
+  btnCameraScan.addEventListener('click', openCameraScan);
   btnCameraCancel.addEventListener('click', closeCameraScan);
 
   // 설정 화면에서 카메라 버튼을 누르면 계산대 화면으로 돌아가 카메라를 바로 띄운다
@@ -236,8 +188,7 @@
     scannerCaptureEnabled = false;
     cameraErrorEl.classList.add('hidden');
     scanHint.classList.add('hidden');
-    barcodeInline.classList.add('hidden');
-    scanModeToggle.classList.add('hidden');
+    btnCameraScan.classList.add('hidden');
     cameraInline.classList.remove('hidden');
 
     if (typeof ZXingBrowser === 'undefined') {
@@ -280,7 +231,11 @@
       cameraControls.stop();
       cameraControls = null;
     }
-    showIdleView();
+    cameraInline.classList.add('hidden');
+    scanHint.classList.remove('hidden');
+    applyCameraScanVisibility();
+    scannerCaptureEnabled = true;
+    refocusScanner();
   }
 
   applyCameraScanVisibility();
@@ -418,7 +373,7 @@
     checkoutOverlay.classList.add('hidden');
     cart = [];
     renderCart();
-    resumeScannerIfActive();
+    refocusScanner();
   });
 
   // ---------- 상품 등록/수정 모달 ----------
@@ -457,7 +412,8 @@
   function closeRegisterModal() {
     registerModal.classList.add('hidden');
     registerMode = null;
-    resumeScannerIfActive();
+    scannerCaptureEnabled = true;
+    refocusScanner();
   }
 
   btnRegisterCancel.addEventListener('click', closeRegisterModal);
@@ -553,7 +509,8 @@
   btnBackFromManage.addEventListener('click', () => {
     manageView.classList.add('hidden');
     scanView.classList.remove('hidden');
-    resumeScannerIfActive();
+    scannerCaptureEnabled = true;
+    refocusScanner();
   });
 
   function renderProductList() {
@@ -706,7 +663,8 @@
 
   function closeMascotPicker() {
     mascotPickerOverlay.classList.add('hidden');
-    resumeScannerIfActive();
+    scannerCaptureEnabled = true;
+    refocusScanner();
   }
 
   btnMascot.addEventListener('click', openMascotPicker);
