@@ -1,0 +1,7 @@
+# 배포할 때마다 아이패드 등에서 예전 JS/CSS가 캐시로 남아 새 HTML과 섞이지 않도록,
+# 매번 서버에 최신 여부를 확인(변경 없으면 304로 빠르게 응답)하게 한다
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|css|js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
