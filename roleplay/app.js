@@ -21,6 +21,7 @@
   let scannerCaptureEnabled = true;
 
   // ---------- DOM ----------
+  const scannerForm = document.getElementById('scanner-form');
   const scannerInput = document.getElementById('scanner-input');
   const manualToggleBtn = document.getElementById('btn-manual-toggle');
   const manualForm = document.getElementById('manual-form');
@@ -102,13 +103,24 @@
     }
   }
 
+  function submitScannerInput() {
+    const code = scannerInput.value.trim();
+    scannerInput.value = '';
+    if (code) handleScan(code);
+  }
+
   scannerInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.keyCode === 13) {
       e.preventDefault();
-      const code = scannerInput.value.trim();
-      scannerInput.value = '';
-      if (code) handleScan(code);
+      submitScannerInput();
     }
+  });
+
+  // 아이패드에서 외장(블루투스) 스캐너의 Enter가 keydown으로 안 잡히는 경우를 대비해
+  // form의 submit(입력칸에서 Enter 시 자동 발생)으로도 똑같이 처리한다
+  scannerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitScannerInput();
   });
 
   document.addEventListener('click', refocusScanner);

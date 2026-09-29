@@ -7,12 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260928">
+<link rel="stylesheet" href="style.css?v=20260929">
 </head>
 <body>
-
-  <!-- 바코드 스캐너(키보드 입력형)가 항상 타이핑할 수 있도록 화면 밖에 숨겨둔 입력창 -->
-  <input type="text" id="scanner-input" autocomplete="off" autocapitalize="off" autocorrect="off" inputmode="none">
 
   <div id="app">
 
@@ -32,6 +29,10 @@
         <div id="scan-hint" class="scan-hint">
           <div class="speech-bubble">바코드를 <strong>삑!</strong> 찍어주세요</div>
           <div id="mascot-big" class="mascot-big"></div>
+          <!-- 바코드 스캐너(키보드 입력형)가 숫자를 입력하는 칸. form으로 감싸서 Enter를 submit으로도 받는다 -->
+          <form id="scanner-form" class="scanner-form">
+            <input type="text" id="scanner-input" class="scanner-input" autocomplete="off" autocapitalize="off" autocorrect="off" inputmode="none" placeholder="👆 여기를 누르고 바코드를 찍어주세요">
+          </form>
         </div>
 
         <div id="camera-inline" class="camera-inline hidden">
@@ -161,6 +162,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js"></script>
-  <script src="app.js?v=20260928"></script>
+  <script src="app.js?v=20260929"></script>
 </body>
 </html>

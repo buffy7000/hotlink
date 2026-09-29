@@ -39,17 +39,34 @@ body {
   user-select: none;
 }
 
-/* 스캐너가 입력을 보낼 숨김 입력창: display:none 은 포커스가 안 되므로 화면 밖으로만 뺀다 */
-#scanner-input {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  border: none;
-  padding: 0;
-  pointer-events: none;
+/* 캐릭터 아래 바코드 입력 칸: 포커스가 잡혀 있으면(스캔 준비됨) 초록색으로 표시 */
+.scanner-form {
+  max-width: 320px;
+  margin: 14px auto 0;
+}
+
+.scanner-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 20px;
+  text-align: center;
+  padding: 12px 14px;
+  border: 2px dashed var(--color-border);
+  border-radius: 16px;
+  background: #fffdf8;
+  color: var(--color-text);
+}
+
+.scanner-input::placeholder {
+  font-size: 16px;
+  color: #b6a48f;
+}
+
+.scanner-input:focus {
+  outline: none;
+  border: 2px solid var(--color-accent);
+  background: #f3fffa;
+  box-shadow: 0 0 0 4px rgba(111, 224, 192, 0.3);
 }
 
 #app {
