@@ -263,16 +263,49 @@
     openRegisterModal('new', barcode);
 
     if (navigator.onLine) {
-      const info = await fetchProductInfo(barcode);
-      if (info && info.image && registerMode === 'new' && registerBarcode.value === barcode) {
+      registerName.placeholder = '상품명 찾는 중…';
+      const [name, info] = await Promise.all([fetchKoreanProductName(barcode), fetchProductInfo(barcode)]);
+      registerName.placeholder = '예: 딸기 우유';
+      if (registerMode !== 'new' || registerBarcode.value !== barcode) return;
+      // 그사이 사용자가 직접 입력했다면 덮어쓰지 않는다
+      if (name && !registerName.value.trim()) registerName.value = name;
+      if (info && info.image) {
         setPhotoPreview(info.image);
         pendingPhotoDataUrl = info.image;
       }
     }
   }
 
+  // 식품안전나라(식약처) 바코드연계제품정보 API. 'sample'은 공개 테스트 키라 막히면
+  // 식품안전나라에서 발급받은 키로 바꾸면 된다. 식품만 있고 2018년 이후 신제품은 없을 수 있다.
+  const FOOD_SAFETY_API_KEY = 'sample';
+
+  async function fetchKoreanProductName(barcode) {
+    try {
+      const res = await fetch(
+        `https://openapi.foodsafetykorea.go.kr/api/${FOOD_SAFETY_API_KEY}/C005/json/1/5/BAR_CD=${encodeURIComponent(barcode)}`,
+        { signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      const rows = (data.C005 && data.C005.row) || [];
+      // 같은 바코드로 여러 건이 나오고 일부는 글자가 깨져 있어서("？시콜라"),
+      // 깨진 이름은 버리고 가장 많이 나온 이름을 고른다
+      const counts = {};
+      for (const row of rows) {
+        const name = (row.PRDLST_NM || '').trim();
+        if (!name || /[?？�]/.test(name)) continue;
+        counts[name] = (counts[name] || 0) + 1;
+      }
+      const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+      return best ? best[0] : null;
+    } catch {
+      return null;
+    }
+  }
+
   async function fetchProductInfo(barcode) {
-    // 상품명은 해외 데이터베이스라 외국어/깨진 문자로 채워지는 경우가 많아 사진만 자동으로 채운다
+    // 해외 데이터베이스라 상품명은 외국어/깨진 문자가 많아 사진만 자동으로 채운다
     try {
       const res = await fetch(
         `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json?fields=image_front_small_url`
