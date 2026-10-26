@@ -48,6 +48,14 @@ if (strlen($html) < 1000) {
     exit(0);
 }
 
+// 뽐뿌는 EUC-KR로 응답하고 HTML에 <meta charset=euc-kr>도 있다. libxml 버전에 따라
+// meta와 아래 '<?xml encoding="UTF-8">' 중 따르는 쪽이 달라 러너 환경에서 글자가 깨졌으므로,
+// 직접 UTF-8로 변환하고 meta도 utf-8로 맞춰 환경과 무관하게 동작시킨다.
+if (!mb_check_encoding($html, 'UTF-8')) {
+    $html = mb_convert_encoding($html, 'UTF-8', 'CP949');
+}
+$html = preg_replace('/<meta[^>]+charset=[^>]*>/i', '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />', $html);
+
 function ppomppu_parse_date($dateString) {
     $dateString = trim($dateString);
 
